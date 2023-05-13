@@ -1,9 +1,9 @@
 package com.ti.acelera.plazoletamicroservice.configuration;
 
-import com.ti.acelera.plazoletamicroservice.adapter.driven.jpa.mysql.adapter.RestaurantMysqlAdapter;
-import com.ti.acelera.plazoletamicroservice.adapter.driven.jpa.mysql.mappers.IRestaurantEntityMapper;
-import com.ti.acelera.plazoletamicroservice.adapter.driven.jpa.mysql.repositories.IRestaurantRepository;
-import com.ti.acelera.plazoletamicroservice.adapter.driver.client.adapter.UserClientImpl;
+import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.adapter.RestaurantMysqlAdapter;
+import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.mappers.IRestaurantEntityMapper;
+import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.repositories.IRestaurantRepository;
+import com.ti.acelera.plazoletamicroservice.adapters.driver.client.adapter.UserClientImpl;
 import com.ti.acelera.plazoletamicroservice.domain.api.IRestaurantServicePort;
 import com.ti.acelera.plazoletamicroservice.domain.gateway.IUserClient;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IRestaurantPersistencePort;
