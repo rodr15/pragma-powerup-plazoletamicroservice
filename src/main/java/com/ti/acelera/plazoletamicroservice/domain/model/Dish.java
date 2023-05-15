@@ -5,21 +5,23 @@ public class Dish {
     private String idCategory;
     private String description;
     private Long price;
-    private Long idRestaurant;
+    private Restaurant restaurant;
     private String urlImage;
     private boolean active;
 
-    public Dish(String name, String idCategory, String description, Long price, Long idRestaurant, String urlImage, boolean active) {
+    public Dish(String name, String idCategory, String description, Long price, Restaurant restaurant, String urlImage, boolean active) {
         this.name = name;
         this.idCategory = idCategory;
         this.description = description;
         this.price = price;
-        this.idRestaurant = idRestaurant;
+        this.restaurant = restaurant;
         this.urlImage = urlImage;
         this.active = active;
     }
 
-    public Dish() {}
+    public Dish() {
+
+    }
 
     public String getName() {
         return name;
@@ -53,12 +55,12 @@ public class Dish {
         this.price = price;
     }
 
-    public Long getIdRestaurant() {
-        return idRestaurant;
+    public Restaurant getRestaurant() {
+        return restaurant;
     }
 
-    public void setIdRestaurant(Long idRestaurant) {
-        this.idRestaurant = idRestaurant;
+    public void setRestaurant(Restaurant restaurant) {
+        this.restaurant = restaurant;
     }
 
     public String getUrlImage() {
