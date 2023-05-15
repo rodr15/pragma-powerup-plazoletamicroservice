@@ -8,4 +8,10 @@ import lombok.Getter;
 public class UpdateDishRequestDto {
     private Long price;
     private String description;
+
+    public static final String example = "{" +
+            "\"description\":\"Pizza\"," +
+            "\"price\":\"12345\"" +
+            "}";
+
 }

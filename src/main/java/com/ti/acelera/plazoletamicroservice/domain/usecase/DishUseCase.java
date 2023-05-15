@@ -51,13 +51,13 @@ public class DishUseCase implements IDishServicePort {
         }
 
         if (price != null) {
-            dish.get().setPrice(price);
+            dish.get().setPrice( price );
         }
         if (description != null) {
-            dish.get().setDescription(description);
+            dish.get().setDescription( description );
         }
 
-        dishPersistencePort.saveDish(dish.get());
+        dishPersistencePort.saveDish( dish.get() );
     }
 
     private void verifyOwner(String userId, String restaurantId) {
