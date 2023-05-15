@@ -1,16 +1,27 @@
 package com.ti.acelera.plazoletamicroservice.adapters.http.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
 public class DishRequestDto {
+    @NotBlank(message = "Mandatory")
     private String name;
+    @NotBlank(message = "Mandatory")
     private String idCategory;
+    @NotBlank(message = "Mandatory")
     private String description;
+    @Positive(message = "Must be greater than 0")
+    @NotNull(message = "Mandatory")
     private Long price;
+    @Positive(message = "Must be an id")
+    @NotNull(message = "Mandatory")
     private Long idRestaurant;
+    @NotBlank(message = "Mandatory")
     private String urlImage;
 
 
