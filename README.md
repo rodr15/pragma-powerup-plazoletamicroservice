@@ -47,6 +47,10 @@ Make sure you have the following installed before running the microservice:
           username: root
           password: <your-password>
    ```
+   * Insert the data in the BD given in 
+   ```yml
+   # src/main/resources/data.sql
+   ```
 
 <!-- USAGE -->
 ## Usage
