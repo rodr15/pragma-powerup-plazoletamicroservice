@@ -1,6 +1,7 @@
 package com.ti.acelera.plazoletamicroservice.configuration;
 
 import com.ti.acelera.plazoletamicroservice.adapters.driver.client.exceptions.UserNotFoundException;
+import com.ti.acelera.plazoletamicroservice.domain.exceptions.DishNotFoundException;
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.NotProprietaryGivenRestaurantException;
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.RestaurantNotExistsException;
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.RoleNotAllowedException;
@@ -38,5 +39,11 @@ public class ControllerAdvisor {
             NotProprietaryGivenRestaurantException notProprietaryGivenRestaurantException) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, PERSON_NOT_PROPRIETARY_GIVEN_RESTAURANT));
+    }
+    @ExceptionHandler(DishNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleDishNotFoundException(
+            DishNotFoundException dishNotFoundException) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, DISH_NOT_FOUND));
     }
 }

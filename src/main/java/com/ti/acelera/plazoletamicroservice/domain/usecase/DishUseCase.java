@@ -1,6 +1,7 @@
 package com.ti.acelera.plazoletamicroservice.domain.usecase;
 
 import com.ti.acelera.plazoletamicroservice.domain.api.IDishServicePort;
+import com.ti.acelera.plazoletamicroservice.domain.exceptions.DishNotFoundException;
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.NotProprietaryGivenRestaurantException;
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.RestaurantNotExistsException;
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.RoleNotAllowedException;
@@ -43,11 +44,11 @@ public class DishUseCase implements IDishServicePort {
     }
 
     @Override
-    public void modifyDish(Long id, Long price, String description) {
-        Optional<Dish> dish = dishPersistencePort.getDish(id);
+    public void modifyDish(Long dishId, Long price, String description) {
+        Optional<Dish> dish = dishPersistencePort.getDish(dishId);
 
         if (dish.isEmpty()) {
-            throw new RuntimeException(); //TODO: Change exception
+            throw new DishNotFoundException();
         }
 
         if (price != null) {
