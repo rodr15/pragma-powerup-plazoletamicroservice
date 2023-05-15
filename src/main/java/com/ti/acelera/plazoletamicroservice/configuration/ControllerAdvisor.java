@@ -1,6 +1,7 @@
 package com.ti.acelera.plazoletamicroservice.configuration;
 
 import com.ti.acelera.plazoletamicroservice.adapters.driver.client.exceptions.UserNotFoundException;
+import com.ti.acelera.plazoletamicroservice.domain.exceptions.RestaurantNotExistsException;
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.RoleNotAllowedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,5 +25,11 @@ public class ControllerAdvisor {
             RoleNotAllowedException roleNotAllowedForCreationException) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, ROLE_NOT_ALLOWED_MESSAGE));
+    }
+    @ExceptionHandler(RestaurantNotExistsException.class)
+    public ResponseEntity<Map<String, String>> handleRestaurantNotExistsException(
+            RestaurantNotExistsException RestaurantNotExistsException) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, RESTAURANT_NOT_EXISTS));
     }
 }

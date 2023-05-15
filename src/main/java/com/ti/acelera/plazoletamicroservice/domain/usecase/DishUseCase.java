@@ -1,7 +1,7 @@
 package com.ti.acelera.plazoletamicroservice.domain.usecase;
 
 import com.ti.acelera.plazoletamicroservice.domain.api.IDishServicePort;
-import com.ti.acelera.plazoletamicroservice.domain.exceptions.RestaurantNotExists;
+import com.ti.acelera.plazoletamicroservice.domain.exceptions.RestaurantNotExistsException;
 import com.ti.acelera.plazoletamicroservice.domain.model.Dish;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IDishPersistencePort;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IRestaurantPersistencePort;
@@ -21,7 +21,7 @@ public class DishUseCase implements IDishServicePort {
     public void saveDish(Dish dish) {
 
         if(!restaurantPersistencePort.restaurantExists( dish.getIdRestaurant() )){
-            throw new RestaurantNotExists();
+            throw new RestaurantNotExistsException();
         }
 
         dish.setActive( true );
