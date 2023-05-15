@@ -19,8 +19,8 @@ public class DishRequestDto {
             "\"idCategory\":\"CC Santa\"," +
             "\"description\":\"Pizza\"," +
             "\"price\":\"12345\"," +
-            "\"idRestaurant\":\"123123123\"" +
-            "\"urlImage\":\"https://mail.google.com/mail/u/0/#inbox\"," +
+            "\"idRestaurant\":\"123123123\"," +
+            "\"urlImage\":\"https://mail.google.com/mail/u/0/#inbox\"" +
             "}";
 
 }
