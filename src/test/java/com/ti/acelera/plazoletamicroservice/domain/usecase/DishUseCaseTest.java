@@ -27,7 +27,7 @@ class DishUseCaseTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        dishUseCase = new DishUseCase(dishPersistencePort, restaurantPersistencePort);
+        dishUseCase = new DishUseCase(dishPersistencePort, restaurantPersistencePort, userClient);
     }
 
     @Test
