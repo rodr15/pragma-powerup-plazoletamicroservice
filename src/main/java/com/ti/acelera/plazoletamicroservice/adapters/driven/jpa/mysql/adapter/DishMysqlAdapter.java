@@ -9,12 +9,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DishMysqlAdapter implements IDishPersistencePort {
 
-    private IDishRepository dishRepository;
-    private IDishEntityMapper dishEntityMapper;
+    private final IDishRepository dishRepository;
+    private final IDishEntityMapper dishEntityMapper;
 
     @Override
     public void saveDish(Dish dish) {
-
         dishRepository.save( dishEntityMapper.toEntity( dish ) );
 
     }

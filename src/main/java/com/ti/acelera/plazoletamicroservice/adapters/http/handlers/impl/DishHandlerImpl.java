@@ -4,15 +4,14 @@ import com.ti.acelera.plazoletamicroservice.adapters.http.dto.request.DishReques
 import com.ti.acelera.plazoletamicroservice.adapters.http.handlers.IDishHandler;
 import com.ti.acelera.plazoletamicroservice.adapters.http.mapper.IDishRequestMapper;
 import com.ti.acelera.plazoletamicroservice.domain.api.IDishServicePort;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+@Service
+@RequiredArgsConstructor
 public class DishHandlerImpl implements IDishHandler {
      private final IDishServicePort dishServicePort;
      private final IDishRequestMapper restaurantRequestMapper;
-
-    public DishHandlerImpl(IDishServicePort dishServicePort,IDishRequestMapper restaurantRequestMapper) {
-        this.dishServicePort = dishServicePort;
-        this.restaurantRequestMapper = restaurantRequestMapper;
-    }
 
     @Override
     public void saveDish(DishRequestDto dishRequestDto) {
