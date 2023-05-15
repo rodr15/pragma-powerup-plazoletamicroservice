@@ -37,14 +37,17 @@ class DishUseCaseTest {
 
     @Test
     void saveDish_ValidData_Success() {
-        Dish dish = new Dish();
-        dish.setIdRestaurant(1L);
-        dish.setActive(false);
 
         Restaurant restaurant = new Restaurant();
+        restaurant.setId(1L);
+
+        Dish dish = new Dish();
+        dish.setRestaurant(restaurant);
+        dish.setActive(false);
+
         restaurant.setIdProprietary("1231231231");
 
-        when(restaurantPersistencePort.getRestaurant(dish.getIdRestaurant())).thenReturn(Optional.of(restaurant));
+        when(restaurantPersistencePort.getRestaurant(dish.getRestaurant().getId())).thenReturn(Optional.of(restaurant));
         when(userClient.getRoleByDni("1231231231")).thenReturn("ROLE_OWNER");
 
         dishUseCase.saveDish(dish);
@@ -54,10 +57,13 @@ class DishUseCaseTest {
 
     @Test
     void saveDish_RestaurantNotExists_ThrowsException() {
-        Dish dish = new Dish();
-        dish.setIdRestaurant(1L);
+        Restaurant restaurant = new Restaurant();
+        restaurant.setId(1L);
 
-        when(restaurantPersistencePort.getRestaurant(dish.getIdRestaurant())).thenReturn(Optional.empty());
+        Dish dish = new Dish();
+        dish.setRestaurant(restaurant);
+
+        when(restaurantPersistencePort.getRestaurant(dish.getRestaurant().getId())).thenReturn(Optional.empty());
 
         assertThrows(RestaurantNotExistsException.class, () -> dishUseCase.saveDish(dish));
 
@@ -66,13 +72,15 @@ class DishUseCaseTest {
 
     @Test
     void saveDish_RoleNotAllowed_ThrowsException() {
-        Dish dish = new Dish();
-        dish.setIdRestaurant(1L);
-
         Restaurant restaurant = new Restaurant();
+        restaurant.setId(1L);
         restaurant.setIdProprietary("1231231231");
 
-        when(restaurantPersistencePort.getRestaurant(dish.getIdRestaurant())).thenReturn(Optional.of(restaurant));
+        Dish dish = new Dish();
+        dish.setRestaurant(restaurant);
+
+
+        when(restaurantPersistencePort.getRestaurant(dish.getRestaurant().getId())).thenReturn(Optional.of(restaurant));
         when(userClient.getRoleByDni("1231231231")).thenReturn("ROLE_USER");
 
         assertThrows(RoleNotAllowedException.class, () -> dishUseCase.saveDish(dish));
@@ -82,13 +90,14 @@ class DishUseCaseTest {
 
     @Test
     void saveDish_DifferentProprietary_ThrowsException() {
-        Dish dish = new Dish();
-        dish.setIdRestaurant(1L);
-
         Restaurant restaurant = new Restaurant();
+        restaurant.setId(1L);
         restaurant.setIdProprietary("987654321");
 
-        when(restaurantPersistencePort.getRestaurant(dish.getIdRestaurant())).thenReturn(Optional.of(restaurant));
+        Dish dish = new Dish();
+        dish.setRestaurant(restaurant);
+
+        when(restaurantPersistencePort.getRestaurant(dish.getRestaurant().getId())).thenReturn(Optional.of(restaurant));
         when(userClient.getRoleByDni("1231231231")).thenReturn("ROLE_OWNER");
 
         assertThrows(NotProprietaryGivenRestaurantException.class, () -> dishUseCase.saveDish(dish));

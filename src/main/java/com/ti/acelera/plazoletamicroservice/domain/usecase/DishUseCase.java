@@ -28,7 +28,7 @@ public class DishUseCase implements IDishServicePort {
     @Override
     public void saveDish(Dish dish) {
 
-        Optional<Restaurant> restaurant = restaurantPersistencePort.getRestaurant(dish.getIdRestaurant());
+        Optional<Restaurant> restaurant = restaurantPersistencePort.getRestaurant(dish.getRestaurant().getId());
 
         if (restaurant.isEmpty()) {
             throw new RestaurantNotExistsException();
