@@ -1,6 +1,5 @@
 package com.ti.acelera.plazoletamicroservice.domain.usecase;
 
-import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.entity.RestaurantEntity;
 import com.ti.acelera.plazoletamicroservice.domain.api.IDishServicePort;
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.NotProprietaryGivenRestaurantException;
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.RestaurantNotExistsException;
@@ -11,10 +10,7 @@ import com.ti.acelera.plazoletamicroservice.domain.model.Restaurant;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IDishPersistencePort;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IRestaurantPersistencePort;
 
-import javax.swing.text.html.Option;
 import java.util.Optional;
-
-import static org.apache.logging.log4j.ThreadContext.isEmpty;
 
 public class DishUseCase implements IDishServicePort {
 
@@ -32,25 +28,25 @@ public class DishUseCase implements IDishServicePort {
     @Override
     public void saveDish(Dish dish) {
 
-        Optional<Restaurant> restaurant = restaurantPersistencePort.getRestaurant( dish.getIdRestaurant() );
+        Optional<Restaurant> restaurant = restaurantPersistencePort.getRestaurant(dish.getIdRestaurant());
 
-        if(restaurant.isEmpty()){
+        if (restaurant.isEmpty()) {
             throw new RestaurantNotExistsException();
         }
 
         final String userId = "1231231231";// TODO: Replace when share token
         final String userRole = userClient.getRoleByDni(userId);
 
-        if (!userRole.equals("ROLE_OWNER")){
+        if (!userRole.equals("ROLE_OWNER")) {
             throw new RoleNotAllowedException();
         }
 
-        if(! restaurant.get().getIdProprietary().equals( userId ) ){
-            throw new RuntimeException(); //TODO: Create Exception
+        if (!restaurant.get().getIdProprietary().equals(userId)) {
+            throw new NotProprietaryGivenRestaurantException();
 
         }
 
-        dish.setActive( true );
-        dishPersistencePort.saveDish( dish );
+        dish.setActive(true);
+        dishPersistencePort.saveDish(dish);
     }
 }
