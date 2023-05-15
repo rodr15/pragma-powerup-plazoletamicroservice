@@ -35,18 +35,24 @@ public class DishUseCase implements IDishServicePort {
         }
 
         final String userId = "1231231231";// TODO: Replace when share token
+
+        verifyOwner(userId,restaurant.get().getIdProprietary());
+
+        dish.setActive(true);
+        dishPersistencePort.saveDish(dish);
+    }
+
+    private void verifyOwner( String userId, String restaurantId ){
         final String userRole = userClient.getRoleByDni(userId);
 
         if (!userRole.equals("ROLE_OWNER")) {
             throw new RoleNotAllowedException();
         }
 
-        if (!restaurant.get().getIdProprietary().equals(userId)) {
+        if (!restaurantId.equals(userId)) {
             throw new NotProprietaryGivenRestaurantException();
 
         }
-
-        dish.setActive(true);
-        dishPersistencePort.saveDish(dish);
     }
+
 }
