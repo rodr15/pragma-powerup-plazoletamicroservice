@@ -3,6 +3,7 @@ package com.ti.acelera.plazoletamicroservice.domain.usecase;
 import com.ti.acelera.plazoletamicroservice.domain.api.IRestaurantServicePort;
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.RoleNotAllowedException;
 import com.ti.acelera.plazoletamicroservice.domain.gateway.IUserClient;
+import com.ti.acelera.plazoletamicroservice.domain.model.Dish;
 import com.ti.acelera.plazoletamicroservice.domain.model.Restaurant;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IRestaurantPersistencePort;
 
