@@ -1,6 +1,5 @@
 package com.ti.acelera.plazoletamicroservice.domain.usecase;
 
-import com.ti.acelera.plazoletamicroservice.domain.api.IDishServicePort;
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.RestaurantNotExistsException;
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.RoleNotAllowedException;
 import com.ti.acelera.plazoletamicroservice.domain.gateway.IUserClient;
@@ -9,12 +8,15 @@ import com.ti.acelera.plazoletamicroservice.domain.spi.IDishPersistencePort;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IRestaurantPersistencePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class DishUseCaseTest {
 
     private DishUseCase dishUseCase;
