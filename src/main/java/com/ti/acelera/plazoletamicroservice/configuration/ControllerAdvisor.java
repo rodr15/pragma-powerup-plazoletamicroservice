@@ -29,11 +29,11 @@ public class ControllerAdvisor {
     }
     @ExceptionHandler(RestaurantNotExistsException.class)
     public ResponseEntity<Map<String, String>> handleRestaurantNotExistsException(
-            RestaurantNotExistsException RestaurantNotExistsException) {
+            RestaurantNotExistsException restaurantNotExistsException) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, RESTAURANT_NOT_EXISTS));
     }
-    @ExceptionHandler(RestaurantNotExistsException.class)
+    @ExceptionHandler(NotProprietaryGivenRestaurantException.class)
     public ResponseEntity<Map<String, String>> handleNotProprietaryGivenRestaurantException(
             NotProprietaryGivenRestaurantException notProprietaryGivenRestaurantException) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
