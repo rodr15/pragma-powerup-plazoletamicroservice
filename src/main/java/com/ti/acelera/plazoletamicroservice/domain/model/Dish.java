@@ -19,6 +19,8 @@ public class Dish {
         this.active = active;
     }
 
+    public Dish() {}
+
     public String getName() {
         return name;
     }

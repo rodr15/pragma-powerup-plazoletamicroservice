@@ -1,44 +1,49 @@
 package com.ti.acelera.plazoletamicroservice.domain.usecase;
 
+import com.ti.acelera.plazoletamicroservice.domain.api.IDishServicePort;
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.RestaurantNotExistsException;
+import com.ti.acelera.plazoletamicroservice.domain.exceptions.RoleNotAllowedException;
+import com.ti.acelera.plazoletamicroservice.domain.gateway.IUserClient;
 import com.ti.acelera.plazoletamicroservice.domain.model.Dish;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IDishPersistencePort;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IRestaurantPersistencePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 class DishUseCaseTest {
+
+    private DishUseCase dishUseCase;
+
     @Mock
     private IDishPersistencePort dishPersistencePort;
 
     @Mock
     private IRestaurantPersistencePort restaurantPersistencePort;
 
-    private DishUseCase dishUseCase;
+    @Mock
+    private IUserClient userClient;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
         dishUseCase = new DishUseCase(dishPersistencePort, restaurantPersistencePort, userClient);
     }
 
     @Test
-    public void testSaveDish_WithExistingRestaurant_ShouldSaveDish() {
-        Dish dish = new Dish(
-                "Restaurant Name", "idCategory", "Some Description", 12345L, 1L, "", true
-        );
+    void saveDish_ValidDishData_DishSaved() {
+        Dish dish = new Dish();
         dish.setIdRestaurant(1L);
+        dish.setName("Pizza");
+        dish.setDescription("Delicious pizza");
+        dish.setPrice(10L);
 
-        when(restaurantPersistencePort.restaurantExists(1L)).thenReturn(true);
-
+        when(restaurantPersistencePort.restaurantExists(dish.getIdRestaurant())).thenReturn(true);
+        when(userClient.getRoleByDni(anyString())).thenReturn("ROLE_OWNER");
 
         assertDoesNotThrow(() -> dishUseCase.saveDish(dish));
         assertTrue(dish.isActive());
@@ -46,16 +51,33 @@ class DishUseCaseTest {
     }
 
     @Test
-    public void testSaveDish_WithNonExistingRestaurant_ShouldThrowException() {
-        Dish dish = new Dish(
-                "Restaurant Name", "idCategory", "Some Description", 12345L, 1L, "", true
-        );
-        dish.setIdRestaurant(2L);
+    void saveDish_RestaurantNotExists_ExceptionThrown() {
+        Dish dish = new Dish();
+        dish.setIdRestaurant(1L);
+        dish.setName("Pizza");
+        dish.setDescription("Delicious pizza");
+        dish.setPrice(10L);
 
-        when(restaurantPersistencePort.restaurantExists(2L)).thenReturn(false);
+        when(restaurantPersistencePort.restaurantExists(dish.getIdRestaurant())).thenReturn(false);
 
         assertThrows(RestaurantNotExistsException.class, () -> dishUseCase.saveDish(dish));
+        assertFalse(dish.isActive());
+        verify(dishPersistencePort, never()).saveDish(dish);
+    }
 
+    @Test
+    void saveDish_UserNotOwner_ExceptionThrown() {
+        Dish dish = new Dish();
+        dish.setIdRestaurant(1L);
+        dish.setName("Pizza");
+        dish.setDescription("Delicious pizza");
+        dish.setPrice(10L);
+
+        when(restaurantPersistencePort.restaurantExists(dish.getIdRestaurant())).thenReturn(true);
+        when(userClient.getRoleByDni(anyString())).thenReturn("ROLE_USER");
+
+        assertThrows(RoleNotAllowedException.class, () -> dishUseCase.saveDish(dish));
+        assertFalse(dish.isActive());
         verify(dishPersistencePort, never()).saveDish(dish);
     }
 }
