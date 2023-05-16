@@ -1,5 +1,7 @@
 package com.ti.acelera.plazoletamicroservice.domain.usecase;
 
+import com.ti.acelera.plazoletamicroservice.adapters.http.dto.request.UpdateDishRequestDto;
+import com.ti.acelera.plazoletamicroservice.domain.exceptions.DishNotFoundException;
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.NotProprietaryGivenRestaurantException;
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.RestaurantNotExistsException;
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.RoleNotAllowedException;
@@ -16,7 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -26,6 +28,7 @@ class DishUseCaseTest {
     private IRestaurantPersistencePort restaurantPersistencePort;
     private IUserClient userClient;
     private DishUseCase dishUseCase;
+
 
     @BeforeEach
     void setUp() {
@@ -104,4 +107,86 @@ class DishUseCaseTest {
 
         verify(dishPersistencePort, never()).saveDish(Mockito.any());
     }
+
+    @Test
+    public void testModifyDish_PriceAndDescription_Success() {
+        // Arrange
+        Long dishId = 1L;
+        Long price = 10L;
+        String description = "New description";
+
+        Dish dish = new Dish();
+        dish.setPrice(5L);
+        dish.setDescription("Old description");
+
+        when(dishPersistencePort.getDish(dishId)).thenReturn(Optional.of(dish));
+
+        // Act
+        assertDoesNotThrow(() -> dishUseCase.modifyDish(dishId, price, description));
+
+        // Assert
+        assertEquals(price, dish.getPrice());
+        assertEquals(description, dish.getDescription());
+        verify(dishPersistencePort, times(1)).saveDish(dish);
+    }
+
+    @Test
+    public void testModifyDish_PriceOnly_Success() {
+        // Arrange
+        Long dishId = 1L;
+        Long price = 10L;
+        String description = null;
+
+        Dish dish = new Dish();
+        dish.setPrice(5L);
+        dish.setDescription("Old description");
+
+        when(dishPersistencePort.getDish(dishId)).thenReturn(Optional.of(dish));
+
+        // Act
+        assertDoesNotThrow(() -> dishUseCase.modifyDish(dishId, price, description));
+
+        // Assert
+        assertEquals(price, dish.getPrice());
+        assertEquals("Old description", dish.getDescription()); // Description should remain unchanged
+        verify(dishPersistencePort, times(1)).saveDish(dish);
+    }
+
+    @Test
+    public void testModifyDish_DescriptionOnly_Success() {
+        // Arrange
+        Long dishId = 1L;
+        Long price = null;
+        String description = "New description";
+
+        Dish dish = new Dish();
+        dish.setPrice(5L);
+        dish.setDescription("Old description");
+
+        when(dishPersistencePort.getDish(dishId)).thenReturn(Optional.of(dish));
+
+        // Act
+        assertDoesNotThrow(() -> dishUseCase.modifyDish(dishId, price, description));
+
+        // Assert
+        assertEquals(5L, dish.getPrice()); // Price should remain unchanged
+        assertEquals(description, dish.getDescription());
+        verify(dishPersistencePort, times(1)).saveDish(dish);
+    }
+
+    @Test
+    public void testModifyDish_DishNotFoundException() {
+        // Arrange
+        Long dishId = 1L;
+        Long price = 10L;
+        String description = "New description";
+
+        when(dishPersistencePort.getDish(dishId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(DishNotFoundException.class, () -> dishUseCase.modifyDish(dishId, price, description));
+        verify(dishPersistencePort, never()).saveDish(Mockito.any());
+    }
+
+
 }
