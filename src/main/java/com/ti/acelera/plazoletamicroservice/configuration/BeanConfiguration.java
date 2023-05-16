@@ -30,22 +30,23 @@ public class BeanConfiguration {
     public IRestaurantPersistencePort restaurantPersistencePort(){
         return new RestaurantMysqlAdapter( restaurantRepository, restaurantEntityMapper );
     }
-    @Bean
-    public IRestaurantServicePort restaurantServicePort(){
-        return new RestaurantUseCase( restaurantPersistencePort(), userClient());
-
-    }
-    @Bean
-    public IDishPersistencePort dishPersistencePort(){
-        return new DishMysqlAdapter( dishRepository, dishEntityMapper);
-    }
-    @Bean
-    public IDishServicePort dishServicePort(){
-        return new DishUseCase( dishPersistencePort(), restaurantPersistencePort(), userClient());
-    }
-
-    private IUserClient userClient() {
-        return new UserClientImpl();
-    }
+//    @Bean
+//    public IRestaurantServicePort restaurantServicePort(){
+//        return new RestaurantUseCase( restaurantPersistencePort(), userClient());
+//
+//    }
+//    @Bean
+//    public IDishPersistencePort dishPersistencePort(){
+//        return new DishMysqlAdapter( dishRepository, dishEntityMapper);
+//    }
+//    @Bean
+//    public IDishServicePort dishServicePort(){
+//        return new DishUseCase( dishPersistencePort(), restaurantPersistencePort(), userClient());
+//    }
+//    @Bean
+//    private IUserClient userClient() {
+//
+//        return new UserClientImpl();
+//    }
 
 }

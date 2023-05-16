@@ -2,13 +2,16 @@ package com.ti.acelera.plazoletamicroservice.adapters.driver.client.adapter;
 
 import com.ti.acelera.plazoletamicroservice.adapters.driver.client.dto.UserRoleDto;
 import com.ti.acelera.plazoletamicroservice.adapters.driver.client.exceptions.UserNotFoundException;
-import com.ti.acelera.plazoletamicroservice.domain.gateway.IUserClient;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 
-public class UserClientImpl implements IUserClient {
+public class UserClientImpl {
 
-    @Override
+
     public String getRoleByDni(String userDni) {
         RestTemplate restTemplate = new RestTemplate();
         try {
@@ -25,4 +28,38 @@ public class UserClientImpl implements IUserClient {
         }
 
     }
+
+
+    public static boolean isAllowed(String url, String token) {
+        RestTemplate restTemplate = new RestTemplate();
+        try {
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", "Bearer " + token );
+
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<Boolean> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    entity,
+                    Boolean.class
+            );
+
+            return response.getBody();
+
+        } catch (Exception e) {
+            throw new UserNotFoundException();
+        }
+    }
+
+
+    public static void main(String[] args) {
+        boolean dummy = isAllowed("http://localhost:8090/restaurant/add","eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjMiLCJyb2xlcyI6WyJST0xFX0FETUlOIiwiUk9MRV9BRE1JTiJdLCJpYXQiOjE2ODQyNzY4MzgsImV4cCI6MTY4NDkyNDgzOH0.8k9KUNzQt0vBVIUTpHfOPl1jyrnx0815oRj2YVn80JQ");
+
+        System.out.println(dummy);
+    }
+
 }
+
+
