@@ -13,4 +13,10 @@ public class Constants {
     public static final String RESTAURANT_NOT_EXISTS = "No restaurant found with the id provided";
     public static final String DISH_CREATED_MESSAGE = "Dish created successfully";
     public static final String PERSON_NOT_PROPRIETARY_GIVEN_RESTAURANT = "The owner is not propietaary of the restaurant";
+    public static final String SWAGGER_TITLE_MESSAGE = "Plazoleta API Pragma Power Up";
+    public static final String SWAGGER_DESCRIPTION_MESSAGE = "Plazoleta microservice";
+    public static final String SWAGGER_VERSION_MESSAGE = "1.0.0";
+    public static final String SWAGGER_LICENSE_NAME_MESSAGE = "Apache 2.0";
+    public static final String SWAGGER_LICENSE_URL_MESSAGE = "http://springdoc.org";
+    public static final String SWAGGER_TERMS_OF_SERVICE_MESSAGE = "http://swagger.io/terms/";
 }
