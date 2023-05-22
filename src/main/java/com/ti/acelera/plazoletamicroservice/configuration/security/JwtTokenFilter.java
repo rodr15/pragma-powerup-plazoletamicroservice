@@ -23,11 +23,15 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             String token = getToken(request);
-            if (token != null && jwtValidate.validateToken(token)) {
-                filterChain.doFilter(request, response);
-            } else {
+            if (token == null || !jwtValidate.validateToken(token)) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+            return;
             }
+            if(!jwtValidate.validateRole( jwtValidate.getRoles(token), request )){
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+            return;
+            }
+                filterChain.doFilter(request, response);
         } catch (Exception e) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
         }
