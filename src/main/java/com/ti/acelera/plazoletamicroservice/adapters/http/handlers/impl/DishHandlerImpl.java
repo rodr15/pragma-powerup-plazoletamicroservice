@@ -24,4 +24,5 @@ public class DishHandlerImpl implements IDishHandler {
     public void modifyDish( String userId,Long dishId, UpdateDishRequestDto updateDishRequestDto) {
         dishServicePort.modifyDish(userId,dishId, updateDishRequestDto.getPrice(), updateDishRequestDto.getDescription());
     }
+
 }

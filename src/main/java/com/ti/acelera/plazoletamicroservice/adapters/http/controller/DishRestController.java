@@ -1,7 +1,6 @@
 package com.ti.acelera.plazoletamicroservice.adapters.http.controller;
 
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.request.DishRequestDto;
-import com.ti.acelera.plazoletamicroservice.adapters.http.dto.request.RestaurantRequestDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.request.UpdateDishRequestDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.handlers.IDishHandler;
 import com.ti.acelera.plazoletamicroservice.adapters.http.handlers.ITokenUtils;

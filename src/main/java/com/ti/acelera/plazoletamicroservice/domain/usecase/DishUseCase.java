@@ -10,22 +10,17 @@ import com.ti.acelera.plazoletamicroservice.domain.model.Dish;
 import com.ti.acelera.plazoletamicroservice.domain.model.Restaurant;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IDishPersistencePort;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IRestaurantPersistencePort;
+import lombok.RequiredArgsConstructor;
 
-import java.util.List;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 public class DishUseCase implements IDishServicePort {
 
     private final IDishPersistencePort dishPersistencePort;
     private final IRestaurantPersistencePort restaurantPersistencePort;
     private final IUserClient userClient;
 
-
-    public DishUseCase(IDishPersistencePort persistencePort, IRestaurantPersistencePort restaurantPersistencePort, IUserClient userClient) {
-        this.dishPersistencePort = persistencePort;
-        this.restaurantPersistencePort = restaurantPersistencePort;
-        this.userClient = userClient;
-    }
 
 
     @Override
@@ -51,6 +46,11 @@ public class DishUseCase implements IDishServicePort {
         }
 
         Optional<Restaurant> restaurant = restaurantPersistencePort.getRestaurant(dish.get().getRestaurant().getId());
+
+        if (restaurant.isEmpty()) {
+            throw new RestaurantNotExistsException();
+        }
+
         verifyOwner(userId, restaurant.get().getIdProprietary());
 
         if (price != null) {
