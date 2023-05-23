@@ -40,11 +40,11 @@ public class BeanConfiguration {
         return new DishMysqlAdapter( dishRepository, dishEntityMapper);
     }
     @Bean
-    public IDishServicePort dishServicePort(){
-        return new DishUseCase( dishPersistencePort(), restaurantPersistencePort(), userClient());
+    public IDishServicePort dishServicePort(IDishPersistencePort dishPersistencePort, IRestaurantPersistencePort restaurantServicePort ,IUserClient userClient ){
+        return new DishUseCase( dishPersistencePort, restaurantServicePort, userClient);
     }
-
-    private IUserClient userClient() {
+    @Bean
+    public IUserClient userClient() {
         return new UserClientImpl();
     }
 

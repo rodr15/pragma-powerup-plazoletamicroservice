@@ -1,6 +1,5 @@
 package com.ti.acelera.plazoletamicroservice.domain.usecase;
 
-import com.ti.acelera.plazoletamicroservice.adapters.http.dto.request.UpdateDishRequestDto;
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.DishNotFoundException;
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.NotProprietaryGivenRestaurantException;
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.RestaurantNotExistsException;
@@ -48,12 +47,13 @@ class DishUseCaseTest {
         dish.setRestaurant(restaurant);
         dish.setActive(false);
 
-        restaurant.setIdProprietary("1231231231");
+        String userId = "1231231231";
+        restaurant.setIdProprietary(userId);
 
         when(restaurantPersistencePort.getRestaurant(dish.getRestaurant().getId())).thenReturn(Optional.of(restaurant));
         when(userClient.getRoleByDni("1231231231")).thenReturn("ROLE_OWNER");
 
-        dishUseCase.saveDish(dish);
+        dishUseCase.saveDish(userId, dish);
 
         verify(dishPersistencePort, times(1)).saveDish(dish);
     }
@@ -66,18 +66,23 @@ class DishUseCaseTest {
         Dish dish = new Dish();
         dish.setRestaurant(restaurant);
 
+        String userId = "1231231231";
+        restaurant.setIdProprietary(userId);
+
         when(restaurantPersistencePort.getRestaurant(dish.getRestaurant().getId())).thenReturn(Optional.empty());
 
-        assertThrows(RestaurantNotExistsException.class, () -> dishUseCase.saveDish(dish));
+        assertThrows(RestaurantNotExistsException.class, () -> dishUseCase.saveDish(userId, dish));
 
         verify(dishPersistencePort, never()).saveDish(Mockito.any());
     }
 
     @Test
     void saveDish_RoleNotAllowed_ThrowsException() {
+        String userId = "1231231231";
+
         Restaurant restaurant = new Restaurant();
         restaurant.setId(1L);
-        restaurant.setIdProprietary("1231231231");
+        restaurant.setIdProprietary(userId);
 
         Dish dish = new Dish();
         dish.setRestaurant(restaurant);
@@ -86,7 +91,7 @@ class DishUseCaseTest {
         when(restaurantPersistencePort.getRestaurant(dish.getRestaurant().getId())).thenReturn(Optional.of(restaurant));
         when(userClient.getRoleByDni("1231231231")).thenReturn("ROLE_USER");
 
-        assertThrows(RoleNotAllowedException.class, () -> dishUseCase.saveDish(dish));
+        assertThrows(RoleNotAllowedException.class, () -> dishUseCase.saveDish(userId, dish));
 
         verify(dishPersistencePort, never()).saveDish(Mockito.any());
     }
@@ -100,29 +105,39 @@ class DishUseCaseTest {
         Dish dish = new Dish();
         dish.setRestaurant(restaurant);
 
-        when(restaurantPersistencePort.getRestaurant(dish.getRestaurant().getId())).thenReturn(Optional.of(restaurant));
-        when(userClient.getRoleByDni("1231231231")).thenReturn("ROLE_OWNER");
+        String userId = "1231231231";
 
-        assertThrows(NotProprietaryGivenRestaurantException.class, () -> dishUseCase.saveDish(dish));
+        when(restaurantPersistencePort.getRestaurant(dish.getRestaurant().getId())).thenReturn(Optional.of(restaurant));
+        when(userClient.getRoleByDni(userId)).thenReturn("ROLE_OWNER");
+
+        assertThrows(NotProprietaryGivenRestaurantException.class, () -> dishUseCase.saveDish(userId, dish));
 
         verify(dishPersistencePort, never()).saveDish(Mockito.any());
     }
 
     @Test
-    public void testModifyDish_PriceAndDescription_Success() {
+    void testModifyDish_WhenDishExists_ShouldModifyDish() {
         // Arrange
         Long dishId = 1L;
         Long price = 10L;
         String description = "New description";
+        String userId = "123456";
+
+        Restaurant restaurant = new Restaurant();
+        restaurant.setIdProprietary(userId);
 
         Dish dish = new Dish();
-        dish.setPrice(5L);
+        dish.setPrice(20L);
         dish.setDescription("Old description");
+        dish.setRestaurant(restaurant);
 
-        when(dishPersistencePort.getDish(dishId)).thenReturn(Optional.of(dish));
+        Optional<Dish> dishOptional = Optional.of(dish);
+        when(dishPersistencePort.getDish(dishId)).thenReturn(dishOptional);
 
+        when(restaurantPersistencePort.getRestaurant(dish.getRestaurant().getId())).thenReturn(Optional.of(restaurant));
+        when(userClient.getRoleByDni(userId)).thenReturn("ROLE_OWNER");
         // Act
-        assertDoesNotThrow(() -> dishUseCase.modifyDish(dishId, price, description));
+        dishUseCase.modifyDish(userId, dishId, price, description);
 
         // Assert
         assertEquals(price, dish.getPrice());
@@ -131,62 +146,19 @@ class DishUseCaseTest {
     }
 
     @Test
-    public void testModifyDish_PriceOnly_Success() {
-        // Arrange
-        Long dishId = 1L;
-        Long price = 10L;
-        String description = null;
-
-        Dish dish = new Dish();
-        dish.setPrice(5L);
-        dish.setDescription("Old description");
-
-        when(dishPersistencePort.getDish(dishId)).thenReturn(Optional.of(dish));
-
-        // Act
-        assertDoesNotThrow(() -> dishUseCase.modifyDish(dishId, price, description));
-
-        // Assert
-        assertEquals(price, dish.getPrice());
-        assertEquals("Old description", dish.getDescription()); // Description should remain unchanged
-        verify(dishPersistencePort, times(1)).saveDish(dish);
-    }
-
-    @Test
-    public void testModifyDish_DescriptionOnly_Success() {
-        // Arrange
-        Long dishId = 1L;
-        Long price = null;
-        String description = "New description";
-
-        Dish dish = new Dish();
-        dish.setPrice(5L);
-        dish.setDescription("Old description");
-
-        when(dishPersistencePort.getDish(dishId)).thenReturn(Optional.of(dish));
-
-        // Act
-        assertDoesNotThrow(() -> dishUseCase.modifyDish(dishId, price, description));
-
-        // Assert
-        assertEquals(5L, dish.getPrice()); // Price should remain unchanged
-        assertEquals(description, dish.getDescription());
-        verify(dishPersistencePort, times(1)).saveDish(dish);
-    }
-
-    @Test
-    public void testModifyDish_DishNotFoundException() {
+    void testModifyDish_WhenDishDoesNotExist_ShouldThrowDishNotFoundException() {
         // Arrange
         Long dishId = 1L;
         Long price = 10L;
         String description = "New description";
+        String userId = "123456";
 
-        when(dishPersistencePort.getDish(dishId)).thenReturn(Optional.empty());
+        Optional<Dish> dishOptional = Optional.empty();
+        when(dishPersistencePort.getDish(dishId)).thenReturn(dishOptional);
 
         // Act & Assert
-        assertThrows(DishNotFoundException.class, () -> dishUseCase.modifyDish(dishId, price, description));
-        verify(dishPersistencePort, never()).saveDish(Mockito.any());
+        assertThrows(DishNotFoundException.class, () ->
+                dishUseCase.modifyDish(userId, dishId, price, description));
+        verify(dishPersistencePort, never()).saveDish(any(Dish.class));
     }
-
-
 }

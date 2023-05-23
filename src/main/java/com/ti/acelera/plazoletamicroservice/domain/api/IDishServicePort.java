@@ -4,7 +4,7 @@ import com.ti.acelera.plazoletamicroservice.domain.model.Dish;
 
 public interface IDishServicePort {
 
-    void saveDish(Dish dish);
-    void modifyDish(Long dishId, Long price, String description);
+    void saveDish(String userId,Dish dish);
+    void modifyDish(String userId,Long dishId, Long price, String description);
 
 }

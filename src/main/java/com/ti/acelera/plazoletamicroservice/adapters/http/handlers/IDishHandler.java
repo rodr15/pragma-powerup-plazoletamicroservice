@@ -4,6 +4,6 @@ import com.ti.acelera.plazoletamicroservice.adapters.http.dto.request.DishReques
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.request.UpdateDishRequestDto;
 
 public interface IDishHandler {
-    void saveDish(DishRequestDto dishRequestDto);
-    void modifyDish( Long dishId, UpdateDishRequestDto updateDishRequestDto);
+    void saveDish(String userId,DishRequestDto dishRequestDto);
+    void modifyDish( String userId,Long dishId, UpdateDishRequestDto updateDishRequestDto);
 }
