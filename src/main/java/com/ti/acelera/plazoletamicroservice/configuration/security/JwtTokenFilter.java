@@ -1,5 +1,6 @@
 package com.ti.acelera.plazoletamicroservice.configuration.security;
 
+import com.ti.acelera.plazoletamicroservice.adapters.http.handlers.ITokenUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +17,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     @Autowired
     private JwtValidate jwtValidate;
+    @Autowired
+    private ITokenUtils tokenUtils;
     private List<String> excludedPrefixes = Arrays.asList("/swagger-ui/**", "/v3/api-docs/**");
     private AntPathMatcher pathMatcher = new AntPathMatcher();
 
@@ -25,14 +28,18 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             String token = getToken(request);
             if (token == null || !jwtValidate.validateToken(token)) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-            return;
+                return;
             }
-            if(!jwtValidate.validateRole( jwtValidate.getRoles(token), request )){
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-            return;
+            if (!jwtValidate.validateRole(tokenUtils.getRoles(token), request)) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Role unauthorized for this action");
+                return;
             }
-                filterChain.doFilter(request, response);
+            String userId = tokenUtils.getIdFromToken(token);
+            request.setAttribute("userId", userId);
+
+            filterChain.doFilter(request, response);
         } catch (Exception e) {
+            e.printStackTrace();
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
         }
 
@@ -40,7 +47,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-                String currentRoute = request.getServletPath();
+        String currentRoute = request.getServletPath();
         for (String prefix : excludedPrefixes) {
             if (pathMatcher.matchStart(prefix, currentRoute)) {
                 return true;

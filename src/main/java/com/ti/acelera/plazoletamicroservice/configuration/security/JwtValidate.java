@@ -37,12 +37,6 @@ public class JwtValidate {
 
     }
 
-    public List<String> getRoles(String token) {
-        SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes());
-        Claims claims = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
-        return (List<String>) claims.get("roles");
-    }
-
     public boolean validateRole(List<String> roles, HttpServletRequest request) {
         String currentRoute = request.getServletPath();
         Set<String> allowedPrefixes = new HashSet<>();
