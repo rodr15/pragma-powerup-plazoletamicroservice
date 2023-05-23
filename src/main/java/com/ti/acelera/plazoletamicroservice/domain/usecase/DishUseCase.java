@@ -43,12 +43,15 @@ public class DishUseCase implements IDishServicePort {
     }
 
     @Override
-    public void modifyDish(Long dishId, Long price, String description) {
+    public void modifyDish(String userId,Long dishId, Long price, String description) {
         Optional<Dish> dish = dishPersistencePort.getDish(dishId);
 
         if (dish.isEmpty()) {
             throw new DishNotFoundException();
         }
+
+        Optional<Restaurant> restaurant = restaurantPersistencePort.getRestaurant(dish.get().getRestaurant().getId());
+        verifyOwner(userId, restaurant.get().getIdProprietary());
 
         if (price != null) {
             dish.get().setPrice( price );

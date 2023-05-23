@@ -46,8 +46,8 @@ public class DishRestController {
     public ResponseEntity<Map<String, String>> updateDish(@PathVariable Long dishId, @Valid @RequestBody @Schema(
             description = "The request body",
             example = UpdateDishRequestDto.example
-    ) UpdateDishRequestDto updateDishRequestDto) {
-        dishHandler.modifyDish(dishId, updateDishRequestDto);
+    ) UpdateDishRequestDto updateDishRequestDto, @RequestAttribute("userId") String userId) {
+        dishHandler.modifyDish(userId, dishId, updateDishRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.DISH_CREATED_MESSAGE));
     }
