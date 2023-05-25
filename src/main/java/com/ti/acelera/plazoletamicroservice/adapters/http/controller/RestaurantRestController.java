@@ -2,7 +2,6 @@ package com.ti.acelera.plazoletamicroservice.adapters.http.controller;
 
 
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.request.RestaurantRequestDto;
-import com.ti.acelera.plazoletamicroservice.adapters.http.dto.request.UpdateDishRequestDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.handlers.IRestaurantHandler;
 import com.ti.acelera.plazoletamicroservice.configuration.Constants;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -26,13 +25,27 @@ public class RestaurantRestController {
 
     @SecurityRequirement(name = "jwt")
     @PostMapping("add")
-    public ResponseEntity<Map<String,String>> saveRestaurant(@Valid @RequestBody @Schema(
+    public ResponseEntity<Map<String, String>> saveRestaurant(@Valid @RequestBody @Schema(
             description = "The request body",
             example = RestaurantRequestDto.example
-    )RestaurantRequestDto restaurantRequestDto){
-        restaurantHandler.saveRestaurant( restaurantRequestDto );
+    ) RestaurantRequestDto restaurantRequestDto) {
+        restaurantHandler.saveRestaurant(restaurantRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.RESTAURANT_CREATED_MESSAGE));
     }
 
+    @SecurityRequirement(name = "jwt")
+    @PutMapping("add-employee")
+    public ResponseEntity<Map<String, String>> assignEmployee(@RequestParam String userId, @RequestParam Long restaurantId) {
+        restaurantHandler.assignRestaurantEmployee(userId, restaurantId);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.RESTAURANT_CREATED_MESSAGE));
+    }
+
+    //    @SecurityRequirement(name = "jwt")
+    @GetMapping("/verify-owner")
+    public ResponseEntity<Boolean> verifyOwner(@RequestParam String userId, @RequestParam Long restaurantId) {
+        boolean isOwner = restaurantHandler.verifyRestaurantOwner(userId, restaurantId);
+        return ResponseEntity.ok(isOwner);
+    }
 }

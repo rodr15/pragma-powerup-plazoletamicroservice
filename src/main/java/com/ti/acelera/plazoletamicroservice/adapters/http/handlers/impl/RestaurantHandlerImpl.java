@@ -2,7 +2,6 @@ package com.ti.acelera.plazoletamicroservice.adapters.http.handlers.impl;
 
 
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.request.RestaurantRequestDto;
-import com.ti.acelera.plazoletamicroservice.adapters.http.dto.request.UpdateDishRequestDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.handlers.IRestaurantHandler;
 import com.ti.acelera.plazoletamicroservice.adapters.http.mapper.IRestaurantRequestMapper;
 import com.ti.acelera.plazoletamicroservice.domain.api.IRestaurantServicePort;
@@ -18,6 +17,15 @@ public class RestaurantHandlerImpl implements IRestaurantHandler {
     @Override
     public void saveRestaurant(RestaurantRequestDto restaurantRequestDto) {
         restaurantServicePort.saveRestaurant( restaurantRequestMapper.toRestaurant( restaurantRequestDto) );
+    }
+
+    @Override
+    public void assignRestaurantEmployee(String employeeId, Long restaurantId) {
+        restaurantServicePort.assignEmployee( employeeId, restaurantId );
+    }
+
+    public boolean verifyRestaurantOwner(String userId, Long restaurantId) {
+        return restaurantServicePort.verifyRestaurantOwner( userId , restaurantId );
     }
 
 }
