@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Set;
+
 @Entity
 @Table(name = "restaurant")
 @NoArgsConstructor
@@ -22,5 +24,6 @@ public class RestaurantEntity {
     private String phone;
     private String urlLogo;
     private String nit;
+    private Set<String> employees;
 
 }

@@ -34,6 +34,14 @@ public class RestaurantRestController {
                 .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.RESTAURANT_CREATED_MESSAGE));
     }
 
+    @SecurityRequirement(name = "jwt")
+    @PutMapping("add-employee")
+    public ResponseEntity<Map<String, String>> assignEmployee(@RequestParam String userId, @RequestParam Long restaurantId) {
+        restaurantHandler.assignRestaurantEmployee(userId, restaurantId);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.RESTAURANT_CREATED_MESSAGE));
+    }
+
     //    @SecurityRequirement(name = "jwt")
     @GetMapping("/verify-owner")
     public ResponseEntity<Boolean> verifyOwner(@RequestParam String userId, @RequestParam Long restaurantId) {

@@ -19,6 +19,11 @@ public class RestaurantHandlerImpl implements IRestaurantHandler {
         restaurantServicePort.saveRestaurant( restaurantRequestMapper.toRestaurant( restaurantRequestDto) );
     }
 
+    @Override
+    public void assignRestaurantEmployee(String employeeId, Long restaurantId) {
+        restaurantServicePort.assignEmployee( employeeId, restaurantId );
+    }
+
     public boolean verifyRestaurantOwner(String userId, Long restaurantId) {
         return restaurantServicePort.verifyRestaurantOwner( userId , restaurantId );
     }
