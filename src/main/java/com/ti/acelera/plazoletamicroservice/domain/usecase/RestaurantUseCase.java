@@ -6,6 +6,9 @@ import com.ti.acelera.plazoletamicroservice.domain.gateway.IUserClient;
 import com.ti.acelera.plazoletamicroservice.domain.model.Restaurant;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IRestaurantPersistencePort;
 
+import java.util.List;
+import java.util.Optional;
+
 public class RestaurantUseCase implements IRestaurantServicePort {
 
     private final IRestaurantPersistencePort restaurantPersistencePort;
@@ -25,5 +28,15 @@ public class RestaurantUseCase implements IRestaurantServicePort {
         }
 
         restaurantPersistencePort.saveRestaurant( restaurant );
+    }
+
+    @Override
+    public boolean verifyRestaurantOwner(String userId, Long restaurantId) {
+
+        Optional<Restaurant> restaurant =  restaurantPersistencePort.getRestaurant( restaurantId );
+
+        if(restaurant.isEmpty()) return false;
+
+        return restaurant.get().getIdProprietary().equals(userId);
     }
 }
