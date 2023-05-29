@@ -6,5 +6,5 @@ public interface IDishServicePort {
 
     void saveDish(String userId,Dish dish);
     void modifyDish(String userId,Long dishId, Long price, String description);
-
+    void modifyDishState( String proprietaryId, Long dishId, boolean dishState);
 }

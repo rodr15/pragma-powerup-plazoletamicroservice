@@ -63,6 +63,24 @@ public class DishUseCase implements IDishServicePort {
         dishPersistencePort.saveDish( dish.get() );
     }
 
+    @Override
+    public void modifyDishState( String proprietaryId, Long dishId, boolean dishState) {
+        Optional<Dish> dish = dishPersistencePort.getDish( dishId );
+
+        if(dish.isEmpty()){
+            //TODO: Exception
+            System.out.println("Empty Dish");
+            return;
+        }
+
+       verifyOwner( proprietaryId, dish.get().getRestaurant().getIdProprietary() );
+
+       dish.get().setActive( dishState );
+       dishPersistencePort.saveDish( dish.get() );
+
+    }
+
+
     private void verifyOwner(String userId, String restaurantOwnerId) {
         final String userRole = userClient.getRoleByDni(userId);
 
@@ -75,5 +93,7 @@ public class DishUseCase implements IDishServicePort {
 
         }
     }
+
+
 
 }

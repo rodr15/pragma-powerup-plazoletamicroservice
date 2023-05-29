@@ -51,5 +51,13 @@ public class DishRestController {
                 .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.DISH_CREATED_MESSAGE));
     }
 
+    @SecurityRequirement(name = "jwt")
+    @PutMapping("enable-disable/{dishId}/{dishState}")
+    public ResponseEntity<Map<String, String>> enableDish(@RequestAttribute("userId") String userId, @PathVariable Long dishId, @PathVariable boolean dishState) {
+        dishHandler.modifyDishState(userId, dishId, dishState);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.DISH_CREATED_MESSAGE));
+    }
+
 
 }
