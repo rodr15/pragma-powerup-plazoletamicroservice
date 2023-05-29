@@ -6,6 +6,7 @@ import com.ti.acelera.plazoletamicroservice.domain.exceptions.RoleNotAllowedExce
 import com.ti.acelera.plazoletamicroservice.domain.gateway.IUserClient;
 import com.ti.acelera.plazoletamicroservice.domain.model.Restaurant;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IRestaurantPersistencePort;
+import org.springframework.data.domain.Page;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -19,6 +20,12 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     public RestaurantUseCase(IRestaurantPersistencePort restaurantPersistencePort, IUserClient userClient) {
         this.restaurantPersistencePort = restaurantPersistencePort;
         this.userClient = userClient;
+    }
+
+    @Override
+    public Page<Restaurant> pageRestaurants(int page, int size) {
+        return restaurantPersistencePort.getAllRestaurants( page, size  );
+
     }
 
     @Override

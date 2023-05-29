@@ -7,6 +7,10 @@ import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.repositori
 import com.ti.acelera.plazoletamicroservice.domain.model.Restaurant;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IRestaurantPersistencePort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.util.Optional;
 
@@ -36,5 +40,14 @@ public class RestaurantMysqlAdapter implements IRestaurantPersistencePort {
 
         return Optional.ofNullable(restaurantEntityMapper.toRestaurant(restaurant.get()));
 
+    }
+
+    @Override
+    public Page<Restaurant> getAllRestaurants(int page ,int size) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("name").ascending());
+        Page<RestaurantEntity>  restaurants = restaurantRepository.findAll( pageable );
+
+        return restaurants.map( restaurantEntityMapper::toRestaurant );
     }
 }

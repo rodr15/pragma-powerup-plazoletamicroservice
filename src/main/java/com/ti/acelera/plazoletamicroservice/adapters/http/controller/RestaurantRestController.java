@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -48,4 +49,15 @@ public class RestaurantRestController {
         boolean isOwner = restaurantHandler.verifyRestaurantOwner(userId, restaurantId);
         return ResponseEntity.ok(isOwner);
     }
+
+    @GetMapping("/restaurant-list")
+    public ResponseEntity<Page<RestaurantRequestDto>> pageRestaurants(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<RestaurantRequestDto> pagedRestaurants = restaurantHandler.pageRestaurants(page, size);
+
+        return ResponseEntity.ok(pagedRestaurants);
+    }
+
 }
