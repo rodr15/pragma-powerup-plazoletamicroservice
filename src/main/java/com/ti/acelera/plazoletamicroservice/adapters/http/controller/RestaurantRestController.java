@@ -2,6 +2,7 @@ package com.ti.acelera.plazoletamicroservice.adapters.http.controller;
 
 
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.request.RestaurantRequestDto;
+import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.RestaurantResponseDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.handlers.IRestaurantHandler;
 import com.ti.acelera.plazoletamicroservice.configuration.Constants;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -50,12 +51,13 @@ public class RestaurantRestController {
         return ResponseEntity.ok(isOwner);
     }
 
+    @SecurityRequirement(name = "jwt")
     @GetMapping("/restaurant-list")
-    public ResponseEntity<Page<RestaurantRequestDto>> pageRestaurants(
+    public ResponseEntity<Page<RestaurantResponseDto>> pageRestaurants(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        Page<RestaurantRequestDto> pagedRestaurants = restaurantHandler.pageRestaurants(page, size);
+        Page<RestaurantResponseDto> pagedRestaurants = restaurantHandler.pageRestaurants(page, size);
 
         return ResponseEntity.ok(pagedRestaurants);
     }

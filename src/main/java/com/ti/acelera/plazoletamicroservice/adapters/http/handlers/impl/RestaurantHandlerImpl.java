@@ -2,8 +2,10 @@ package com.ti.acelera.plazoletamicroservice.adapters.http.handlers.impl;
 
 
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.request.RestaurantRequestDto;
+import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.RestaurantResponseDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.handlers.IRestaurantHandler;
 import com.ti.acelera.plazoletamicroservice.adapters.http.mapper.IRestaurantRequestMapper;
+import com.ti.acelera.plazoletamicroservice.adapters.http.mapper.IRestaurantResponseMapper;
 import com.ti.acelera.plazoletamicroservice.domain.api.IRestaurantServicePort;
 import com.ti.acelera.plazoletamicroservice.domain.model.Restaurant;
 import lombok.RequiredArgsConstructor;
@@ -15,11 +17,12 @@ import org.springframework.stereotype.Service;
 public class RestaurantHandlerImpl implements IRestaurantHandler {
     private final IRestaurantServicePort restaurantServicePort;
     private final IRestaurantRequestMapper restaurantRequestMapper;
+    private final IRestaurantResponseMapper restaurantResponseMapper;
 
     @Override
-    public Page<RestaurantRequestDto> pageRestaurants(int page, int size) {
+    public Page<RestaurantResponseDto> pageRestaurants(int page, int size) {
          Page<Restaurant> restaurantPage = restaurantServicePort.pageRestaurants(page,size);
-        return restaurantPage.map( restaurantRequestMapper::toRequestDto );
+        return restaurantPage.map( restaurantResponseMapper::toResponseDto );
     }
 
     @Override
