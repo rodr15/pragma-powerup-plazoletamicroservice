@@ -68,9 +68,7 @@ public class DishUseCase implements IDishServicePort {
         Optional<Dish> dish = dishPersistencePort.getDish( dishId );
 
         if(dish.isEmpty()){
-            //TODO: Exception
-            System.out.println("Empty Dish");
-            return;
+            throw new DishNotFoundException();
         }
 
        verifyOwner( proprietaryId, dish.get().getRestaurant().getIdProprietary() );

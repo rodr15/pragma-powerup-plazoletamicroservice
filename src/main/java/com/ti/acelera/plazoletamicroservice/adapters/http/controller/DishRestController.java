@@ -3,12 +3,10 @@ package com.ti.acelera.plazoletamicroservice.adapters.http.controller;
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.request.DishRequestDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.request.UpdateDishRequestDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.handlers.IDishHandler;
-import com.ti.acelera.plazoletamicroservice.adapters.http.handlers.ITokenUtils;
 import com.ti.acelera.plazoletamicroservice.configuration.Constants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
-import jdk.swing.interop.SwingInterOpUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +21,6 @@ import java.util.Map;
 public class DishRestController {
 
     private final IDishHandler dishHandler;
-
-    private ITokenUtils tokenUtils;
 
 
     @SecurityRequirement(name = "jwt")
@@ -47,16 +43,16 @@ public class DishRestController {
             example = UpdateDishRequestDto.example
     ) UpdateDishRequestDto updateDishRequestDto, @RequestAttribute("userId") String userId) {
         dishHandler.modifyDish(userId, dishId, updateDishRequestDto);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.DISH_CREATED_MESSAGE));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.DISH_UPDATED_MESSAGE));
     }
 
     @SecurityRequirement(name = "jwt")
     @PutMapping("enable-disable/{dishId}/{dishState}")
     public ResponseEntity<Map<String, String>> enableDish(@RequestAttribute("userId") String userId, @PathVariable Long dishId, @PathVariable boolean dishState) {
         dishHandler.modifyDishState(userId, dishId, dishState);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.DISH_CREATED_MESSAGE));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.DISH_UPDATED_MESSAGE));
     }
 
 
