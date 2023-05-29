@@ -1,6 +1,5 @@
 package com.ti.acelera.plazoletamicroservice.configuration.security;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +22,7 @@ public class JwtValidate {
         rolePermissions = new HashMap<>();
         rolePermissions.put("ROLE_ADMIN", Arrays.asList("/restaurant/add"));
         rolePermissions.put("ROLE_OWNER", Arrays.asList("/dish/**"));
+        rolePermissions.put("ROLE_CLIENT", Arrays.asList("/restaurant/restaurant-list"));
     }
 
     public boolean validateToken(String token) {
