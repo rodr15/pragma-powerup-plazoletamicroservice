@@ -1,10 +1,7 @@
 package com.ti.acelera.plazoletamicroservice.configuration;
 
 import com.ti.acelera.plazoletamicroservice.adapters.driver.client.exceptions.UserNotFoundException;
-import com.ti.acelera.plazoletamicroservice.domain.exceptions.DishNotFoundException;
-import com.ti.acelera.plazoletamicroservice.domain.exceptions.NotProprietaryGivenRestaurantException;
-import com.ti.acelera.plazoletamicroservice.domain.exceptions.RestaurantNotExistsException;
-import com.ti.acelera.plazoletamicroservice.domain.exceptions.RoleNotAllowedException;
+import com.ti.acelera.plazoletamicroservice.domain.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -45,5 +42,11 @@ public class ControllerAdvisor {
             DishNotFoundException dishNotFoundException) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, DISH_NOT_FOUND));
+    }
+    @ExceptionHandler(BadPagedException.class)
+    public ResponseEntity<Map<String, String>> handleBadPagedException(
+            BadPagedException badPagedException) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, BAD_PAGED_MESSAGE));
     }
 }

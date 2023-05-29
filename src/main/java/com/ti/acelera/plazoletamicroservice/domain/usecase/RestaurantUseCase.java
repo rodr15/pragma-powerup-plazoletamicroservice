@@ -1,6 +1,7 @@
 package com.ti.acelera.plazoletamicroservice.domain.usecase;
 
 import com.ti.acelera.plazoletamicroservice.domain.api.IRestaurantServicePort;
+import com.ti.acelera.plazoletamicroservice.domain.exceptions.BadPagedException;
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.RestaurantNotExistsException;
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.RoleNotAllowedException;
 import com.ti.acelera.plazoletamicroservice.domain.gateway.IUserClient;
@@ -24,8 +25,12 @@ public class RestaurantUseCase implements IRestaurantServicePort {
 
     @Override
     public Page<Restaurant> pageRestaurants(int page, int size) {
-        return restaurantPersistencePort.getAllRestaurants( page, size  );
 
+        if( page < 0 || size <= 0){
+            throw new BadPagedException();
+        }
+
+        return restaurantPersistencePort.getAllRestaurants( page, size  );
     }
 
     @Override
