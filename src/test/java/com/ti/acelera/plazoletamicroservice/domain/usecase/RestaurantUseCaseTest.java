@@ -1,5 +1,6 @@
 package com.ti.acelera.plazoletamicroservice.domain.usecase;
 
+import com.ti.acelera.plazoletamicroservice.domain.exceptions.BadPagedException;
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.RestaurantNotExistsException;
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.RoleNotAllowedException;
 import com.ti.acelera.plazoletamicroservice.domain.gateway.IUserClient;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -182,4 +184,42 @@ class RestaurantUseCaseTest {
     }
 
 
+    @Test
+    void pageRestaurants_withValidPageAndSize_shouldReturnPageOfRestaurants() {
+        // Arrange
+        int page = 0;
+        int size = 10;
+
+        Page<Restaurant> expectedPage = mock(Page.class);
+        when(restaurantPersistencePort.getAllRestaurants(page, size)).thenReturn(expectedPage);
+
+        // Act
+        Page<Restaurant> resultPage = restaurantUseCase.pageRestaurants(page, size);
+
+        // Assert
+        assertEquals(expectedPage, resultPage);
+        verify(restaurantPersistencePort, times(1)).getAllRestaurants(page, size);
+    }
+
+    @Test
+    void pageRestaurants_withInvalidPage_shouldThrowBadPagedException() {
+        // Arrange
+        int page = -1;
+        int size = 10;
+
+        // Act & Assert
+        assertThrows(BadPagedException.class, () -> restaurantUseCase.pageRestaurants(page, size));
+        verify(restaurantPersistencePort, never()).getAllRestaurants(anyInt(), anyInt());
+    }
+
+    @Test
+    void pageRestaurants_withInvalidSize_shouldThrowBadPagedException() {
+        // Arrange
+        int page = 0;
+        int size = 0;
+
+        // Act & Assert
+        assertThrows(BadPagedException.class, () -> restaurantUseCase.pageRestaurants(page, size));
+        verify(restaurantPersistencePort, never()).getAllRestaurants(anyInt(), anyInt());
+    }
 }
