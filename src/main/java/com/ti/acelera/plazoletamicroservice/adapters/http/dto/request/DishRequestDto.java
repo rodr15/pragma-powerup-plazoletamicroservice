@@ -11,8 +11,9 @@ import lombok.Getter;
 public class DishRequestDto {
     @NotBlank(message = "Mandatory")
     private String name;
+    @Positive(message = "Must be an id")
     @NotBlank(message = "Mandatory")
-    private String idCategory;
+    private Long idCategory;
     @NotBlank(message = "Mandatory")
     private String description;
     @Positive(message = "Must be greater than 0")
@@ -27,7 +28,7 @@ public class DishRequestDto {
 
     public static final String example = "{" +
             "\"name\":\"Pizza\"," +
-            "\"idCategory\":\"CC Santa\"," +
+            "\"idCategory\":\"1\"," +
             "\"description\":\"Pizza\"," +
             "\"price\":\"12345\"," +
             "\"idRestaurant\":\"123123123\"," +
