@@ -44,14 +44,7 @@ public class DishUseCase implements IDishServicePort {
         if (dish.isEmpty()) {
             throw new DishNotFoundException();
         }
-
-        Optional<Restaurant> restaurant = restaurantPersistencePort.getRestaurant(dish.get().getRestaurant().getId());
-
-        if (restaurant.isEmpty()) {
-            throw new RestaurantNotExistsException();
-        }
-
-        verifyOwner(userId, restaurant.get().getIdProprietary());
+        verifyOwner(userId, dish.get().getRestaurant().getIdProprietary());
 
         if (price != null) {
             dish.get().setPrice( price );
@@ -91,7 +84,4 @@ public class DishUseCase implements IDishServicePort {
 
         }
     }
-
-
-
 }

@@ -134,7 +134,6 @@ class DishUseCaseTest {
         Optional<Dish> dishOptional = Optional.of(dish);
         when(dishPersistencePort.getDish(dishId)).thenReturn(dishOptional);
 
-        when(restaurantPersistencePort.getRestaurant(dish.getRestaurant().getId())).thenReturn(Optional.of(restaurant));
         when(userClient.getRoleByDni(userId)).thenReturn("ROLE_OWNER");
         // Act
         dishUseCase.modifyDish(userId, dishId, price, description);
@@ -159,6 +158,77 @@ class DishUseCaseTest {
         // Act & Assert
         assertThrows(DishNotFoundException.class, () ->
                 dishUseCase.modifyDish(userId, dishId, price, description));
+        verify(dishPersistencePort, never()).saveDish(any(Dish.class));
+    }
+
+    @Test
+    void testModifyDishState_ValidDishIdAndProprietaryId_DishStateModified() {
+        // Arrange
+        String proprietaryId = "123456";
+
+        Restaurant restaurant = new Restaurant();
+        restaurant.setIdProprietary(proprietaryId);
+
+        Long dishId = 1L;
+        boolean dishState = false;
+        Dish dish = new Dish();
+        dish.setRestaurant(restaurant);
+
+        Optional<Dish> optionalDish = Optional.of(dish);
+
+        when(dishPersistencePort.getDish(dishId)).thenReturn(optionalDish);
+        when(userClient.getRoleByDni(proprietaryId)).thenReturn("ROLE_OWNER");
+
+        // Act
+        dishUseCase.modifyDishState(proprietaryId, dishId, dishState);
+
+        // Assert
+        assertFalse(dish.isActive());
+        verify(dishPersistencePort, times(1)).getDish(dishId);
+        verify(dishPersistencePort, times(1)).saveDish(dish);
+    }
+
+    @Test
+    void testModifyDishState_InvalidDishId_DishNotFoundExceptionThrown() {
+        // Arrange
+        Long dishId = 1L;
+        String proprietaryId = "123456";
+        boolean dishState = true;
+        Optional<Dish> optionalDish = Optional.empty();
+
+        when(dishPersistencePort.getDish(dishId)).thenReturn(optionalDish);
+
+        // Act & Assert
+        assertThrows(DishNotFoundException.class,
+                () -> dishUseCase.modifyDishState(proprietaryId, dishId, dishState));
+        verify(dishPersistencePort, times(1)).getDish(dishId);
+        verify(dishPersistencePort, never()).saveDish(any(Dish.class));
+    }
+
+    @Test
+    void testModifyDishState_NotProprietaryGivenRestaurant_NotProprietaryGivenRestaurantExceptionThrown() {
+        // Arrange
+        String proprietaryId = "123456";
+        String otherProprietaryId = "654321";
+
+        Long dishId = 1L;
+        boolean dishState = true;
+        Dish dish = new Dish();
+
+        Restaurant restaurant = new Restaurant();
+        restaurant.setIdProprietary(otherProprietaryId);
+
+        dish.setRestaurant(restaurant);
+
+        Optional<Dish> optionalDish = Optional.of(dish);
+
+        when(dishPersistencePort.getDish(dishId)).thenReturn(optionalDish);
+        when(userClient.getRoleByDni(proprietaryId)).thenReturn("ROLE_OWNER");
+
+        // Act & Assert
+        assertThrows(NotProprietaryGivenRestaurantException.class,
+                () -> dishUseCase.modifyDishState(proprietaryId, dishId, dishState));
+        verify(dishPersistencePort, times(1)).getDish(dishId);
         verify(dishPersistencePort, never()).saveDish(any(Dish.class));
     }
 }
