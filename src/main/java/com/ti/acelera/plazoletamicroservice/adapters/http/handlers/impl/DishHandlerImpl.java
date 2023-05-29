@@ -25,4 +25,9 @@ public class DishHandlerImpl implements IDishHandler {
         dishServicePort.modifyDish(userId,dishId, updateDishRequestDto.getPrice(), updateDishRequestDto.getDescription());
     }
 
+    @Override
+    public void modifyDishState(String userId, Long dishId, boolean dishState) {
+        dishServicePort.modifyDishState(userId, dishId, dishState);
+    }
+
 }
