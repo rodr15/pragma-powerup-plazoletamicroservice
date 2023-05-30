@@ -1,6 +1,7 @@
 package com.ti.acelera.plazoletamicroservice.adapters.http.controller;
 
 
+import com.ti.acelera.plazoletamicroservice.adapters.http.dto.request.OrderRequestDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.request.RestaurantRequestDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.DishResponseDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.RestaurantResponseDto;
@@ -73,5 +74,10 @@ public class RestaurantRestController {
         return ResponseEntity.ok(restaurantHandler.pageDishes(restaurantId,categoryId,page, size));
     }
 
-
+//    @SecurityRequirement(name = "jwt")
+    @GetMapping("/{restaurantId}/order")
+    public ResponseEntity<String> order(
+            OrderRequestDto orderRequestDto) {
+        return ResponseEntity.ok( "" );
+    }
 }
