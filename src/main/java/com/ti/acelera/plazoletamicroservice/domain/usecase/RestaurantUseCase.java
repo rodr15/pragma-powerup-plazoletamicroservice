@@ -32,7 +32,7 @@ public class RestaurantUseCase implements IRestaurantServicePort {
         }
 
         Optional<Restaurant> restaurant = restaurantPersistencePort.getRestaurant(restaurantId);
-        if (restaurant.isEmpty()) {
+        if(restaurant.isEmpty()){
             throw new RestaurantNotExistsException();
         }
 

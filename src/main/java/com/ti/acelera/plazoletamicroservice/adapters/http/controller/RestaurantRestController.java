@@ -63,6 +63,7 @@ public class RestaurantRestController {
         return ResponseEntity.ok(pagedRestaurants);
     }
 
+    @SecurityRequirement(name = "jwt")
     @GetMapping("/{restaurantId}/menu")
     public ResponseEntity<Page<DishResponseDto>> pageRestaurantDishes(
             @PathVariable Long restaurantId,

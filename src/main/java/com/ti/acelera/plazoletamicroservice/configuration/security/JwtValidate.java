@@ -15,14 +15,14 @@ public class JwtValidate {
 
     @Value("${jwt.secret}")
     private String secret;
-    private AntPathMatcher pathMatcher = new AntPathMatcher();
-    private Map<String, List<String>> rolePermissions;
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
+    private final Map<String, List<String>> rolePermissions;
 
     public JwtValidate() {
         rolePermissions = new HashMap<>();
         rolePermissions.put("ROLE_ADMIN", Arrays.asList("/restaurant/add"));
         rolePermissions.put("ROLE_OWNER", Arrays.asList("/dish/**"));
-        rolePermissions.put("ROLE_CLIENT", Arrays.asList("/restaurant/restaurant-list"));
+        rolePermissions.put("ROLE_CLIENT", Arrays.asList("/restaurant/restaurant-list","/restaurant/*/menu"));
     }
 
     public boolean validateToken(String token) {
@@ -45,7 +45,7 @@ public class JwtValidate {
         }
 
         for (String prefix : allowedPrefixes) {
-            if (pathMatcher.matchStart(prefix, currentRoute)) {
+            if (pathMatcher.match(prefix, currentRoute)) {
                 return true;
             }
         }
