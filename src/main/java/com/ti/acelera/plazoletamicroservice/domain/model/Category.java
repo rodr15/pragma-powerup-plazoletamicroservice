@@ -9,14 +9,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Setter
 @Getter
-public class Dish {
+public class Category {
     private Long id;
     private String name;
-    private Category category;
     private String description;
-    private Long price;
-    private Restaurant restaurant;
-    private String urlImage;
-    private boolean active;
 
 }

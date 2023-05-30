@@ -6,6 +6,9 @@ import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.repositori
 import com.ti.acelera.plazoletamicroservice.domain.model.Dish;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IDishPersistencePort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 
@@ -17,16 +20,34 @@ public class DishMysqlAdapter implements IDishPersistencePort {
 
     @Override
     public void saveDish(Dish dish) {
-        dishRepository.save( dishEntityMapper.toEntity( dish ) );
+        dishRepository.save(dishEntityMapper.toEntity(dish));
     }
 
     @Override
     public Optional<Dish> getDish(Long id) {
         Optional<DishEntity> dish = dishRepository.findById(id);
 
-        if( dish.isEmpty()){
+        if (dish.isEmpty()) {
             return Optional.empty();
         }
-        return  Optional.ofNullable( dishEntityMapper.toDish( dish.get() ) );
+        return Optional.ofNullable(dishEntityMapper.toDish(dish.get()));
+    }
+
+    @Override
+    public Page<Dish> getActiveDishesByRestaurantId(Long restaurantId, int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<DishEntity> dishEntityPage = dishRepository.findByRestaurantIdAndActiveTrue(restaurantId, pageable);
+
+        return dishEntityPage.map(dishEntityMapper::toDish);
+    }
+
+    @Override
+    public Page<Dish> getActiveDishesByRestaurantId(Long restaurantId, Long categoryId, int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<DishEntity> dishEntityPage = dishRepository.findByRestaurantIdAndCategoryIdAndActiveTrue(restaurantId, categoryId, pageable);
+
+        return dishEntityPage.map(dishEntityMapper::toDish);
     }
 }

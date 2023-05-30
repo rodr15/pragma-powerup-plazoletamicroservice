@@ -4,7 +4,9 @@ import com.ti.acelera.plazoletamicroservice.domain.exceptions.BadPagedException;
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.RestaurantNotExistsException;
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.RoleNotAllowedException;
 import com.ti.acelera.plazoletamicroservice.domain.gateway.IUserClient;
+import com.ti.acelera.plazoletamicroservice.domain.model.Dish;
 import com.ti.acelera.plazoletamicroservice.domain.model.Restaurant;
+import com.ti.acelera.plazoletamicroservice.domain.spi.IDishPersistencePort;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IRestaurantPersistencePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,10 +15,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -28,6 +29,8 @@ class RestaurantUseCaseTest {
 
     @Mock
     private IRestaurantPersistencePort restaurantPersistencePort;
+    @Mock
+    private IDishPersistencePort dishPersistencePort;
 
     @Mock
     private IUserClient userClient;
@@ -35,7 +38,7 @@ class RestaurantUseCaseTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        restaurantUseCase = new RestaurantUseCase(restaurantPersistencePort, userClient);
+        restaurantUseCase = new RestaurantUseCase(restaurantPersistencePort, dishPersistencePort, userClient);
     }
 
     @Test
@@ -63,7 +66,7 @@ class RestaurantUseCaseTest {
 
         // Assert
         verify(userClient).getRoleByDni(restaurant.getIdProprietary());
-        verify(restaurantPersistencePort,times(0)).saveRestaurant(restaurant);
+        verify(restaurantPersistencePort, times(0)).saveRestaurant(restaurant);
     }
 
     @Test
@@ -222,4 +225,79 @@ class RestaurantUseCaseTest {
         assertThrows(BadPagedException.class, () -> restaurantUseCase.pageRestaurants(page, size));
         verify(restaurantPersistencePort, never()).getAllRestaurants(anyInt(), anyInt());
     }
+
+    @Test
+    void testPageDishWithNullCategoryId() {
+        // Mock restaurant
+        Restaurant restaurant = new Restaurant();
+        restaurant.setId(1L);
+        Optional<Restaurant> optionalRestaurant = Optional.of(restaurant);
+        when(restaurantPersistencePort.getRestaurant(anyLong())).thenReturn(optionalRestaurant);
+
+        // Mock dish page
+        List<Dish> dishList = new ArrayList<>();
+        dishList.add(new Dish());
+        dishList.add(new Dish());
+        Page<Dish> dishPage = new PageImpl<>(dishList);
+        when(dishPersistencePort.getActiveDishesByRestaurantId(anyLong(), anyInt(), anyInt())).thenReturn(dishPage);
+
+        // Call the method
+        int page = 0;
+        int size = 10;
+        Page<Dish> result = restaurantUseCase.pageDish(1L, null, page, size);
+
+        // Assertions
+        assertEquals(dishPage, result);
+    }
+
+    @Test
+    void testPageDishWithNonNullCategoryId() {
+        // Mock restaurant
+        Restaurant restaurant = new Restaurant();
+        restaurant.setId(1L);
+        Optional<Restaurant> optionalRestaurant = Optional.of(restaurant);
+        when(restaurantPersistencePort.getRestaurant(anyLong())).thenReturn(optionalRestaurant);
+
+        // Mock dish page
+        List<Dish> dishList = new ArrayList<>();
+        dishList.add(new Dish());
+        dishList.add(new Dish());
+        Page<Dish> dishPage = new PageImpl<>(dishList);
+        when(dishPersistencePort.getActiveDishesByRestaurantId(anyLong(), anyLong(), anyInt(), anyInt())).thenReturn(dishPage);
+
+        // Call the method
+        int page = 0;
+        int size = 10;
+        Page<Dish> result = restaurantUseCase.pageDish(1L, 2L, page, size);
+
+        // Assertions
+        assertEquals(dishPage, result);
+    }
+
+    @Test
+    void testPageDishWithInvalidPageAndSize() {
+        // Call the method with invalid page and size
+        int invalidPage = -1;
+        int invalidSize = 0;
+
+        assertThrows(BadPagedException.class, () -> {
+            restaurantUseCase.pageDish(1L, null, invalidPage, invalidSize);
+        });
+    }
+
+    @Test
+    void testPageDishWithNonExistingRestaurant() {
+        // Mock non-existing restaurant
+        Optional<Restaurant> optionalRestaurant = Optional.empty();
+        when(restaurantPersistencePort.getRestaurant(anyLong())).thenReturn(optionalRestaurant);
+
+        // Call the method
+        int page = 0;
+        int size = 10;
+
+        assertThrows(RestaurantNotExistsException.class, () -> {
+            restaurantUseCase.pageDish(1L, null, page, size);
+        });
+    }
+
 }
