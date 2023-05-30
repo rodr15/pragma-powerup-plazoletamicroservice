@@ -2,6 +2,7 @@ package com.ti.acelera.plazoletamicroservice.adapters.http.controller;
 
 
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.request.RestaurantRequestDto;
+import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.DishResponseDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.RestaurantResponseDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.handlers.IRestaurantHandler;
 import com.ti.acelera.plazoletamicroservice.configuration.Constants;
@@ -61,5 +62,15 @@ public class RestaurantRestController {
 
         return ResponseEntity.ok(pagedRestaurants);
     }
+
+    @GetMapping("/{restaurantId}/menu")
+    public ResponseEntity<Page<DishResponseDto>> pageRestaurantDishes(
+            @PathVariable Long restaurantId,
+            @RequestParam(defaultValue = "") Long categoryId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(restaurantHandler.pageDishes(restaurantId,categoryId,page, size));
+    }
+
 
 }

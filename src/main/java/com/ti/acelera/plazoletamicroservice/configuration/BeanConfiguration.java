@@ -31,8 +31,8 @@ public class BeanConfiguration {
         return new RestaurantMysqlAdapter( restaurantRepository, restaurantEntityMapper );
     }
     @Bean
-    public IRestaurantServicePort restaurantServicePort(){
-        return new RestaurantUseCase( restaurantPersistencePort(), userClient());
+    public IRestaurantServicePort restaurantServicePort( IRestaurantPersistencePort restaurantPersistencePort, IDishPersistencePort dishPersistencePort, IUserClient userClient){
+        return new RestaurantUseCase( restaurantPersistencePort, dishPersistencePort,userClient);
 
     }
     @Bean

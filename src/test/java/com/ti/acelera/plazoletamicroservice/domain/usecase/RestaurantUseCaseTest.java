@@ -5,6 +5,7 @@ import com.ti.acelera.plazoletamicroservice.domain.exceptions.RestaurantNotExist
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.RoleNotAllowedException;
 import com.ti.acelera.plazoletamicroservice.domain.gateway.IUserClient;
 import com.ti.acelera.plazoletamicroservice.domain.model.Restaurant;
+import com.ti.acelera.plazoletamicroservice.domain.spi.IDishPersistencePort;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IRestaurantPersistencePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,8 @@ class RestaurantUseCaseTest {
 
     @Mock
     private IRestaurantPersistencePort restaurantPersistencePort;
+    @Mock
+    private IDishPersistencePort dishPersistencePort;
 
     @Mock
     private IUserClient userClient;
@@ -35,7 +38,7 @@ class RestaurantUseCaseTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        restaurantUseCase = new RestaurantUseCase(restaurantPersistencePort, userClient);
+        restaurantUseCase = new RestaurantUseCase(restaurantPersistencePort,dishPersistencePort ,userClient);
     }
 
     @Test
