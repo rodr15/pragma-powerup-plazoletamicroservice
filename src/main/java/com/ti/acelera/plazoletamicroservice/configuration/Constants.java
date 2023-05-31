@@ -4,6 +4,11 @@ public class Constants {
     private Constants() {
         throw new IllegalStateException("Utility class");
     }
+
+    public static final String EARRING_ORDER = "EARRING";
+    public static final String IN_PREPARATION_ORDER = "IN PREPARATION";
+    public static final String READY_ORDER = "READY";
+    public static final String FINISHED_ORDER = "FINISHED";
     public static final String RESPONSE_MESSAGE_KEY = "message";
     public static final String RESTAURANT_CREATED_MESSAGE = "Restaurant created successfully";
     public static final String RESPONSE_ERROR_MESSAGE_KEY = "error";

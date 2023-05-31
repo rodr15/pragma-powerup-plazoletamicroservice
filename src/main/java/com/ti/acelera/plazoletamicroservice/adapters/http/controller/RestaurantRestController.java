@@ -71,13 +71,17 @@ public class RestaurantRestController {
             @RequestParam(defaultValue = "") Long categoryId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(restaurantHandler.pageDishes(restaurantId,categoryId,page, size));
+        return ResponseEntity.ok(restaurantHandler.pageDishes(restaurantId, categoryId, page, size));
     }
 
-//    @SecurityRequirement(name = "jwt")
-    @GetMapping("/{restaurantId}/order")
+    @SecurityRequirement(name = "jwt")
+    @PostMapping("/order")
     public ResponseEntity<String> order(
-            OrderRequestDto orderRequestDto) {
-        return ResponseEntity.ok( "" );
+            @Valid @RequestBody @Schema(
+                    description = "The request body",
+                    example = OrderRequestDto.EXAMPLE
+            ) OrderRequestDto orderRequestDto) {
+        restaurantHandler.makeOrder(orderRequestDto );
+        return ResponseEntity.ok("");
     }
 }

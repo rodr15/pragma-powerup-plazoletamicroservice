@@ -1,13 +1,24 @@
 package com.ti.acelera.plazoletamicroservice.adapters.http.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-import java.util.Map;
-
+import java.util.List;
+@AllArgsConstructor
+@Getter
 public class OrderRequestDto {
-    @NotBlank(message = "Mandatory")
-    private String idRestaurant;
-    @NotBlank(message = "Should order one or more dishes")
-    private Map<Long,Integer> order;
+    @Positive
+    private Long restaurantId;
+    private List<DishOrderRequestDto> dishes;
+
+
+    public static final String EXAMPLE = "{" +
+            "\"restaurantId\": 1," +
+            "\"dishes\": [" +
+            DishOrderRequestDto.EXAMPLE +
+            "]" +
+            "}";
+
 
 }

@@ -1,11 +1,13 @@
 package com.ti.acelera.plazoletamicroservice.adapters.http.handlers.impl;
 
 
+import com.ti.acelera.plazoletamicroservice.adapters.http.dto.request.OrderRequestDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.request.RestaurantRequestDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.DishResponseDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.RestaurantResponseDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.handlers.IRestaurantHandler;
 import com.ti.acelera.plazoletamicroservice.adapters.http.mapper.IDishResponseMapper;
+import com.ti.acelera.plazoletamicroservice.adapters.http.mapper.IOrderRestaurantRequestMapper;
 import com.ti.acelera.plazoletamicroservice.adapters.http.mapper.IRestaurantRequestMapper;
 import com.ti.acelera.plazoletamicroservice.adapters.http.mapper.IRestaurantResponseMapper;
 import com.ti.acelera.plazoletamicroservice.domain.api.IRestaurantServicePort;
@@ -22,6 +24,12 @@ public class RestaurantHandlerImpl implements IRestaurantHandler {
     private final IRestaurantRequestMapper restaurantRequestMapper;
     private final IRestaurantResponseMapper restaurantResponseMapper;
     private final IDishResponseMapper dishResponseMapper;
+    private final IOrderRestaurantRequestMapper orderRestaurantRequestMapper;
+
+    @Override
+    public void makeOrder(OrderRequestDto orderRequestDto) {
+        restaurantServicePort.orderToRestaurant( orderRestaurantRequestMapper.toOrderRestaurant( orderRequestDto ) );
+    }
 
     @Override
     public Page<DishResponseDto> pageDishes(Long restaurantId, Long categoryId , int page, int size) {

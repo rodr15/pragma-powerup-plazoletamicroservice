@@ -23,6 +23,7 @@ import org.springframework.context.annotation.Configuration;
 public class BeanConfiguration {
     private final IRestaurantRepository restaurantRepository;
     private final IRestaurantEntityMapper restaurantEntityMapper;
+
     private final IDishRepository dishRepository;
     private final IDishEntityMapper dishEntityMapper;
 

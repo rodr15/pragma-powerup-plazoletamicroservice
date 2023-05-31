@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,4 +19,5 @@ public class OrderRestaurant {
     private String state;
     private Long idChef;
     private Restaurant restaurant;
+    private List<DishOrder> dishes;
 }
