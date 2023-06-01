@@ -9,4 +9,7 @@ import org.mapstruct.ReportingPolicy;
         unmappedSourcePolicy = ReportingPolicy.IGNORE)
 public interface IOrderEntityMapper {
     OrderRestaurant toOrder(OrderRestaurantEntity orderEntity);
+    OrderRestaurantEntity toOrderEntity(OrderRestaurant orderRestaurant);
+
+
 }

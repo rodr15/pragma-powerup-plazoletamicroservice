@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collections;
 import java.util.Map;
 
+import static java.lang.Long.parseLong;
+
 @RestController
 @RequestMapping("/restaurant")
 @RequiredArgsConstructor
@@ -76,12 +78,12 @@ public class RestaurantRestController {
 
     @SecurityRequirement(name = "jwt")
     @PostMapping("/order")
-    public ResponseEntity<String> order(
+    public ResponseEntity<String> order(@RequestAttribute("userId") String userId,
             @Valid @RequestBody @Schema(
                     description = "The request body",
                     example = OrderRequestDto.EXAMPLE
             ) OrderRequestDto orderRequestDto) {
-        restaurantHandler.makeOrder(orderRequestDto );
+        restaurantHandler.makeOrder(parseLong(userId),orderRequestDto );
         return ResponseEntity.ok("");
     }
 }

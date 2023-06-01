@@ -8,7 +8,7 @@ import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.Restauran
 import org.springframework.data.domain.Page;
 
 public interface IRestaurantHandler {
-    void makeOrder(OrderRequestDto orderRequestDto);
+    void makeOrder(Long clientId,OrderRequestDto orderRequestDto) ;
     Page<DishResponseDto> pageDishes(Long restaurantId, Long categoryId , int page, int size);
     Page<RestaurantResponseDto> pageRestaurants(int page, int size);
     void saveRestaurant(RestaurantRequestDto restaurantRequestDto);

@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @NoArgsConstructor
@@ -15,7 +15,7 @@ import java.util.List;
 public class OrderRestaurant {
     private Long id;
     private Long idClient;
-    private Date date;
+    private LocalDate date;
     private String state;
     private Long idChef;
     private Restaurant restaurant;

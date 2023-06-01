@@ -25,4 +25,17 @@ public class OrderRestaurantEntity {
     @ManyToOne
     @JoinColumn(name = "id_restaurant")
     private RestaurantEntity restaurant;
+
+    @Override
+    public String toString() {
+        return "OrderRestaurantEntity{" +
+                "id=" + id +
+                ", idClient=" + idClient +
+                ", date=" + date +
+                ", state='" + state + '\'' +
+                ", idChef=" + idChef +
+                ", restaurant=" + restaurant +
+                '}';
+    }
+
 }
