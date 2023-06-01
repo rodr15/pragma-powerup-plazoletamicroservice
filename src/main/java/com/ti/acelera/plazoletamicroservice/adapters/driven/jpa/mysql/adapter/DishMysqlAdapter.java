@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -49,5 +50,12 @@ public class DishMysqlAdapter implements IDishPersistencePort {
         Page<DishEntity> dishEntityPage = dishRepository.findByRestaurantIdAndCategoryIdAndActiveTrue(restaurantId, categoryId, pageable);
 
         return dishEntityPage.map(dishEntityMapper::toDish);
+    }
+
+    @Override
+    public List<Dish> findAllDishesByIdAndByRestaurantId(Long restaurantId, List<Long> dishesId) {
+        List<DishEntity> dishEntityList = dishRepository.findAllByIdInAndRestaurantIdAndActiveTrue(dishesId, restaurantId);
+        return dishEntityList.stream().map(dishEntityMapper::toDish).toList();
+
     }
 }

@@ -22,7 +22,7 @@ public class JwtValidate {
         rolePermissions = new HashMap<>();
         rolePermissions.put("ROLE_ADMIN", Arrays.asList("/restaurant/add"));
         rolePermissions.put("ROLE_OWNER", Arrays.asList("/dish/**"));
-        rolePermissions.put("ROLE_CLIENT", Arrays.asList("/restaurant/restaurant-list","/restaurant/*/menu"));
+        rolePermissions.put("ROLE_CLIENT", Arrays.asList("/restaurant/restaurant-list","/restaurant/*/menu","/restaurant/order"));
     }
 
     public boolean validateToken(String token) {
@@ -43,7 +43,6 @@ public class JwtValidate {
         for (String role : roles) {
             allowedPrefixes.addAll(rolePermissions.get(role));
         }
-
         for (String prefix : allowedPrefixes) {
             if (pathMatcher.match(prefix, currentRoute)) {
                 return true;

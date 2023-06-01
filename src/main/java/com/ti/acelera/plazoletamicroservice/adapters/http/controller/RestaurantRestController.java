@@ -1,6 +1,7 @@
 package com.ti.acelera.plazoletamicroservice.adapters.http.controller;
 
 
+import com.ti.acelera.plazoletamicroservice.adapters.http.dto.request.OrderRequestDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.request.RestaurantRequestDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.DishResponseDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.RestaurantResponseDto;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.Map;
+
+import static java.lang.Long.parseLong;
 
 @RestController
 @RequestMapping("/restaurant")
@@ -70,8 +73,18 @@ public class RestaurantRestController {
             @RequestParam(defaultValue = "") Long categoryId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(restaurantHandler.pageDishes(restaurantId,categoryId,page, size));
+        return ResponseEntity.ok(restaurantHandler.pageDishes(restaurantId, categoryId, page, size));
     }
 
-
+    @SecurityRequirement(name = "jwt")
+    @PostMapping("/order")
+    public ResponseEntity<Map<String, String>> order(@RequestAttribute("userId") String userId,
+                                                     @Valid @RequestBody @Schema(
+                                                             description = "The request body",
+                                                             example = OrderRequestDto.EXAMPLE
+                                                     ) OrderRequestDto orderRequestDto) {
+        restaurantHandler.makeOrder(parseLong(userId), orderRequestDto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.ORDER_CREATED_MESSAGE));
+    }
 }

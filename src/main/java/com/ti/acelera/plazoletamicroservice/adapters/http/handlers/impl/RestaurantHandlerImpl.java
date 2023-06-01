@@ -1,15 +1,18 @@
 package com.ti.acelera.plazoletamicroservice.adapters.http.handlers.impl;
 
 
+import com.ti.acelera.plazoletamicroservice.adapters.http.dto.request.OrderRequestDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.request.RestaurantRequestDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.DishResponseDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.RestaurantResponseDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.handlers.IRestaurantHandler;
 import com.ti.acelera.plazoletamicroservice.adapters.http.mapper.IDishResponseMapper;
+import com.ti.acelera.plazoletamicroservice.adapters.http.mapper.IOrderRestaurantRequestMapper;
 import com.ti.acelera.plazoletamicroservice.adapters.http.mapper.IRestaurantRequestMapper;
 import com.ti.acelera.plazoletamicroservice.adapters.http.mapper.IRestaurantResponseMapper;
 import com.ti.acelera.plazoletamicroservice.domain.api.IRestaurantServicePort;
 import com.ti.acelera.plazoletamicroservice.domain.model.Dish;
+import com.ti.acelera.plazoletamicroservice.domain.model.OrderRestaurant;
 import com.ti.acelera.plazoletamicroservice.domain.model.Restaurant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,6 +25,14 @@ public class RestaurantHandlerImpl implements IRestaurantHandler {
     private final IRestaurantRequestMapper restaurantRequestMapper;
     private final IRestaurantResponseMapper restaurantResponseMapper;
     private final IDishResponseMapper dishResponseMapper;
+    private final IOrderRestaurantRequestMapper orderRestaurantRequestMapper;
+
+    @Override
+    public void makeOrder(Long clientId,OrderRequestDto orderRequestDto) {
+        OrderRestaurant orderRestaurant =  orderRestaurantRequestMapper.toOrderRestaurant( orderRequestDto );
+        orderRestaurant.setIdClient( clientId );
+        restaurantServicePort.makeOrder( orderRestaurant );
+    }
 
     @Override
     public Page<DishResponseDto> pageDishes(Long restaurantId, Long categoryId , int page, int size) {
