@@ -5,6 +5,6 @@ import com.ti.acelera.plazoletamicroservice.domain.model.OrderRestaurant;
 public interface IOrderRestaurantPersistencePort {
 
     boolean hasUnfinishedOrders( Long clientId );
-    void createNewOrder(OrderRestaurant orderRestaurant);
+    Long createNewOrder(OrderRestaurant orderRestaurant);
 
 }

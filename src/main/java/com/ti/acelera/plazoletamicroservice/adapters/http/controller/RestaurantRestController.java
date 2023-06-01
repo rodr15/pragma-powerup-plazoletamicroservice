@@ -78,12 +78,13 @@ public class RestaurantRestController {
 
     @SecurityRequirement(name = "jwt")
     @PostMapping("/order")
-    public ResponseEntity<String> order(@RequestAttribute("userId") String userId,
-            @Valid @RequestBody @Schema(
-                    description = "The request body",
-                    example = OrderRequestDto.EXAMPLE
-            ) OrderRequestDto orderRequestDto) {
-        restaurantHandler.makeOrder(parseLong(userId),orderRequestDto );
-        return ResponseEntity.ok("");
+    public ResponseEntity<Map<String, String>> order(@RequestAttribute("userId") String userId,
+                                                     @Valid @RequestBody @Schema(
+                                                             description = "The request body",
+                                                             example = OrderRequestDto.EXAMPLE
+                                                     ) OrderRequestDto orderRequestDto) {
+        restaurantHandler.makeOrder(parseLong(userId), orderRequestDto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.ORDER_CREATED_MESSAGE));
     }
 }

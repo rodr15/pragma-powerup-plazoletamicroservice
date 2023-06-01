@@ -31,7 +31,7 @@ public class RestaurantUseCase implements IRestaurantServicePort {
 
 
     @Override
-    public OrderRestaurant makeOrder(OrderRestaurant orderRestaurant) {
+    public Long makeOrder(OrderRestaurant orderRestaurant) {
 
         if (orderRestaurantPersistencePort.hasUnfinishedOrders(orderRestaurant.getIdClient())) {
            throw new ThisClientHasUnfinishedOrdersException();
@@ -57,8 +57,8 @@ public class RestaurantUseCase implements IRestaurantServicePort {
         orderRestaurant.setState(EARRING_ORDER);
         orderRestaurant.setDate(LocalDate.now());
 
-        orderRestaurantPersistencePort.createNewOrder(orderRestaurant);
-        return orderRestaurant;
+
+        return orderRestaurantPersistencePort.createNewOrder(orderRestaurant);
     }
 
     @Override
