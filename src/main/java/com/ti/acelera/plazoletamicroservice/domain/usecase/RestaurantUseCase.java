@@ -48,6 +48,12 @@ public class RestaurantUseCase implements IRestaurantServicePort {
                 .map(Dish::getId)
                 .toList();
 
+        Set<Long> uniqueDishIds = new HashSet<>(dishIds);
+
+        if( dishIds.size() != uniqueDishIds.size() ){
+                throw new MalformedOrderException();
+        }
+
         List<Dish> dishesFromDatabase = dishPersistencePort.findAllDishesByIdAndByRestaurantId(orderRestaurant.getRestaurant().getId(), dishIds);
 
         if (dishesFromDatabase.size() != dishIds.size()) {

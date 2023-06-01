@@ -55,4 +55,10 @@ public class ControllerAdvisor {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, HAS_UNFINISHED_ORDERS));
     }
+    @ExceptionHandler(MalformedOrderException.class)
+    public ResponseEntity<Map<String, String>> handleMalformedOrderException(
+            MalformedOrderException thisMalformedOrderException) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, BAD_ORDER_MESSAGE));
+    }
 }
