@@ -1,9 +1,7 @@
 package com.ti.acelera.plazoletamicroservice.domain.usecase;
 
 import com.ti.acelera.plazoletamicroservice.domain.api.IRestaurantServicePort;
-import com.ti.acelera.plazoletamicroservice.domain.exceptions.BadPagedException;
-import com.ti.acelera.plazoletamicroservice.domain.exceptions.RestaurantNotExistsException;
-import com.ti.acelera.plazoletamicroservice.domain.exceptions.RoleNotAllowedException;
+import com.ti.acelera.plazoletamicroservice.domain.exceptions.*;
 import com.ti.acelera.plazoletamicroservice.domain.gateway.IUserClient;
 import com.ti.acelera.plazoletamicroservice.domain.model.Dish;
 import com.ti.acelera.plazoletamicroservice.domain.model.DishOrder;
@@ -36,15 +34,11 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     public OrderRestaurant makeOrder(OrderRestaurant orderRestaurant) {
 
         if (orderRestaurantPersistencePort.hasUnfinishedOrders(orderRestaurant.getIdClient())) {
-            //TODO: CHANGE FOR EXCEPTIONS
-            System.out.println(" EL CLIENTE TIENE PEDIDOS SIN FINALIZAR ");
-            return null;
+           throw new ThisClientHasUnfinishedOrdersException();
         }
 
         if (!restaurantPersistencePort.restaurantExists(orderRestaurant.getRestaurant().getId())) {
-            //TODO: CHANGE FOR EXCEPTIONS
-            System.out.println(" EL RESTAURANTE ELEGIDO NO EXISTE ");
-            return null;
+            throw new RestaurantNotExistsException();
         }
 
 
@@ -57,9 +51,7 @@ public class RestaurantUseCase implements IRestaurantServicePort {
         List<Dish> dishesFromDatabase = dishPersistencePort.findAllDishesByIdAndByRestaurantId(orderRestaurant.getRestaurant().getId(), dishIds);
 
         if (dishesFromDatabase.size() != dishIds.size()) {
-            //TODO: CHANGE FOR EXCEPTIONS
-            System.out.println(" NO SE HA ENCONTRADO ALGUN PLATO ");
-            return null;
+            throw new DishNotFoundException();
         }
 
         orderRestaurant.setState(EARRING_ORDER);

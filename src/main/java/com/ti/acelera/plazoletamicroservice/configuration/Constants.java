@@ -12,6 +12,7 @@ public class Constants {
     public static final String RESPONSE_MESSAGE_KEY = "message";
     public static final String RESTAURANT_CREATED_MESSAGE = "Restaurant created successfully";
     public static final String RESPONSE_ERROR_MESSAGE_KEY = "error";
+    public static final String HAS_UNFINISHED_ORDERS = "This user has unfinished orders";
     public static final String PERSON_NOT_FOUND_MESSAGE = "No person found with the id provided";
     public static final String DISH_NOT_FOUND = "No dish found with the id provided";
     public static final String BAD_PAGED_MESSAGE = "The pagination is malformed";
