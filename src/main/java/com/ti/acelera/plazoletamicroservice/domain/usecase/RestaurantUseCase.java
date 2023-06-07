@@ -7,6 +7,7 @@ import com.ti.acelera.plazoletamicroservice.domain.model.Dish;
 import com.ti.acelera.plazoletamicroservice.domain.model.DishOrder;
 import com.ti.acelera.plazoletamicroservice.domain.model.OrderRestaurant;
 import com.ti.acelera.plazoletamicroservice.domain.model.Restaurant;
+import com.ti.acelera.plazoletamicroservice.domain.spi.IDishOrderPersistencePort;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IDishPersistencePort;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IOrderRestaurantPersistencePort;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IRestaurantPersistencePort;
@@ -27,14 +28,33 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     private final IRestaurantPersistencePort restaurantPersistencePort;
     private final IDishPersistencePort dishPersistencePort;
     private final IOrderRestaurantPersistencePort orderRestaurantPersistencePort;
+    private final IDishOrderPersistencePort dishOrderPersistencePort;
     private final IUserClient userClient;
 
+
+    @Override
+    public Page<OrderRestaurant> getOrdersList(Long employeeId, String state, int page, int size) {
+        Long restaurantId = restaurantPersistencePort.getRestaurantIdByEmployeeId(employeeId)
+                .orElseThrow(RestaurantNotExistsException::new);
+
+        Page<OrderRestaurant> ordersList = orderRestaurantPersistencePort.getOrdersList(restaurantId, state, page, size);
+
+        ordersList.forEach(orderRestaurant -> {
+            List<DishOrder> dishOrders = dishOrderPersistencePort.getDishOrderByOrderRestaurantId(orderRestaurant.getId());
+            if(dishOrders.isEmpty()) {
+                throw new MalformedOrderException();
+            }
+            orderRestaurant.setDishes(dishOrders);
+        });
+
+        return ordersList;
+    }
 
     @Override
     public Long makeOrder(OrderRestaurant orderRestaurant) {
 
         if (orderRestaurantPersistencePort.hasUnfinishedOrders(orderRestaurant.getIdClient())) {
-           throw new ThisClientHasUnfinishedOrdersException();
+            throw new ThisClientHasUnfinishedOrdersException();
         }
 
         if (!restaurantPersistencePort.restaurantExists(orderRestaurant.getRestaurant().getId())) {
@@ -50,8 +70,8 @@ public class RestaurantUseCase implements IRestaurantServicePort {
 
         Set<Long> uniqueDishIds = new HashSet<>(dishIds);
 
-        if( dishIds.size() != uniqueDishIds.size() ){
-                throw new MalformedOrderException();
+        if (dishIds.size() != uniqueDishIds.size()) {
+            throw new MalformedOrderException();
         }
 
         List<Dish> dishesFromDatabase = dishPersistencePort.findAllDishesByIdAndByRestaurantId(orderRestaurant.getRestaurant().getId(), dishIds);

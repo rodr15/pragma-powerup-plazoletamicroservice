@@ -4,6 +4,7 @@ package com.ti.acelera.plazoletamicroservice.adapters.http.controller;
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.request.OrderRequestDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.request.RestaurantRequestDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.DishResponseDto;
+import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.OrderRestaurantResponseDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.RestaurantResponseDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.handlers.IRestaurantHandler;
 import com.ti.acelera.plazoletamicroservice.configuration.Constants;
@@ -87,4 +88,16 @@ public class RestaurantRestController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.ORDER_CREATED_MESSAGE));
     }
+    @SecurityRequirement(name = "jwt")
+    @GetMapping("/order-list")
+    public ResponseEntity<Page<OrderRestaurantResponseDto>> listOrder(@RequestAttribute("userId") String userId,
+                                                                @RequestParam(defaultValue = "FINISHED") String state,
+                                                                @RequestParam(defaultValue = "0") int page,
+                                                                @RequestParam(defaultValue = "10") int size) {
+
+
+        return ResponseEntity.ok(restaurantHandler.getOrdersListByEmployeeId( parseLong(userId),state,page,size ));
+    }
+
+
 }

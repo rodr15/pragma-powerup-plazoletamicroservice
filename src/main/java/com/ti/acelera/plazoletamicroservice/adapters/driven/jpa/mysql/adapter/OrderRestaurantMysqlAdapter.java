@@ -9,6 +9,9 @@ import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.repositori
 import com.ti.acelera.plazoletamicroservice.domain.model.OrderRestaurant;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IOrderRestaurantPersistencePort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -21,6 +24,12 @@ public class OrderRestaurantMysqlAdapter implements IOrderRestaurantPersistenceP
     private final IOrderEntityMapper orderEntityMapper;
     private final IDishOrderRepository dishOrderRepository;
     private final IDishOrderEntityMapper dishOrderEntityMapper;
+
+    @Override
+    public Page<OrderRestaurant> getOrdersList(Long restaurantId, String state, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return orderRestaurantRepository.findByRestaurantIdAndState(restaurantId, state, pageable).map(orderEntityMapper::toOrder);
+    }
 
     @Override
     public boolean hasUnfinishedOrders(Long clientId) {

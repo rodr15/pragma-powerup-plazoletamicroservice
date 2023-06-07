@@ -8,6 +8,7 @@ import java.util.Optional;
 public interface IRestaurantPersistencePort {
     void saveRestaurant(Restaurant restaurant);
 
+    Optional<Long> getRestaurantIdByEmployeeId(Long employeeId);
     boolean restaurantExists(Long id);
     Optional<Restaurant> getRestaurant(Long id);
     Page<Restaurant> getAllRestaurants(int page ,int size);
