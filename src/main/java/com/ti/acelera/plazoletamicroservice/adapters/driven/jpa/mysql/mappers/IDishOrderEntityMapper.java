@@ -10,6 +10,7 @@ import org.mapstruct.ReportingPolicy;
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
         unmappedSourcePolicy = ReportingPolicy.IGNORE)
 public interface IDishOrderEntityMapper {
+    @Mapping(target = "order.id", source = "orderRestaurant.id")
     DishOrder toDishOrder(DishOrderEntity dishOrderEntity);
     @Mapping(target = "orderRestaurant.id", source = "order.id")
     DishOrderEntity toDishOrderEntity(DishOrder dishOrder);

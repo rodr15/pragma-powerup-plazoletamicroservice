@@ -25,6 +25,12 @@ public class RestaurantMysqlAdapter implements IRestaurantPersistencePort {
     }
 
     @Override
+    public Optional<Long> getRestaurantIdByEmployeeId(Long employeeId) {
+        Optional<RestaurantEntity> restaurant = restaurantRepository.findRestaurantsByEmployeeId(String.valueOf(employeeId));
+        return restaurant.map(RestaurantEntity::getId);
+    }
+
+    @Override
     public boolean restaurantExists(Long id) {
         return restaurantRepository.existsById(id);
     }
@@ -33,21 +39,16 @@ public class RestaurantMysqlAdapter implements IRestaurantPersistencePort {
     public Optional<Restaurant> getRestaurant(Long id) {
 
         Optional<RestaurantEntity> restaurant = restaurantRepository.findById(id);
-
-        if (restaurant.isEmpty()) {
-            return Optional.empty();
-        }
-
-        return Optional.ofNullable(restaurantEntityMapper.toRestaurant(restaurant.get()));
+        return restaurant.map(restaurantEntityMapper::toRestaurant);
 
     }
 
     @Override
-    public Page<Restaurant> getAllRestaurants(int page ,int size) {
+    public Page<Restaurant> getAllRestaurants(int page, int size) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("name").ascending());
-        Page<RestaurantEntity>  restaurants = restaurantRepository.findAll( pageable );
+        Page<RestaurantEntity> restaurants = restaurantRepository.findAll(pageable);
 
-        return restaurants.map( restaurantEntityMapper::toRestaurant );
+        return restaurants.map(restaurantEntityMapper::toRestaurant);
     }
 }

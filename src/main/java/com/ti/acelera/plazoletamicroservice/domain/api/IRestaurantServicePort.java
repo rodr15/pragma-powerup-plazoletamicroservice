@@ -6,6 +6,7 @@ import com.ti.acelera.plazoletamicroservice.domain.model.Restaurant;
 import org.springframework.data.domain.Page;
 
 public interface IRestaurantServicePort {
+    Page<OrderRestaurant> getOrdersList(Long restaurantId, String state, int page, int size);
     Long makeOrder(OrderRestaurant orderRestaurant) ;
     Page<Dish> pageDish( Long restaurantId, Long categoryId, int page,int size );
     Page<Restaurant> pageRestaurants(int page, int size);
