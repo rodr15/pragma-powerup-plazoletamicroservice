@@ -3,10 +3,7 @@ package com.ti.acelera.plazoletamicroservice.domain.usecase;
 import com.ti.acelera.plazoletamicroservice.domain.api.IRestaurantServicePort;
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.*;
 import com.ti.acelera.plazoletamicroservice.domain.gateway.IUserClient;
-import com.ti.acelera.plazoletamicroservice.domain.model.Dish;
-import com.ti.acelera.plazoletamicroservice.domain.model.DishOrder;
-import com.ti.acelera.plazoletamicroservice.domain.model.OrderRestaurant;
-import com.ti.acelera.plazoletamicroservice.domain.model.Restaurant;
+import com.ti.acelera.plazoletamicroservice.domain.model.*;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IDishOrderPersistencePort;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IDishPersistencePort;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IOrderRestaurantPersistencePort;
@@ -20,7 +17,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.ti.acelera.plazoletamicroservice.configuration.Constants.EARRING_ORDER;
 import static java.lang.Long.parseLong;
 
 @AllArgsConstructor
@@ -52,12 +48,17 @@ public class RestaurantUseCase implements IRestaurantServicePort {
             throw new OrdersNotFoundException();
         }
 
-        selectedOrdersRestaurant.forEach(selectedOrderRestaurant -> selectedOrderRestaurant.setIdChef(parseLong(employeeId)));
+        selectedOrdersRestaurant.forEach(selectedOrderRestaurant -> {
+                    selectedOrderRestaurant.setIdChef(parseLong(employeeId));
+                    selectedOrderRestaurant.setOrderStatus(selectedOrderRestaurant.getOrderStatus().next());
+                }
+
+        );
         orderRestaurantPersistencePort.saveAllOrderRestaurant(selectedOrdersRestaurant);
     }
 
     @Override
-    public Page<OrderRestaurant> getOrdersPage(Long employeeId, String state, int page, int size) {
+    public Page<OrderRestaurant> getOrdersPage(Long employeeId, OrderStatus state, int page, int size) {
         Long restaurantId = restaurantPersistencePort.getRestaurantIdByEmployeeId(employeeId)
                 .orElseThrow(RestaurantNotExistsException::new);
 
@@ -104,7 +105,7 @@ public class RestaurantUseCase implements IRestaurantServicePort {
             throw new DishNotFoundException();
         }
 
-        orderRestaurant.setState(EARRING_ORDER);
+        orderRestaurant.setOrderStatus(OrderStatus.EARRING_ORDER);
         orderRestaurant.setDate(LocalDate.now());
 
 

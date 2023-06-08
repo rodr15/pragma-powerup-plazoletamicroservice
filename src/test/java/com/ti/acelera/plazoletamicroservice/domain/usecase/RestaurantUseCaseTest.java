@@ -454,7 +454,7 @@ class RestaurantUseCaseTest {
         // Arrange
         Long employeeId = 123L;
         Long restaurantId = 1L;
-        String state = "FINISHED";
+        OrderStatus state = OrderStatus.FINISHED_ORDER;
         int page = 0;
         int size = 10;
 
@@ -489,7 +489,7 @@ class RestaurantUseCaseTest {
     void getOrdersList_InvalidEmployeeId_ThrowsException() {
         // Arrange
         Long employeeId = 123L;
-        String state = "FINISHED";
+        OrderStatus state = OrderStatus.FINISHED_ORDER;
         int page = 0;
         int size = 10;
 
@@ -509,7 +509,7 @@ class RestaurantUseCaseTest {
     void getOrdersList_EmptyDishOrders_ShouldThrowMalformedOrderException() {
         // Arrange
         Long employeeId = 123L;
-        String state = "OPEN";
+        OrderStatus state = OrderStatus.EARRING_ORDER;
         int page = 0;
         int size = 10;
         Long restaurantId = 456L;
