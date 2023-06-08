@@ -105,8 +105,8 @@ public class RestaurantRestController {
     public ResponseEntity<Map<String, String>> assignOrder(@RequestAttribute("userId") String userId,
                                                                       @RequestParam List<Long> ordersId) {
         restaurantHandler.assignEmployeeToOrders(userId,ordersId);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.ORDER_CREATED_MESSAGE));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.EMPLOYEE_ASSIGN_TO_ORDER_MESSAGE));
     }
 
 }

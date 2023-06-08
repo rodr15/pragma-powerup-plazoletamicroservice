@@ -36,15 +36,14 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     @Override
     public void assignEmployeeToOrder(String employeeId, List<Long> ordersId) {
         Long restaurantId = restaurantPersistencePort.getRestaurantIdByEmployeeId(parseLong(employeeId))
-                .orElseThrow(RestaurantNotExistsException::new);// TODO: Replace this exception
+                .orElseThrow(EmployeeNotFindException::new);
 
-        List<OrderRestaurant> restaurantOrdersList = orderRestaurantPersistencePort.getOrdersList( restaurantId );
+        List<OrderRestaurant> restaurantOrdersList = orderRestaurantPersistencePort.getOrdersList(restaurantId);
         List<OrderRestaurant> selectedOrdersRestaurant = orderRestaurantPersistencePort.getOrdersById(ordersId)
-                .orElseThrow(RestaurantNotExistsException::new); // TODO: REPLACE THIS EXCEPTION
+                .orElseThrow(OrdersNotFoundException::new);
 
-        if(selectedOrdersRestaurant.size() != ordersId.size()){
-            //TODO: throw new Exception;
-            return;
+        if (selectedOrdersRestaurant.size() != ordersId.size()) {
+            throw new OrdersNotFoundException();
         }
 
         boolean allIdsPresent = selectedOrdersRestaurant
@@ -54,12 +53,11 @@ public class RestaurantUseCase implements IRestaurantServicePort {
                         .anyMatch(selectedOrder -> selectedOrder.getId().equals(restaurantOrder)));
 
         if (!allIdsPresent) {
-            //TODO: throw new Exception;
-            return;
+            throw new OrdersNotFoundException();
         }
 
-       selectedOrdersRestaurant.forEach(selectedOrderRestaurant -> selectedOrderRestaurant.setIdChef(parseLong(employeeId)));
-       orderRestaurantPersistencePort.saveAllOrderRestaurant(selectedOrdersRestaurant);
+        selectedOrdersRestaurant.forEach(selectedOrderRestaurant -> selectedOrderRestaurant.setIdChef(parseLong(employeeId)));
+        orderRestaurantPersistencePort.saveAllOrderRestaurant(selectedOrdersRestaurant);
     }
 
     @Override

@@ -14,8 +14,11 @@ public class Constants {
     public static final String ORDER_CREATED_MESSAGE = "Order created successfully";
     public static final String RESPONSE_ERROR_MESSAGE_KEY = "error";
     public static final String HAS_UNFINISHED_ORDERS = "This user has unfinished orders";
-    public static final String BAD_ORDER_MESSAGE = "The order is malformed,";
+    public static final String BAD_ORDER_MESSAGE = "The order is malformed";
+    public static final String ORDER_NOT_FOUND_MESSAGE = "No order found with the one or more of the ids provided";
+    public static final String EMPLOYEE_ASSIGN_TO_ORDER_MESSAGE = "The employee has been assign to the orders successfully";
     public static final String PERSON_NOT_FOUND_MESSAGE = "No person found with the id provided";
+    public static final String EMPLOYEE_NOT_FOUND_MESSAGE = "No employee found with the id provided";
     public static final String DISH_NOT_FOUND = "No dish found with the id provided";
     public static final String BAD_PAGED_MESSAGE = "The pagination is malformed";
     public static final String ROLE_NOT_ALLOWED_MESSAGE = "No permission granted to create restaurant for this role";
