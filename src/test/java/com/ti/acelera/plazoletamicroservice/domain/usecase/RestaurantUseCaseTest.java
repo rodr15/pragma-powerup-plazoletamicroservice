@@ -642,6 +642,7 @@ class RestaurantUseCaseTest {
                 id -> {
                     OrderRestaurant orderRestaurant = new OrderRestaurant();
                     orderRestaurant.setId(id);
+                    orderRestaurant.setOrderStatus(OrderStatus.EARRING_ORDER);
                     orderRestaurant.setRestaurant(restaurant);
                     orderRestaurantList.add(orderRestaurant);
                 });
