@@ -1,5 +1,6 @@
 package com.ti.acelera.plazoletamicroservice.domain.usecase;
 
+import com.ti.acelera.plazoletamicroservice.domain.api.IRestaurantServicePort;
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.*;
 import com.ti.acelera.plazoletamicroservice.domain.gateway.IUserClient;
 import com.ti.acelera.plazoletamicroservice.domain.model.*;
@@ -26,7 +27,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class RestaurantUseCaseTest {
 
-    private RestaurantUseCase restaurantUseCase;
+    private IRestaurantServicePort restaurantUseCase;
 
     @Mock
     private IRestaurantPersistencePort restaurantPersistencePort;
@@ -536,4 +537,115 @@ class RestaurantUseCaseTest {
         verify(orderRestaurantPersistencePort, times(1)).getOrdersList(restaurantId, state, page, size);
         verify(dishOrderPersistencePort, times(1)).getDishOrderByOrderRestaurantId(anyLong());
     }
+
+    @Test
+    void assignEmployeeToOrder_ValidData_SuccessfullyAssigned() {
+        // Arrange
+        String employeeId = "123";
+        Long restaurantId = 1L;
+        List<Long> ordersId = Arrays.asList(1L, 2L, 3L);
+
+        List<OrderRestaurant> restaurantOrdersList = createOrderRestaurantList(restaurantId, ordersId);
+        List<OrderRestaurant> selectedOrdersRestaurant = createOrderRestaurantList(restaurantId, ordersId);
+
+        when(restaurantPersistencePort.getRestaurantIdByEmployeeId(anyLong()))
+                .thenReturn(Optional.of(restaurantId));
+        when(orderRestaurantPersistencePort.getOrdersList(restaurantId)).thenReturn(restaurantOrdersList);
+        when(orderRestaurantPersistencePort.getOrdersById(ordersId)).thenReturn(Optional.of(selectedOrdersRestaurant));
+
+        // Act
+        assertDoesNotThrow(() -> restaurantUseCase.assignEmployeeToOrder(employeeId, ordersId));
+
+        // Assert
+
+        verify(orderRestaurantPersistencePort, times(1)).getOrdersById(ordersId);
+        verify(orderRestaurantPersistencePort, times(1)).saveAllOrderRestaurant(selectedOrdersRestaurant);
+
+    }
+
+    @Test
+    void assignEmployeeToOrder_InvalidEmployeeId_ThrowsEmployeeNotFindException() {
+        // Arrange
+        String employeeId = "1";
+        List<Long> ordersId = Arrays.asList(1L, 2L, 3L);
+
+        when(restaurantPersistencePort.getRestaurantIdByEmployeeId(anyLong()))
+                .thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(EmployeeNotFindException.class,
+                () -> restaurantUseCase.assignEmployeeToOrder(employeeId, ordersId));
+
+        verify(restaurantPersistencePort, times(1)).getRestaurantIdByEmployeeId(anyLong());
+        verify(orderRestaurantPersistencePort, never()).getOrdersList(anyLong());
+        verify(orderRestaurantPersistencePort, never()).getOrdersById(anyList());
+        verify(orderRestaurantPersistencePort, never()).saveAllOrderRestaurant(anyList());
+    }
+
+    @Test
+    void assignEmployeeToOrder_InvalidOrdersId_ThrowsOrdersNotFoundException() {
+        // Arrange
+        String employeeId = "123";
+        Long restaurantId = 1L;
+        List<Long> ordersId = Arrays.asList(1L, 2L, 3L);
+
+        List<OrderRestaurant> restaurantOrdersList = createOrderRestaurantList(restaurantId, ordersId);
+
+        when(restaurantPersistencePort.getRestaurantIdByEmployeeId(anyLong()))
+                .thenReturn(Optional.of(restaurantId));
+        when(orderRestaurantPersistencePort.getOrdersList(restaurantId)).thenReturn(restaurantOrdersList);
+        when(orderRestaurantPersistencePort.getOrdersById(ordersId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(OrdersNotFoundException.class,
+                () -> restaurantUseCase.assignEmployeeToOrder(employeeId, ordersId));
+
+        verify(restaurantPersistencePort, times(1)).getRestaurantIdByEmployeeId(anyLong());
+        verify(orderRestaurantPersistencePort, times(1)).getOrdersList(anyLong());
+        verify(orderRestaurantPersistencePort, times(1)).getOrdersById(anyList());
+        verify(orderRestaurantPersistencePort, never()).saveAllOrderRestaurant(anyList());
+    }
+
+    @Test
+    void assignEmployeeToOrder_NotFoundAllOrders_ThrowsOrdersNotFoundException() {
+        // Arrange
+        String employeeId = "123";
+        Long restaurantId = 1L;
+        List<Long> ordersIds = Arrays.asList(1L, 2L);
+        List<Long> selectedOrdersIds = Arrays.asList(1L, 2L,3L);
+
+        List<OrderRestaurant> restaurantOrdersList = createOrderRestaurantList(restaurantId, ordersIds);
+        List<OrderRestaurant> selectedOrdersList = createOrderRestaurantList(restaurantId, selectedOrdersIds);
+
+        when(restaurantPersistencePort.getRestaurantIdByEmployeeId(anyLong()))
+                .thenReturn(Optional.of(restaurantId));
+        when(orderRestaurantPersistencePort.getOrdersList(restaurantId)).thenReturn(restaurantOrdersList);
+        when(orderRestaurantPersistencePort.getOrdersById(selectedOrdersIds)).thenReturn(Optional.of(selectedOrdersList));
+
+        // Act & Assert
+        assertThrows(OrdersNotFoundException.class,
+                () -> restaurantUseCase.assignEmployeeToOrder(employeeId, selectedOrdersIds));
+
+        verify(restaurantPersistencePort, times(1)).getRestaurantIdByEmployeeId(anyLong());
+        verify(orderRestaurantPersistencePort, times(1)).getOrdersList(anyLong());
+        verify(orderRestaurantPersistencePort, times(1)).getOrdersById(anyList());
+        verify(orderRestaurantPersistencePort, never()).saveAllOrderRestaurant(anyList());
+    }
+
+    private List<OrderRestaurant> createOrderRestaurantList(Long restaurantId, List<Long> orderRestaurantIds) {
+
+        List<OrderRestaurant> orderRestaurantList = new ArrayList<>();
+        Restaurant restaurant = new Restaurant();
+        restaurant.setId(restaurantId);
+
+        orderRestaurantIds.forEach(
+                id -> {
+                    OrderRestaurant orderRestaurant = new OrderRestaurant();
+                    orderRestaurant.setId(id);
+                    orderRestaurant.setRestaurant(restaurant);
+                    orderRestaurantList.add(orderRestaurant);
+                });
+        return orderRestaurantList;
+    }
+
 }
