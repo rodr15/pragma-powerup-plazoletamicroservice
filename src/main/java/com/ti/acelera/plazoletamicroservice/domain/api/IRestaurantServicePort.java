@@ -5,12 +5,15 @@ import com.ti.acelera.plazoletamicroservice.domain.model.OrderRestaurant;
 import com.ti.acelera.plazoletamicroservice.domain.model.Restaurant;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 public interface IRestaurantServicePort {
-    Page<OrderRestaurant> getOrdersList(Long restaurantId, String state, int page, int size);
+    void assignEmployeeToOrder(String employeeId, List<Long> ordersId);
+    Page<OrderRestaurant> getOrdersPage(Long restaurantId, String state, int page, int size);
     Long makeOrder(OrderRestaurant orderRestaurant) ;
     Page<Dish> pageDish( Long restaurantId, Long categoryId, int page,int size );
     Page<Restaurant> pageRestaurants(int page, int size);
     void saveRestaurant(Restaurant restaurant);
     boolean verifyRestaurantOwner(String userId, Long restaurantId);
-    void assignEmployee(String userId, Long restaurantId);
+    void assignEmployeeToRestaurant(String userId, Long restaurantId);
 }

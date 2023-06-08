@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.ti.acelera.plazoletamicroservice.configuration.Constants.EARRING_ORDER;
+import static java.lang.Long.parseLong;
 
 @AllArgsConstructor
 public class RestaurantUseCase implements IRestaurantServicePort {
@@ -33,7 +34,36 @@ public class RestaurantUseCase implements IRestaurantServicePort {
 
 
     @Override
-    public Page<OrderRestaurant> getOrdersList(Long employeeId, String state, int page, int size) {
+    public void assignEmployeeToOrder(String employeeId, List<Long> ordersId) {
+        Long restaurantId = restaurantPersistencePort.getRestaurantIdByEmployeeId(parseLong(employeeId))
+                .orElseThrow(RestaurantNotExistsException::new);// TODO: Replace this exception
+
+        List<OrderRestaurant> restaurantOrdersList = orderRestaurantPersistencePort.getOrdersList( restaurantId );
+        List<OrderRestaurant> selectedOrdersRestaurant = orderRestaurantPersistencePort.getOrdersById(ordersId)
+                .orElseThrow(RestaurantNotExistsException::new); // TODO: REPLACE THIS EXCEPTION
+
+        if(selectedOrdersRestaurant.size() != ordersId.size()){
+            //TODO: throw new Exception;
+            return;
+        }
+
+        boolean allIdsPresent = selectedOrdersRestaurant
+                .stream()
+                .map(OrderRestaurant::getId)
+                .allMatch(restaurantOrder -> restaurantOrdersList.stream()
+                        .anyMatch(selectedOrder -> selectedOrder.getId().equals(restaurantOrder)));
+
+        if (!allIdsPresent) {
+            //TODO: throw new Exception;
+            return;
+        }
+
+       selectedOrdersRestaurant.forEach(selectedOrderRestaurant -> selectedOrderRestaurant.setIdChef(parseLong(employeeId)));
+       orderRestaurantPersistencePort.saveAllOrderRestaurant(selectedOrdersRestaurant);
+    }
+
+    @Override
+    public Page<OrderRestaurant> getOrdersPage(Long employeeId, String state, int page, int size) {
         Long restaurantId = restaurantPersistencePort.getRestaurantIdByEmployeeId(employeeId)
                 .orElseThrow(RestaurantNotExistsException::new);
 
@@ -41,7 +71,7 @@ public class RestaurantUseCase implements IRestaurantServicePort {
 
         ordersList.forEach(orderRestaurant -> {
             List<DishOrder> dishOrders = dishOrderPersistencePort.getDishOrderByOrderRestaurantId(orderRestaurant.getId());
-            if(dishOrders.isEmpty()) {
+            if (dishOrders.isEmpty()) {
                 throw new MalformedOrderException();
             }
             orderRestaurant.setDishes(dishOrders);
@@ -145,7 +175,7 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     }
 
     @Override
-    public void assignEmployee(String userId, Long restaurantId) {
+    public void assignEmployeeToRestaurant(String userId, Long restaurantId) {
         Optional<Restaurant> restaurant = restaurantPersistencePort.getRestaurant(restaurantId);
 
         if (restaurant.isEmpty()) {

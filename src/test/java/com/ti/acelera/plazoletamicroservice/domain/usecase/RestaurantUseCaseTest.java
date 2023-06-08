@@ -135,7 +135,7 @@ class RestaurantUseCaseTest {
 
 
         // Act
-        restaurantUseCase.assignEmployee(userId, restaurantId);
+        restaurantUseCase.assignEmployeeToRestaurant(userId, restaurantId);
 
         // Assert
         Set<String> employees = restaurant.getEmployees();
@@ -161,7 +161,7 @@ class RestaurantUseCaseTest {
 
 
         // Act
-        restaurantUseCase.assignEmployee(userId, restaurantId);
+        restaurantUseCase.assignEmployeeToRestaurant(userId, restaurantId);
 
         // Assert
         Set<String> employees = restaurant.getEmployees();
@@ -184,7 +184,7 @@ class RestaurantUseCaseTest {
 
         // Act & Assert
         assertThrows(RestaurantNotExistsException.class,
-                () -> restaurantUseCase.assignEmployee(userId, restaurantId));
+                () -> restaurantUseCase.assignEmployeeToRestaurant(userId, restaurantId));
 
         verify(restaurantPersistencePort, times(1)).getRestaurant(restaurantId);
         verify(restaurantPersistencePort, never()).saveRestaurant(any(Restaurant.class));
@@ -474,7 +474,7 @@ class RestaurantUseCaseTest {
         when(dishOrderPersistencePort.getDishOrderByOrderRestaurantId(restaurantId)).thenReturn(dishOrders);
 
         // Act
-        Page<OrderRestaurant> result = restaurantUseCase.getOrdersList(employeeId, state, page, size);
+        Page<OrderRestaurant> result = restaurantUseCase.getOrdersPage(employeeId, state, page, size);
 
         // Assert
         assertEquals(ordersPage, result);
@@ -497,7 +497,7 @@ class RestaurantUseCaseTest {
 
         // Act and assert
         assertThrows(RestaurantNotExistsException.class, () ->
-                restaurantUseCase.getOrdersList(employeeId, state, page, size));
+                restaurantUseCase.getOrdersPage(employeeId, state, page, size));
 
         verify(restaurantPersistencePort, times(1)).getRestaurantIdByEmployeeId(employeeId);
         verifyNoInteractions(orderRestaurantPersistencePort);
@@ -530,7 +530,7 @@ class RestaurantUseCaseTest {
 
         // Act and Assert
         assertThrows(MalformedOrderException.class, () ->
-                restaurantUseCase.getOrdersList(employeeId, state, page, size));
+                restaurantUseCase.getOrdersPage(employeeId, state, page, size));
 
         verify(restaurantPersistencePort, times(1)).getRestaurantIdByEmployeeId(employeeId);
         verify(orderRestaurantPersistencePort, times(1)).getOrdersList(restaurantId, state, page, size);

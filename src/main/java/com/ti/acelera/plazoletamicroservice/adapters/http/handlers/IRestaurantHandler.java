@@ -8,7 +8,10 @@ import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.OrderRest
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.RestaurantResponseDto;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 public interface IRestaurantHandler {
+    void assignEmployeeToOrders(String employeeId , List<Long> ordersId);
     Page<OrderRestaurantResponseDto> getOrdersListByEmployeeId(Long employeeId, String state, int page, int size );
     void makeOrder(Long clientId,OrderRequestDto orderRequestDto) ;
     Page<DishResponseDto> pageDishes(Long restaurantId, Long categoryId , int page, int size);
