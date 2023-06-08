@@ -61,4 +61,18 @@ public class ControllerAdvisor {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, BAD_ORDER_MESSAGE));
     }
+    @ExceptionHandler(EmployeeNotFindException.class)
+    public ResponseEntity<Map<String, String>> handleEmployeeNotAssignToAnyRestaurantException(
+            EmployeeNotFindException thisEmployeeNotAssignToAnyRestaurantException) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY,EMPLOYEE_NOT_FOUND_MESSAGE ));
+    }
+
+    @ExceptionHandler(OrdersNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleOrdersNotFoundException(
+            OrdersNotFoundException thisOrdersNotFoundException) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, ORDER_NOT_FOUND_MESSAGE));
+    }
+
 }

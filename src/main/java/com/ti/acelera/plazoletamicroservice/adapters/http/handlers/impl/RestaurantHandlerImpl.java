@@ -16,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class RestaurantHandlerImpl implements IRestaurantHandler {
@@ -27,8 +29,13 @@ public class RestaurantHandlerImpl implements IRestaurantHandler {
     private final IOrderRestaurantResponseMapper orderRestaurantResponseMapper;
 
     @Override
+    public void assignEmployeeToOrders(String employeeId, List<Long> ordersId) {
+        restaurantServicePort.assignEmployeeToOrder( employeeId,ordersId );
+    }
+
+    @Override
     public Page<OrderRestaurantResponseDto> getOrdersListByEmployeeId(Long employeeId, String state, int page, int size) {
-        Page<OrderRestaurant> orderRestaurantPage = restaurantServicePort.getOrdersList(employeeId, state, page, size);
+        Page<OrderRestaurant> orderRestaurantPage = restaurantServicePort.getOrdersPage(employeeId, state, page, size);
         return orderRestaurantPage.map(orderRestaurantResponseMapper::toOrderRestaurantResponseDto);
     }
 
@@ -58,7 +65,7 @@ public class RestaurantHandlerImpl implements IRestaurantHandler {
 
     @Override
     public void assignRestaurantEmployee(String employeeId, Long restaurantId) {
-        restaurantServicePort.assignEmployee(employeeId, restaurantId);
+        restaurantServicePort.assignEmployeeToRestaurant(employeeId, restaurantId);
     }
 
     public boolean verifyRestaurantOwner(String userId, Long restaurantId) {

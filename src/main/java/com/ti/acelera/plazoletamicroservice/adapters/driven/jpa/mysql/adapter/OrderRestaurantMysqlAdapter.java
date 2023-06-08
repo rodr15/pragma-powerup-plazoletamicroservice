@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.ti.acelera.plazoletamicroservice.configuration.Constants.FINISHED_ORDER;
 
@@ -25,10 +26,46 @@ public class OrderRestaurantMysqlAdapter implements IOrderRestaurantPersistenceP
     private final IDishOrderRepository dishOrderRepository;
     private final IDishOrderEntityMapper dishOrderEntityMapper;
 
+
+    @Override
+    public Optional<List<OrderRestaurant>> getOrdersById(List<Long> ordersId) {
+        List<OrderRestaurantEntity> list = orderRestaurantRepository.findAllById(ordersId);
+
+        if (list.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(list.stream()
+                .map(orderEntityMapper::toOrder)
+                .toList());
+
+    }
+
+    @Override
+    public List<OrderRestaurant> saveAllOrderRestaurant(List<OrderRestaurant> orderRestaurant) {
+        List<OrderRestaurantEntity> orderRestaurantEntityList = orderRestaurant
+                .stream()
+                .map(orderEntityMapper::toOrderEntity)
+                .toList();
+
+        return orderRestaurantRepository.saveAll(orderRestaurantEntityList)
+                .stream()
+                .map(orderEntityMapper::toOrder)
+                .toList();
+    }
+
     @Override
     public Page<OrderRestaurant> getOrdersList(Long restaurantId, String state, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return orderRestaurantRepository.findByRestaurantIdAndState(restaurantId, state, pageable).map(orderEntityMapper::toOrder);
+    }
+
+    @Override
+    public List<OrderRestaurant> getOrdersList(Long restaurantId) {
+        return  orderRestaurantRepository.findByRestaurantId( restaurantId )
+                .stream()
+                .map( orderEntityMapper::toOrder )
+                .toList();
     }
 
     @Override
@@ -39,16 +76,16 @@ public class OrderRestaurantMysqlAdapter implements IOrderRestaurantPersistenceP
 
     @Override
     public Long createNewOrder(OrderRestaurant orderRestaurant) {
-        OrderRestaurantEntity savedOrderRestraurantEntity = orderRestaurantRepository.save(orderEntityMapper.toOrderEntity(orderRestaurant));
-        OrderRestaurant savedOrderRestraurant = orderEntityMapper.toOrder(savedOrderRestraurantEntity);
+        OrderRestaurantEntity savedOrderRestaurantEntity = orderRestaurantRepository.save(orderEntityMapper.toOrderEntity(orderRestaurant));
+        OrderRestaurant savedOrderRestaurant = orderEntityMapper.toOrder(savedOrderRestaurantEntity);
         orderRestaurant.getDishes().forEach(
                 dishOrder -> {
-                    dishOrder.setOrder(savedOrderRestraurant);
+                    dishOrder.setOrder(savedOrderRestaurant);
                     DishOrderEntity dishOrderEntity = dishOrderEntityMapper.toDishOrderEntity(dishOrder);
                     dishOrderRepository.save(dishOrderEntity);
                 }
         );
 
-        return savedOrderRestraurant.getId();
+        return savedOrderRestaurant.getId();
     }
 }

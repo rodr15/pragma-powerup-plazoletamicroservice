@@ -56,6 +56,27 @@ Make sure you have the following installed before running the microservice:
 ## Usage
 Right-click the class PowerUpApplication and choose Run
 
+## Autenticación y Roles
+
+Para acceder a ciertos endpoints de la API, es necesario autenticarse con un rol determinado. A continuación se detallan los roles y los endpoints asociados:
+
+- `ROLE_ADMIN`: Permite acceder a los siguientes endpoints:
+   - `/restaurant/add` (POST)
+  
+- `ROLE_OWNER`: Permite acceder a los siguientes endpoints:
+  - `/dish/add` (POST)
+  - `/dish/update/{dishId}` (PUT)
+  - `/dish/enable-disable/{dishId}/{dishState}` (PUT)
+
+- `ROLE_EMPLOYEE`: Permite acceder a los siguientes endpoints:
+  - `/restaurant/order-list` (GET)
+  - `/restaurant/assign-order` (PUT)
+
+- `ROLE_CLIENT`: Permite acceder a los siguientes endpoints:
+  - `/restaurant/restaurant-list` (GET)
+  - `/restaurant/{restaurantId}/menu` (GET)
+  - `/restaurant/order` (POST)
+
 ## Documentation
 The microservice documentation is done using Swagger. Once the microservice is up and running, you can access the documentation through the following URL:
 ```sh

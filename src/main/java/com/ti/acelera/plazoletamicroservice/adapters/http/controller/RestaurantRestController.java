@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import static java.lang.Long.parseLong;
@@ -99,5 +100,13 @@ public class RestaurantRestController {
         return ResponseEntity.ok(restaurantHandler.getOrdersListByEmployeeId( parseLong(userId),state,page,size ));
     }
 
+    @SecurityRequirement(name = "jwt")
+    @PutMapping("/assign-order")
+    public ResponseEntity<Map<String, String>> assignOrder(@RequestAttribute("userId") String userId,
+                                                                      @RequestParam List<Long> ordersId) {
+        restaurantHandler.assignEmployeeToOrders(userId,ordersId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.EMPLOYEE_ASSIGN_TO_ORDER_MESSAGE));
+    }
 
 }
