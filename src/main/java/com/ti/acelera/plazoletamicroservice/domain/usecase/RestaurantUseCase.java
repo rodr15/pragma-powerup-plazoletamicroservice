@@ -42,10 +42,6 @@ public class RestaurantUseCase implements IRestaurantServicePort {
         List<OrderRestaurant> selectedOrdersRestaurant = orderRestaurantPersistencePort.getOrdersById(ordersId)
                 .orElseThrow(OrdersNotFoundException::new);
 
-        if (selectedOrdersRestaurant.size() != ordersId.size()) {
-            throw new OrdersNotFoundException();
-        }
-
         boolean allIdsPresent = selectedOrdersRestaurant
                 .stream()
                 .map(OrderRestaurant::getId)
