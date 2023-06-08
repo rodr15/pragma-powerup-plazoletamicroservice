@@ -16,7 +16,7 @@ public class OrderRestaurant {
     private Long id;
     private Long idClient;
     private LocalDate date;
-    private String state;
+    private OrderStatus orderStatus;
     private Long idChef;
     private Restaurant restaurant;
     private List<DishOrder> dishes;
