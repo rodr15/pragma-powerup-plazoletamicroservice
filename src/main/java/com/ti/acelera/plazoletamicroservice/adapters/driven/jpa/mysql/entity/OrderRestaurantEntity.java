@@ -1,6 +1,5 @@
 package com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.entity;
 
-import com.ti.acelera.plazoletamicroservice.domain.model.OrderStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,8 +20,7 @@ public class OrderRestaurantEntity {
     private Long id;
     private Long idClient;
     private Date date;
-    @Enumerated(EnumType.STRING)
-    private OrderStatus orderStatus;
+    private String state;
     private Long idChef;
     @ManyToOne
     @JoinColumn(name = "id_restaurant")
@@ -34,7 +32,7 @@ public class OrderRestaurantEntity {
                 "id=" + id +
                 ", idClient=" + idClient +
                 ", date=" + date +
-                ", state='" + orderStatus + '\'' +
+                ", state='" + state + '\'' +
                 ", idChef=" + idChef +
                 ", restaurant=" + restaurant +
                 '}';

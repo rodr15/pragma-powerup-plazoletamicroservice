@@ -11,7 +11,6 @@ import com.ti.acelera.plazoletamicroservice.adapters.http.mapper.*;
 import com.ti.acelera.plazoletamicroservice.domain.api.IRestaurantServicePort;
 import com.ti.acelera.plazoletamicroservice.domain.model.Dish;
 import com.ti.acelera.plazoletamicroservice.domain.model.OrderRestaurant;
-import com.ti.acelera.plazoletamicroservice.domain.model.OrderStatus;
 import com.ti.acelera.plazoletamicroservice.domain.model.Restaurant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -35,7 +34,7 @@ public class RestaurantHandlerImpl implements IRestaurantHandler {
     }
 
     @Override
-    public Page<OrderRestaurantResponseDto> getOrdersListByEmployeeId(Long employeeId, OrderStatus state, int page, int size) {
+    public Page<OrderRestaurantResponseDto> getOrdersListByEmployeeId(Long employeeId, String state, int page, int size) {
         Page<OrderRestaurant> orderRestaurantPage = restaurantServicePort.getOrdersPage(employeeId, state, page, size);
         return orderRestaurantPage.map(orderRestaurantResponseMapper::toOrderRestaurantResponseDto);
     }

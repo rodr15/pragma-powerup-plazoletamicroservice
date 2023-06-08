@@ -1,6 +1,5 @@
 package com.ti.acelera.plazoletamicroservice.adapters.http.dto.response;
 
-import com.ti.acelera.plazoletamicroservice.domain.model.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +17,7 @@ public class OrderRestaurantResponseDto {
     private Long idClient;
     private Long idChef;
     private LocalDate date;
-    private OrderStatus orderStatus;
+    private String state;
     private List<DishOrderResponseDto> dishes;
 
 }
