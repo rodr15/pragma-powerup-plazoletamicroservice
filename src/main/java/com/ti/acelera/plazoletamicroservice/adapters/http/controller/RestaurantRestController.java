@@ -8,6 +8,7 @@ import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.OrderRest
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.RestaurantResponseDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.handlers.IRestaurantHandler;
 import com.ti.acelera.plazoletamicroservice.configuration.Constants;
+import com.ti.acelera.plazoletamicroservice.domain.model.OrderStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -92,7 +93,7 @@ public class RestaurantRestController {
     @SecurityRequirement(name = "jwt")
     @GetMapping("/order-list")
     public ResponseEntity<Page<OrderRestaurantResponseDto>> listOrder(@RequestAttribute("userId") String userId,
-                                                                @RequestParam(defaultValue = "FINISHED") String state,
+                                                                @RequestParam OrderStatus state,
                                                                 @RequestParam(defaultValue = "0") int page,
                                                                 @RequestParam(defaultValue = "10") int size) {
 
