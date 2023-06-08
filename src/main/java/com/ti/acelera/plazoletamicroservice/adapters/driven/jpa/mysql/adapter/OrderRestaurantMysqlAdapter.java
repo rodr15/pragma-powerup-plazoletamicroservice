@@ -7,7 +7,6 @@ import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.mappers.IO
 import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.repositories.IDishOrderRepository;
 import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.repositories.IOrderRestaurantRepository;
 import com.ti.acelera.plazoletamicroservice.domain.model.OrderRestaurant;
-import com.ti.acelera.plazoletamicroservice.domain.model.OrderStatus;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IOrderRestaurantPersistencePort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,6 +15,8 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
+
+import static com.ti.acelera.plazoletamicroservice.configuration.Constants.FINISHED_ORDER;
 
 @RequiredArgsConstructor
 public class OrderRestaurantMysqlAdapter implements IOrderRestaurantPersistencePort {
@@ -54,9 +55,9 @@ public class OrderRestaurantMysqlAdapter implements IOrderRestaurantPersistenceP
     }
 
     @Override
-    public Page<OrderRestaurant> getOrdersList(Long restaurantId, OrderStatus state, int page, int size) {
+    public Page<OrderRestaurant> getOrdersList(Long restaurantId, String state, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return orderRestaurantRepository.findByRestaurantIdAndOrderStatus(restaurantId, state, pageable).map(orderEntityMapper::toOrder);
+        return orderRestaurantRepository.findByRestaurantIdAndState(restaurantId, state, pageable).map(orderEntityMapper::toOrder);
     }
 
     @Override
@@ -69,7 +70,7 @@ public class OrderRestaurantMysqlAdapter implements IOrderRestaurantPersistenceP
 
     @Override
     public boolean hasUnfinishedOrders(Long clientId) {
-        List<OrderRestaurantEntity> unfinishedOrders = orderRestaurantRepository.findByIdClientAndOrderStatusNot(clientId, OrderStatus.FINISHED_ORDER);
+        List<OrderRestaurantEntity> unfinishedOrders = orderRestaurantRepository.findByIdClientAndStateNot(clientId, FINISHED_ORDER);
         return !unfinishedOrders.isEmpty();
     }
 
