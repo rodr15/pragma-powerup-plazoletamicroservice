@@ -189,7 +189,7 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     }
 
     @Override
-    public void OrderRestaurantReady(Long orderRestaurantId) {
+    public void orderRestaurantReady(Long orderRestaurantId) {
         OrderRestaurant orderRestaurant = orderRestaurantPersistencePort.getOrderById(orderRestaurantId).orElseThrow(OrdersNotFoundException::new);
 
         String pin = generateSecurityPin();

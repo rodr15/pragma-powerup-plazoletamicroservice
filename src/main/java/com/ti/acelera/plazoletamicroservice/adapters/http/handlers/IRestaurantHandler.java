@@ -20,5 +20,6 @@ public interface IRestaurantHandler {
     void saveRestaurant(RestaurantRequestDto restaurantRequestDto);
     void assignRestaurantEmployee(String employeeId , Long restaurantId);
     boolean verifyRestaurantOwner( String userid,  Long restaurantId );
+    void finishRestaurantOrder(Long orderRestaurantId);
 
 }

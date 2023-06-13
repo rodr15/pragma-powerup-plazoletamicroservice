@@ -27,7 +27,7 @@ public class OrderRestaurantEntity {
     @ManyToOne
     @JoinColumn(name = "id_restaurant")
     private RestaurantEntity restaurant;
-
+    private String code;
     @Override
     public String toString() {
         return "OrderRestaurantEntity{" +

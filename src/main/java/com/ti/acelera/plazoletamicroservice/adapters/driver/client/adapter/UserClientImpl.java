@@ -6,8 +6,6 @@ import com.ti.acelera.plazoletamicroservice.domain.gateway.IUserClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
-
 
 public class UserClientImpl implements IUserClient {
     @Value("${user.service.url}")
@@ -26,6 +24,21 @@ public class UserClientImpl implements IUserClient {
             throw new UserNotFoundException();
         }
 
+    }
+
+    @Override
+    public String getUserPhoneNumber(String userDni) {
+        RestTemplate restTemplate = new RestTemplate();
+        try {
+            String url = String.format("%s/user-phone/%s", userServiceUrl, userDni);
+            String userPhone = restTemplate.getForObject(url, String.class);
+            if (userPhone == null) {
+                throw new UserNotFoundException();
+            }
+            return userPhone;
+        } catch (Exception e) {
+            throw new UserNotFoundException();
+        }
     }
 
 

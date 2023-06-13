@@ -75,7 +75,7 @@ public class RestaurantHandlerImpl implements IRestaurantHandler {
 
     @Override
     public void finishRestaurantOrder(Long orderRestaurantId) {
-        restaurantServicePort.OrderRestaurantReady( orderRestaurantId );
+        restaurantServicePort.orderRestaurantReady( orderRestaurantId );
     }
 
 }
