@@ -74,5 +74,11 @@ public class ControllerAdvisor {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, ORDER_NOT_FOUND_MESSAGE));
     }
+    @ExceptionHandler(OrderNotAssignedException.class)
+    public ResponseEntity<Map<String, String>> handleOrderNotAssignedException(
+            OrderNotAssignedException thisOrderNotAssignedException) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, ORDER_NOT_ASSIGN_MESSAGE));
+    }
 
 }

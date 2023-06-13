@@ -192,6 +192,10 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     public void orderRestaurantReady(Long orderRestaurantId) {
         OrderRestaurant orderRestaurant = orderRestaurantPersistencePort.getOrderById(orderRestaurantId).orElseThrow(OrdersNotFoundException::new);
 
+        if( orderRestaurant.getIdChef() == null){
+            throw new OrderNotAssignedException();
+        }
+
         String pin = generateSecurityPin();
 
         orderRestaurant.setOrderStatus(OrderStatus.READY_ORDER);

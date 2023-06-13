@@ -31,4 +31,13 @@ public enum OrderStatus {
         }
         return OrderStatus.FINISHED_ORDER;
     }
+
+    public boolean isBefore(OrderStatus otherStatus) {
+        return this.order < otherStatus.order;
+    }
+
+    public boolean isAfter(OrderStatus otherStatus) {
+        return this.order > otherStatus.order;
+    }
+
 }
