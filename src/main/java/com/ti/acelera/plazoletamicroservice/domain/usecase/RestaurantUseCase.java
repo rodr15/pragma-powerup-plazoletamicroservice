@@ -9,6 +9,8 @@ import com.ti.acelera.plazoletamicroservice.domain.spi.IDishOrderPersistencePort
 import com.ti.acelera.plazoletamicroservice.domain.spi.IDishPersistencePort;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IOrderRestaurantPersistencePort;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IRestaurantPersistencePort;
+import com.ti.acelera.plazoletamicroservice.domain.utils.PhoneNumberUtils;
+import com.ti.acelera.plazoletamicroservice.domain.utils.RandomVerificationCode;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 
@@ -196,7 +198,7 @@ public class RestaurantUseCase implements IRestaurantServicePort {
             throw new OrderNotAssignedException();
         }
 
-        String pin = generateSecurityPin();
+        String pin = RandomVerificationCode.generateSecurityPin();
 
         orderRestaurant.setOrderStatus(OrderStatus.READY_ORDER);
         orderRestaurant.setVerificationCode(pin);
@@ -204,31 +206,12 @@ public class RestaurantUseCase implements IRestaurantServicePort {
         String message = String.format(SMS_READY_ORDER_MESSAGE, pin);
 
         String clientPhone = userClient.getUserPhoneNumber(orderRestaurant.getIdClient().toString());
-        String correctedClientPhone = correctPhoneNumber(clientPhone);
+        String correctedClientPhone =  PhoneNumberUtils.isValidColombianCellphoneNumber(clientPhone);
         smsClient.sendMessage( correctedClientPhone, message );
 
         orderRestaurantPersistencePort.saveOrderRestaurant( orderRestaurant );
 
     }
 
-
-    private String correctPhoneNumber(String phoneNumber) {
-        String digitsOnly = phoneNumber.replaceAll("\\D", "");
-        if (digitsOnly.startsWith("3")) {
-            digitsOnly = "+57" + digitsOnly;
-        }
-
-        if (!digitsOnly.startsWith("+")) {
-            digitsOnly = "+" + digitsOnly;
-        }
-        if (digitsOnly.length() != 13) {
-            throw new IllegalArgumentException("Invalid phone number format");
-        }
-
-        return digitsOnly;
-    }
-    private String generateSecurityPin() {
-        return UUID.randomUUID().toString().substring(0, 6);
-    }
 
 }
