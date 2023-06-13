@@ -87,4 +87,15 @@ public class OrderRestaurantMysqlAdapter implements IOrderRestaurantPersistenceP
 
         return savedOrderRestaurant.getId();
     }
+
+    @Override
+    public Optional<OrderRestaurant> getOrderById(Long orderId) {
+        return orderRestaurantRepository.findById( orderId ).map( orderEntityMapper::toOrder );
+    }
+
+    @Override
+    public OrderRestaurant saveOrderRestaurant(OrderRestaurant orderRestaurant) {
+        OrderRestaurantEntity savedOrderRestaurant =  orderRestaurantRepository.save( orderEntityMapper.toOrderEntity(orderRestaurant) );
+        return orderEntityMapper.toOrder(savedOrderRestaurant);
+    }
 }

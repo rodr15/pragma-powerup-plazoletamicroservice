@@ -17,6 +17,11 @@ user:
   service:
     url: http://localhost:8090/user
 
+twillio:
+  accountSid: AC6f7c3755e94af14295c6340b3e4a3285
+  authToken: 1eb0fc0ee4347c269f47f754756043d3
+  fromPhone: +13614410715
+
 management:
   endpoints:
     web:

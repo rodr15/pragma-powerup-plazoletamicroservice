@@ -90,24 +90,34 @@ public class RestaurantRestController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.ORDER_CREATED_MESSAGE));
     }
+
     @SecurityRequirement(name = "jwt")
     @GetMapping("/order-list")
     public ResponseEntity<Page<OrderRestaurantResponseDto>> listOrder(@RequestAttribute("userId") String userId,
-                                                                @RequestParam OrderStatus state,
-                                                                @RequestParam(defaultValue = "0") int page,
-                                                                @RequestParam(defaultValue = "10") int size) {
+                                                                      @RequestParam OrderStatus state,
+                                                                      @RequestParam(defaultValue = "0") int page,
+                                                                      @RequestParam(defaultValue = "10") int size) {
 
 
-        return ResponseEntity.ok(restaurantHandler.getOrdersListByEmployeeId( parseLong(userId),state,page,size ));
+        return ResponseEntity.ok(restaurantHandler.getOrdersListByEmployeeId(parseLong(userId), state, page, size));
     }
 
     @SecurityRequirement(name = "jwt")
     @PutMapping("/assign-order")
     public ResponseEntity<Map<String, String>> assignOrder(@RequestAttribute("userId") String userId,
-                                                                      @RequestParam List<Long> ordersId) {
-        restaurantHandler.assignEmployeeToOrders(userId,ordersId);
+                                                           @RequestParam List<Long> ordersId) {
+        restaurantHandler.assignEmployeeToOrders(userId, ordersId);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.EMPLOYEE_ASSIGN_TO_ORDER_MESSAGE));
     }
+
+    @SecurityRequirement(name = "jwt")
+    @PostMapping("/ready-order")
+    public ResponseEntity<Map<String, String>> readyOrder(@RequestParam(defaultValue = "1") Long orderId) {
+        restaurantHandler.finishRestaurantOrder( orderId );
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.ORDER_CREATED_MESSAGE));
+    }
+
 
 }

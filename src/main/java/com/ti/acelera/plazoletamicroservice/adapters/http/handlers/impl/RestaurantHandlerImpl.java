@@ -73,4 +73,9 @@ public class RestaurantHandlerImpl implements IRestaurantHandler {
         return restaurantServicePort.verifyRestaurantOwner(userId, restaurantId);
     }
 
+    @Override
+    public void finishRestaurantOrder(Long orderRestaurantId) {
+        restaurantServicePort.OrderRestaurantReady( orderRestaurantId );
+    }
+
 }

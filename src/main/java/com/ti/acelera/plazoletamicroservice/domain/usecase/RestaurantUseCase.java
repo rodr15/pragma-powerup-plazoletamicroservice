@@ -2,6 +2,7 @@ package com.ti.acelera.plazoletamicroservice.domain.usecase;
 
 import com.ti.acelera.plazoletamicroservice.domain.api.IRestaurantServicePort;
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.*;
+import com.ti.acelera.plazoletamicroservice.domain.gateway.ISmsClient;
 import com.ti.acelera.plazoletamicroservice.domain.gateway.IUserClient;
 import com.ti.acelera.plazoletamicroservice.domain.model.*;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IDishOrderPersistencePort;
@@ -12,11 +13,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
+import static com.ti.acelera.plazoletamicroservice.configuration.Constants.SMS_READY_ORDER_MESSAGE;
 import static java.lang.Long.parseLong;
 
 @AllArgsConstructor
@@ -27,6 +26,7 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     private final IOrderRestaurantPersistencePort orderRestaurantPersistencePort;
     private final IDishOrderPersistencePort dishOrderPersistencePort;
     private final IUserClient userClient;
+    private final ISmsClient smsClient;
 
 
     @Override
@@ -187,4 +187,44 @@ public class RestaurantUseCase implements IRestaurantServicePort {
         restaurant.get().setEmployees(employees);
         restaurantPersistencePort.saveRestaurant(restaurant.get());
     }
+
+    @Override
+    public void OrderRestaurantReady(Long orderRestaurantId) {
+        OrderRestaurant orderRestaurant = orderRestaurantPersistencePort.getOrderById(orderRestaurantId).orElseThrow(OrdersNotFoundException::new);
+
+        String pin = generateSecurityPin();
+
+        orderRestaurant.setOrderStatus(OrderStatus.READY_ORDER);
+        orderRestaurant.setVerificationCode(pin);
+
+        String message = String.format(SMS_READY_ORDER_MESSAGE, pin);
+
+        String clientPhone = userClient.getUserPhoneNumber(orderRestaurant.getIdClient().toString());
+        String correctedClientPhone = correctPhoneNumber(clientPhone);
+        smsClient.sendMessage( correctedClientPhone, message );
+
+        orderRestaurantPersistencePort.saveOrderRestaurant( orderRestaurant );
+
+    }
+
+
+    private String correctPhoneNumber(String phoneNumber) {
+        String digitsOnly = phoneNumber.replaceAll("\\D", "");
+        if (digitsOnly.startsWith("3")) {
+            digitsOnly = "+57" + digitsOnly;
+        }
+
+        if (!digitsOnly.startsWith("+")) {
+            digitsOnly = "+" + digitsOnly;
+        }
+        if (digitsOnly.length() != 13) {
+            throw new IllegalArgumentException("Invalid phone number format");
+        }
+
+        return digitsOnly;
+    }
+    private String generateSecurityPin() {
+        return UUID.randomUUID().toString().substring(0, 6);
+    }
+
 }
