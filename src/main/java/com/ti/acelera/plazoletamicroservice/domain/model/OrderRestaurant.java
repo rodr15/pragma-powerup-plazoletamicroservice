@@ -20,4 +20,5 @@ public class OrderRestaurant {
     private Long idChef;
     private Restaurant restaurant;
     private List<DishOrder> dishes;
+    private String verificationCode;
 }

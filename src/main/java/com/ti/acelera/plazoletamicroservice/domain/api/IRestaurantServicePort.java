@@ -17,4 +17,5 @@ public interface IRestaurantServicePort {
     void saveRestaurant(Restaurant restaurant);
     boolean verifyRestaurantOwner(String userId, Long restaurantId);
     void assignEmployeeToRestaurant(String userId, Long restaurantId);
+    void orderRestaurantReady(Long orderRestaurantId );
 }

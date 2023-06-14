@@ -51,6 +51,14 @@ Make sure you have the following installed before running the microservice:
    ```yml
    # src/main/resources/data.sql
    ```
+3. Configure the Twillio API KEY:
+    ```yml
+   # src/main/resources/application-dev.yml
+   twillio:
+      accountSid:
+      authToken: 
+      fromPhone: 
+   ```
 
 <!-- USAGE -->
 ## Usage

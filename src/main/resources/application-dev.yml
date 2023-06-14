@@ -5,7 +5,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost/plazoleta-powerup
     username: root
-    password: asrf.07.15
+    password:
   jpa:
     hibernate:
       ddl-auto: update
@@ -16,6 +16,11 @@ jwt:
 user:
   service:
     url: http://localhost:8090/user
+
+twillio:
+  accountSid:
+  authToken:
+  fromPhone:
 
 management:
   endpoints:

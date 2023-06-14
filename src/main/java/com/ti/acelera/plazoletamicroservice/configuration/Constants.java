@@ -12,10 +12,12 @@ public class Constants {
     public static final String RESPONSE_MESSAGE_KEY = "message";
     public static final String RESTAURANT_CREATED_MESSAGE = "Restaurant created successfully";
     public static final String ORDER_CREATED_MESSAGE = "Order created successfully";
+    public static final String SMS_READY_ORDER_MESSAGE = "Your order is ready. Please use the following security PIN to claim it: %s";
     public static final String RESPONSE_ERROR_MESSAGE_KEY = "error";
     public static final String HAS_UNFINISHED_ORDERS = "This user has unfinished orders";
     public static final String BAD_ORDER_MESSAGE = "The order is malformed";
     public static final String ORDER_NOT_FOUND_MESSAGE = "No order found with the one or more of the ids provided";
+    public static final String ORDER_NOT_ASSIGN_MESSAGE = "Order not assigned";
     public static final String EMPLOYEE_ASSIGN_TO_ORDER_MESSAGE = "The employee has been assign to the orders successfully";
     public static final String PERSON_NOT_FOUND_MESSAGE = "No person found with the id provided";
     public static final String EMPLOYEE_NOT_FOUND_MESSAGE = "No employee found with the id provided";

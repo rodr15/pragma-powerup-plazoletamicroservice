@@ -10,10 +10,18 @@ import java.util.Optional;
 public interface IOrderRestaurantPersistencePort {
 
     Optional<List<OrderRestaurant>> getOrdersById(List<Long> ordersId);
-    List<OrderRestaurant> saveAllOrderRestaurant(List<OrderRestaurant> ordersRestaurant );
+
+    List<OrderRestaurant> saveAllOrderRestaurant(List<OrderRestaurant> ordersRestaurant);
+
     Page<OrderRestaurant> getOrdersList(Long restaurantId, OrderStatus state, int page, int size);
+
     List<OrderRestaurant> getOrdersList(Long restaurantId);
-    boolean hasUnfinishedOrders( Long clientId );
+
+    boolean hasUnfinishedOrders(Long clientId);
+
     Long createNewOrder(OrderRestaurant orderRestaurant);
 
+    Optional<OrderRestaurant> getOrderById(Long orderId);
+
+    OrderRestaurant saveOrderRestaurant(OrderRestaurant orderRestaurant);
 }

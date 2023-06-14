@@ -12,9 +12,11 @@ import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.repositori
 import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.repositories.IDishRepository;
 import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.repositories.IOrderRestaurantRepository;
 import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.repositories.IRestaurantRepository;
+import com.ti.acelera.plazoletamicroservice.adapters.driver.client.adapter.SmsClientImpl;
 import com.ti.acelera.plazoletamicroservice.adapters.driver.client.adapter.UserClientImpl;
 import com.ti.acelera.plazoletamicroservice.domain.api.IDishServicePort;
 import com.ti.acelera.plazoletamicroservice.domain.api.IRestaurantServicePort;
+import com.ti.acelera.plazoletamicroservice.domain.gateway.ISmsClient;
 import com.ti.acelera.plazoletamicroservice.domain.gateway.IUserClient;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IDishOrderPersistencePort;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IDishPersistencePort;
@@ -54,17 +56,20 @@ public class BeanConfiguration {
                                                         IDishPersistencePort dishPersistencePort,
                                                         IOrderRestaurantPersistencePort orderRestaurantPersistencePort,
                                                         IDishOrderPersistencePort dishOrderPersistencePort,
-                                                        IUserClient userClient) {
-        return new RestaurantUseCase(restaurantPersistencePort, dishPersistencePort, orderRestaurantPersistencePort, dishOrderPersistencePort, userClient);
+                                                        IUserClient userClient,
+                                                        ISmsClient smsClient
+    ) {
+        return new RestaurantUseCase(restaurantPersistencePort, dishPersistencePort, orderRestaurantPersistencePort, dishOrderPersistencePort, userClient, smsClient);
     }
 
     @Bean
     public IDishPersistencePort dishPersistencePort() {
         return new DishMysqlAdapter(dishRepository, dishEntityMapper);
     }
+
     @Bean
     public IDishOrderPersistencePort dishOrderPersistencePort() {
-        return new DishOrderMysqlAdapter(dishOrderRepository,dishOrderEntityMapper);
+        return new DishOrderMysqlAdapter(dishOrderRepository, dishOrderEntityMapper);
     }
 
     @Bean
@@ -73,8 +78,8 @@ public class BeanConfiguration {
     }
 
     @Bean
-    public IUserClient userClient() {
-        return new UserClientImpl();
-    }
+    public IUserClient userClient() {return new UserClientImpl();}
+    @Bean
+    public ISmsClient smsClient() {return new SmsClientImpl();}
 
 }
