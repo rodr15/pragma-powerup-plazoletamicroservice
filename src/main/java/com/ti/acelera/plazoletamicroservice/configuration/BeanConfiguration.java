@@ -11,9 +11,11 @@ import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.repositori
 import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.repositories.IDishRepository;
 import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.repositories.IOrderRestaurantRepository;
 import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.repositories.IRestaurantRepository;
+import com.ti.acelera.plazoletamicroservice.adapters.driver.client.adapter.TraceabilityClientImpl;
 import com.ti.acelera.plazoletamicroservice.adapters.driver.client.adapter.UserClientImpl;
 import com.ti.acelera.plazoletamicroservice.domain.api.IDishServicePort;
 import com.ti.acelera.plazoletamicroservice.domain.api.IRestaurantServicePort;
+import com.ti.acelera.plazoletamicroservice.domain.gateway.ITraceabilityClient;
 import com.ti.acelera.plazoletamicroservice.domain.gateway.IUserClient;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IDishPersistencePort;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IOrderRestaurantPersistencePort;
@@ -47,8 +49,8 @@ public class BeanConfiguration {
         return new OrderRestaurantMysqlAdapter(orderRestaurantRepository, orderEntityMapper, dishOrderRepository, dishOrderEntityMapper);
     }
     @Bean
-    public IRestaurantServicePort restaurantServicePort( IRestaurantPersistencePort restaurantPersistencePort, IDishPersistencePort dishPersistencePort,IOrderRestaurantPersistencePort orderRestaurantPersistencePort, IUserClient userClient){
-        return new RestaurantUseCase( restaurantPersistencePort, dishPersistencePort,orderRestaurantPersistencePort ,userClient);
+    public IRestaurantServicePort restaurantServicePort( IRestaurantPersistencePort restaurantPersistencePort, IDishPersistencePort dishPersistencePort,IOrderRestaurantPersistencePort orderRestaurantPersistencePort, IUserClient userClient,ITraceabilityClient traceabilityClient){
+        return new RestaurantUseCase( restaurantPersistencePort, dishPersistencePort,orderRestaurantPersistencePort ,userClient,traceabilityClient);
 
     }
     @Bean
@@ -62,6 +64,11 @@ public class BeanConfiguration {
     @Bean
     public IUserClient userClient() {
         return new UserClientImpl();
+    }
+
+    @Bean
+    public ITraceabilityClient traceabilityClient() {
+        return new TraceabilityClientImpl();
     }
 
 }

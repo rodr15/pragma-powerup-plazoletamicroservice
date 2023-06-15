@@ -17,6 +17,10 @@ user:
   service:
     url: http://localhost:8090/user
 
+traceability:
+  service:
+    url: http://localhost:8092/trace
+
 management:
   endpoints:
     web:
