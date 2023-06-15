@@ -38,7 +38,7 @@ public class OrderRestaurantMysqlAdapter implements IOrderRestaurantPersistenceP
     }
 
     @Override
-    public Long createNewOrder(OrderRestaurant orderRestaurant) {
+    public OrderRestaurant createNewOrder(OrderRestaurant orderRestaurant) {
         OrderRestaurantEntity savedOrderRestraurantEntity = orderRestaurantRepository.save(orderEntityMapper.toOrderEntity(orderRestaurant));
         OrderRestaurant savedOrderRestraurant = orderEntityMapper.toOrder(savedOrderRestraurantEntity);
         orderRestaurant.getDishes().forEach(
@@ -49,6 +49,6 @@ public class OrderRestaurantMysqlAdapter implements IOrderRestaurantPersistenceP
                 }
         );
 
-        return savedOrderRestraurant.getId();
+        return savedOrderRestraurant;
     }
 }
