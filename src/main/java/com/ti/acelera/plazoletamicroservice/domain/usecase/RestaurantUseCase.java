@@ -2,6 +2,7 @@ package com.ti.acelera.plazoletamicroservice.domain.usecase;
 
 import com.ti.acelera.plazoletamicroservice.domain.api.IRestaurantServicePort;
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.*;
+import com.ti.acelera.plazoletamicroservice.domain.gateway.ITraceabilityClient;
 import com.ti.acelera.plazoletamicroservice.domain.gateway.IUserClient;
 import com.ti.acelera.plazoletamicroservice.domain.model.*;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IDishOrderPersistencePort;
@@ -27,6 +28,7 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     private final IOrderRestaurantPersistencePort orderRestaurantPersistencePort;
     private final IDishOrderPersistencePort dishOrderPersistencePort;
     private final IUserClient userClient;
+    private final ITraceabilityClient traceabilityClient;
 
 
     @Override
@@ -108,8 +110,11 @@ public class RestaurantUseCase implements IRestaurantServicePort {
         orderRestaurant.setOrderStatus(OrderStatus.EARRING_ORDER);
         orderRestaurant.setDate(LocalDate.now());
 
+         OrderRestaurant createdOrder =  orderRestaurantPersistencePort.createNewOrder(orderRestaurant);
 
-        return orderRestaurantPersistencePort.createNewOrder(orderRestaurant);
+        traceabilityClient.saveOrderTrace(createdOrder);
+
+        return createdOrder.getId();
     }
 
     @Override

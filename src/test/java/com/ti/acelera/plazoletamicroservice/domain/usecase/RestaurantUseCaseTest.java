@@ -2,6 +2,7 @@ package com.ti.acelera.plazoletamicroservice.domain.usecase;
 
 import com.ti.acelera.plazoletamicroservice.domain.api.IRestaurantServicePort;
 import com.ti.acelera.plazoletamicroservice.domain.exceptions.*;
+import com.ti.acelera.plazoletamicroservice.domain.gateway.ITraceabilityClient;
 import com.ti.acelera.plazoletamicroservice.domain.gateway.IUserClient;
 import com.ti.acelera.plazoletamicroservice.domain.model.*;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IDishOrderPersistencePort;
@@ -34,16 +35,18 @@ class RestaurantUseCaseTest {
     @Mock
     private IDishPersistencePort dishPersistencePort;
     @Mock
-    IOrderRestaurantPersistencePort orderRestaurantPersistencePort;
+    private IOrderRestaurantPersistencePort orderRestaurantPersistencePort;
     @Mock
-    IDishOrderPersistencePort dishOrderPersistencePort;
+    private IDishOrderPersistencePort dishOrderPersistencePort;
     @Mock
     private IUserClient userClient;
+    @Mock
+    private ITraceabilityClient traceabilityClient;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        restaurantUseCase = new RestaurantUseCase(restaurantPersistencePort, dishPersistencePort, orderRestaurantPersistencePort, dishOrderPersistencePort, userClient);
+        restaurantUseCase = new RestaurantUseCase(restaurantPersistencePort, dishPersistencePort,orderRestaurantPersistencePort , dishOrderPersistencePort,userClient,traceabilityClient);
     }
 
     @Test
@@ -322,7 +325,7 @@ class RestaurantUseCaseTest {
         when(orderRestaurantPersistencePort.hasUnfinishedOrders(orderRestaurant.getIdClient())).thenReturn(false);
         when(restaurantPersistencePort.restaurantExists(orderRestaurant.getRestaurant().getId())).thenReturn(true);
         when(dishPersistencePort.findAllDishesByIdAndByRestaurantId(anyLong(), anyList())).thenReturn(validDishList);
-        when(orderRestaurantPersistencePort.createNewOrder(orderRestaurant)).thenReturn(1L);
+        when(orderRestaurantPersistencePort.createNewOrder(orderRestaurant)).thenReturn(orderRestaurant);
 
         // Act
         Long orderId = restaurantUseCase.makeOrder(orderRestaurant);
@@ -648,5 +651,4 @@ class RestaurantUseCaseTest {
                 });
         return orderRestaurantList;
     }
-
 }

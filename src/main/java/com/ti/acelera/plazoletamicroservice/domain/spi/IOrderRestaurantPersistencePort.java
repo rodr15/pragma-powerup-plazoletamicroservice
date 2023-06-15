@@ -14,6 +14,6 @@ public interface IOrderRestaurantPersistencePort {
     Page<OrderRestaurant> getOrdersList(Long restaurantId, OrderStatus state, int page, int size);
     List<OrderRestaurant> getOrdersList(Long restaurantId);
     boolean hasUnfinishedOrders( Long clientId );
-    Long createNewOrder(OrderRestaurant orderRestaurant);
+    OrderRestaurant createNewOrder(OrderRestaurant orderRestaurant);
 
 }
