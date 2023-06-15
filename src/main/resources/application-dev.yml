@@ -22,6 +22,10 @@ twillio:
   authToken:
   fromPhone:
 
+traceability:
+  service:
+    url: http://localhost:8092/trace
+
 management:
   endpoints:
     web:

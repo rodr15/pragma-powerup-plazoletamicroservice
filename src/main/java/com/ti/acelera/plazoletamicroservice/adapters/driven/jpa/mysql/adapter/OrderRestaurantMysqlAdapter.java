@@ -69,12 +69,12 @@ public class OrderRestaurantMysqlAdapter implements IOrderRestaurantPersistenceP
 
     @Override
     public boolean hasUnfinishedOrders(Long clientId) {
-        List<OrderRestaurantEntity> unfinishedOrders = orderRestaurantRepository.findByIdClientAndOrderStatusNot(clientId, OrderStatus.FINISHED_ORDER);
+        List<OrderRestaurantEntity> unfinishedOrders = orderRestaurantRepository.findByIdClientAndOrderStatusNot(clientId,OrderStatus.FINISHED_ORDER );
         return !unfinishedOrders.isEmpty();
     }
 
     @Override
-    public Long createNewOrder(OrderRestaurant orderRestaurant) {
+    public OrderRestaurant createNewOrder(OrderRestaurant orderRestaurant) {
         OrderRestaurantEntity savedOrderRestaurantEntity = orderRestaurantRepository.save(orderEntityMapper.toOrderEntity(orderRestaurant));
         OrderRestaurant savedOrderRestaurant = orderEntityMapper.toOrder(savedOrderRestaurantEntity);
         orderRestaurant.getDishes().forEach(
@@ -85,7 +85,7 @@ public class OrderRestaurantMysqlAdapter implements IOrderRestaurantPersistenceP
                 }
         );
 
-        return savedOrderRestaurant.getId();
+        return savedOrderRestaurant;
     }
 
     @Override
