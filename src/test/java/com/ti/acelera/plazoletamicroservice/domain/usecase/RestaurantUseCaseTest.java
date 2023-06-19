@@ -20,7 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -322,7 +322,7 @@ class RestaurantUseCaseTest {
 
         List<DishOrder> dishOrders = List.of(dishOrder);
         List<Dish> validDishList = List.of(dish);
-        OrderRestaurant orderRestaurant = new OrderRestaurant(1L, 1L, LocalDate.now(), null, null, validRestaurant, dishOrders,null);
+        OrderRestaurant orderRestaurant = new OrderRestaurant(1L, 1L, LocalDateTime.now(), null, null, validRestaurant, dishOrders,null);
 
 
         when(orderRestaurantPersistencePort.hasUnfinishedOrders(orderRestaurant.getIdClient())).thenReturn(false);
@@ -355,7 +355,7 @@ class RestaurantUseCaseTest {
         DishOrder dishOrder = new DishOrder(null, dish, 2);
 
         List<DishOrder> dishOrders = List.of(dishOrder);
-        OrderRestaurant orderRestaurant = new OrderRestaurant(1L, 1L, LocalDate.now(), null, null, validRestaurant, dishOrders,null);
+        OrderRestaurant orderRestaurant = new OrderRestaurant(1L, 1L, LocalDateTime.now(), null, null, validRestaurant, dishOrders,null);
 
 
         when(orderRestaurantPersistencePort.hasUnfinishedOrders(orderRestaurant.getIdClient())).thenReturn(true);
@@ -382,7 +382,7 @@ class RestaurantUseCaseTest {
         DishOrder dishOrder = new DishOrder(null, dish, 2);
 
         List<DishOrder> dishOrders = List.of(dishOrder);
-        OrderRestaurant orderRestaurant = new OrderRestaurant(1L, 1L, LocalDate.now(), null, null, validRestaurant, dishOrders,null);
+        OrderRestaurant orderRestaurant = new OrderRestaurant(1L, 1L, LocalDateTime.now(), null, null, validRestaurant, dishOrders,null);
 
 
         when(orderRestaurantPersistencePort.hasUnfinishedOrders(orderRestaurant.getIdClient())).thenReturn(false);
@@ -410,7 +410,7 @@ class RestaurantUseCaseTest {
         DishOrder dishOrder = new DishOrder(null, dish, 2);
 
         List<DishOrder> dishOrders = List.of(dishOrder, dishOrder);
-        OrderRestaurant orderRestaurant = new OrderRestaurant(1L, 1L, LocalDate.now(), null, null, validRestaurant, dishOrders,null);
+        OrderRestaurant orderRestaurant = new OrderRestaurant(1L, 1L, LocalDateTime.now(), null, null, validRestaurant, dishOrders,null);
 
 
         when(orderRestaurantPersistencePort.hasUnfinishedOrders(orderRestaurant.getIdClient())).thenReturn(false);
@@ -439,7 +439,7 @@ class RestaurantUseCaseTest {
 
         List<DishOrder> dishOrders = List.of(dishOrder);
         List<Dish> validDishList = List.of();
-        OrderRestaurant orderRestaurant = new OrderRestaurant(1L, 1L, LocalDate.now(), null, null, validRestaurant, dishOrders,null);
+        OrderRestaurant orderRestaurant = new OrderRestaurant(1L, 1L, LocalDateTime.now(), null, null, validRestaurant, dishOrders,null);
 
 
         when(orderRestaurantPersistencePort.hasUnfinishedOrders(orderRestaurant.getIdClient())).thenReturn(false);
@@ -465,7 +465,7 @@ class RestaurantUseCaseTest {
         int size = 10;
 
         Restaurant restaurant = new Restaurant(1L, "Mock", "ABC", "1", "321312312", "", "", new HashSet<>());
-        OrderRestaurant orderRestaurant = new OrderRestaurant(1L, 111L, LocalDate.now(), state, 5L, restaurant, List.of(),null);
+        OrderRestaurant orderRestaurant = new OrderRestaurant(1L, 111L, LocalDateTime.now(), state, 5L, restaurant, List.of(),null);
         List<OrderRestaurant> orders = Collections.singletonList(orderRestaurant);
         Page<OrderRestaurant> ordersPage = new PageImpl<>(orders, PageRequest.of(page, size), orders.size());
 
@@ -521,7 +521,7 @@ class RestaurantUseCaseTest {
         Long restaurantId = 456L;
 
         Restaurant restaurant = new Restaurant(1L, "Mock", "ABC", "1", "321312312", "", "", new HashSet<>());
-        OrderRestaurant orderRestaurant = new OrderRestaurant(1L, 111L, LocalDate.now(), state, 5L, restaurant, List.of(),null);
+        OrderRestaurant orderRestaurant = new OrderRestaurant(1L, 111L, LocalDateTime.now(), state, 5L, restaurant, List.of(),null);
 
         // Mocking the restaurantPersistencePort
         when(restaurantPersistencePort.getRestaurantIdByEmployeeId(employeeId)).thenReturn(Optional.of(restaurantId));
@@ -543,6 +543,34 @@ class RestaurantUseCaseTest {
         verify(orderRestaurantPersistencePort, times(1)).getOrdersList(restaurantId, state, page, size);
         verify(dishOrderPersistencePort, times(1)).getDishOrderByOrderRestaurantId(anyLong());
     }
+
+    @Test
+    void assignEmployeeToOrder_InvalidData_ThrowsOrderStatusNotAllowedForThisActionException() {
+        // Arrange
+        String employeeId = "123";
+        Long restaurantId = 1L;
+        List<Long> ordersId = Arrays.asList(1L, 2L, 3L);
+
+        List<OrderRestaurant> restaurantOrdersList = createOrderRestaurantList(restaurantId, ordersId);
+        List<OrderRestaurant> selectedOrdersRestaurant = createOrderRestaurantListWithWrongOrderStatusState(restaurantId, ordersId);
+
+
+        when(restaurantPersistencePort.getRestaurantIdByEmployeeId(anyLong()))
+                .thenReturn(Optional.of(restaurantId));
+        when(orderRestaurantPersistencePort.getOrdersList(restaurantId)).thenReturn(restaurantOrdersList);
+        when(orderRestaurantPersistencePort.getOrdersById(ordersId)).thenReturn(Optional.of(selectedOrdersRestaurant));
+
+        // Act
+        assertThrows(OrderStatusNotAllowedForThisActionException.class,() -> restaurantUseCase.assignEmployeeToOrder(employeeId, ordersId));
+
+        // Assert
+
+        verify(orderRestaurantPersistencePort, times(1)).getOrdersById(ordersId);
+        verify(orderRestaurantPersistencePort, never()).saveAllOrderRestaurant(selectedOrdersRestaurant);
+
+    }
+
+
 
     @Test
     void assignEmployeeToOrder_ValidData_SuccessfullyAssigned() {
@@ -655,6 +683,22 @@ class RestaurantUseCaseTest {
         return orderRestaurantList;
     }
 
+    private List<OrderRestaurant> createOrderRestaurantListWithWrongOrderStatusState(Long restaurantId, List<Long> orderRestaurantIds) {
+
+        List<OrderRestaurant> orderRestaurantList = new ArrayList<>();
+        Restaurant restaurant = new Restaurant();
+        restaurant.setId(restaurantId);
+
+        orderRestaurantIds.forEach(
+                id -> {
+                    OrderRestaurant orderRestaurant = new OrderRestaurant();
+                    orderRestaurant.setId(id);
+                    orderRestaurant.setOrderStatus(OrderStatus.READY_ORDER);
+                    orderRestaurant.setRestaurant(restaurant);
+                    orderRestaurantList.add(orderRestaurant);
+                });
+        return orderRestaurantList;
+    }
     @Test
     void testOrderRestaurantReady_ValidOrder() {
         // Arrange
@@ -708,4 +752,99 @@ class RestaurantUseCaseTest {
         verify(smsClient, never()).sendMessage(anyString(), anyString());
     }
 
+    @Test
+    void orderRestaurantDeliver_ValidOrder_AllStatusChecksPassed() {
+        // Arrange
+        Long orderRestaurantId = 1L;
+        String verificationCode = "123456";
+        Long employeeId = 100L;
+
+        OrderRestaurant orderRestaurant = new OrderRestaurant();
+        orderRestaurant.setId(orderRestaurantId);
+        orderRestaurant.setIdChef(employeeId);
+        orderRestaurant.setOrderStatus(OrderStatus.READY_ORDER);
+        orderRestaurant.setVerificationCode(verificationCode);
+
+        when(orderRestaurantPersistencePort.getOrderById(orderRestaurantId)).thenReturn(Optional.of(orderRestaurant));
+
+        // Act
+        restaurantUseCase.orderRestaurantDeliver(orderRestaurantId, verificationCode, employeeId);
+
+        // Assert
+        assertEquals(OrderStatus.FINISHED_ORDER, orderRestaurant.getOrderStatus());
+        verify(traceabilityClient, times(1)).modifyOrderTrace(orderRestaurant);
+        verify(orderRestaurantPersistencePort, times(1)).saveOrderRestaurant(orderRestaurant);
+    }
+
+    @Test
+    void orderRestaurantDeliver_InvalidChef_ThrowsOrderNotAssignedException() {
+        // Arrange
+        Long orderRestaurantId = 1L;
+        String verificationCode = "123456";
+        Long employeeId = 100L;
+
+        OrderRestaurant orderRestaurant = new OrderRestaurant();
+        orderRestaurant.setId(orderRestaurantId);
+        orderRestaurant.setIdChef(200L);
+        orderRestaurant.setOrderStatus(OrderStatus.READY_ORDER);
+        orderRestaurant.setVerificationCode(verificationCode);
+
+        when(orderRestaurantPersistencePort.getOrderById(orderRestaurantId)).thenReturn(Optional.of(orderRestaurant));
+
+        // Assert
+        assertThrows(OrderNotAssignedException.class, () -> {
+            // Act
+            restaurantUseCase.orderRestaurantDeliver(orderRestaurantId, verificationCode, employeeId);
+        });
+        verify(traceabilityClient, never()).modifyOrderTrace(any());
+        verify(orderRestaurantPersistencePort, never()).saveOrderRestaurant(any());
+    }
+
+    @Test
+    void orderRestaurantDeliver_OrderNotReady_ThrowsNotAReadyOrderException() {
+        // Arrange
+        Long orderRestaurantId = 1L;
+        String verificationCode = "123456";
+        Long employeeId = 100L;
+
+        OrderRestaurant orderRestaurant = new OrderRestaurant();
+        orderRestaurant.setId(orderRestaurantId);
+        orderRestaurant.setIdChef(employeeId);
+        orderRestaurant.setOrderStatus(OrderStatus.IN_PREPARATION_ORDER);
+        orderRestaurant.setVerificationCode(verificationCode);
+
+        when(orderRestaurantPersistencePort.getOrderById(orderRestaurantId)).thenReturn(Optional.of(orderRestaurant));
+
+        // Assert
+        assertThrows(NotAReadyOrderException.class, () -> {
+            // Act
+            restaurantUseCase.orderRestaurantDeliver(orderRestaurantId, verificationCode, employeeId);
+        });
+        verify(traceabilityClient, never()).modifyOrderTrace(any());
+        verify(orderRestaurantPersistencePort, never()).saveOrderRestaurant(any());
+    }
+
+    @Test
+    void orderRestaurantDeliver_WrongVerificationCode_ThrowsWrongVerificationCodeException() {
+        // Arrange
+        Long orderRestaurantId = 1L;
+        String verificationCode = "123456";
+        Long employeeId = 100L;
+
+        OrderRestaurant orderRestaurant = new OrderRestaurant();
+        orderRestaurant.setId(orderRestaurantId);
+        orderRestaurant.setIdChef(employeeId);
+        orderRestaurant.setOrderStatus(OrderStatus.READY_ORDER);
+        orderRestaurant.setVerificationCode("654321"); // Wrong verification code
+
+        when(orderRestaurantPersistencePort.getOrderById(orderRestaurantId)).thenReturn(Optional.of(orderRestaurant));
+
+        // Assert
+        assertThrows(WrongVerificationCodeException.class, () -> {
+            // Act
+            restaurantUseCase.orderRestaurantDeliver(orderRestaurantId, verificationCode, employeeId);
+        });
+        verify(traceabilityClient, never()).modifyOrderTrace(any());
+        verify(orderRestaurantPersistencePort, never()).saveOrderRestaurant(any());
+    }
 }

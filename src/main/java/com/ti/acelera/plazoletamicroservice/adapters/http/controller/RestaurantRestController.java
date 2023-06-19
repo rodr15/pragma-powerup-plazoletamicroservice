@@ -112,12 +112,24 @@ public class RestaurantRestController {
     }
 
     @SecurityRequirement(name = "jwt")
-    @PostMapping("/ready-order")
+    @PutMapping("/ready-order")
     public ResponseEntity<Map<String, String>> readyOrder(@RequestParam(defaultValue = "1") Long orderId) {
-        restaurantHandler.finishRestaurantOrder( orderId );
+        restaurantHandler.finishRestaurantOrder(orderId);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.ORDER_CREATED_MESSAGE));
     }
 
+    @SecurityRequirement(name = "jwt")
+    @PutMapping("/deliver-order")
+    public ResponseEntity<Map<String, String>> deliverOrder(
+            @RequestAttribute("userId") String userId,
+            @RequestParam(defaultValue = "1") Long orderId,
+            @RequestParam String verificationCode) {
+
+        restaurantHandler.deliverRestaurantOrder(orderId, verificationCode, parseLong(userId));
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.ORDER_CREATED_MESSAGE));
+    }
 
 }
