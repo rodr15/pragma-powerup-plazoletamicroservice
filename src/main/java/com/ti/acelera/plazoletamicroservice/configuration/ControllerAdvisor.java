@@ -81,4 +81,18 @@ public class ControllerAdvisor {
                 .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, ORDER_NOT_ASSIGN_MESSAGE));
     }
 
+    @ExceptionHandler(NotAReadyOrderException.class)
+    public ResponseEntity<Map<String, String>> handleNotAReadyOrderException(
+            NotAReadyOrderException thisNotAReadyOrderException) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, NOT_ORDER_STATUS_REQUIRED_MESSAGE));
+    }
+
+    @ExceptionHandler(WrongVerificationCodeException.class)
+    public ResponseEntity<Map<String, String>> handleWrongVerificationCodeException(
+            WrongVerificationCodeException thisWrongVerificationCodeException) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, WRONG_VERIFICATION_CODE_MESSAGE));
+    }
+
 }

@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "orderRestaurant")
@@ -20,7 +20,7 @@ public class OrderRestaurantEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long idClient;
-    private Date date;
+    private LocalDateTime date;
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
     private Long idChef;

@@ -15,7 +15,7 @@ import com.ti.acelera.plazoletamicroservice.domain.utils.RandomVerificationCode;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.ti.acelera.plazoletamicroservice.configuration.Constants.SMS_READY_ORDER_MESSAGE;
@@ -54,7 +54,11 @@ public class RestaurantUseCase implements IRestaurantServicePort {
 
         selectedOrdersRestaurant.forEach(selectedOrderRestaurant -> {
                     selectedOrderRestaurant.setIdChef(parseLong(employeeId));
+                    if(! selectedOrderRestaurant.getOrderStatus().equals( OrderStatus.EARRING_ORDER )  ){
+                        throw new OrderStatusNotAllowedForThisActionException();
+                    }
                     selectedOrderRestaurant.setOrderStatus(selectedOrderRestaurant.getOrderStatus().next());
+                    traceabilityClient.saveOrderTrace(selectedOrderRestaurant);
                 }
 
         );
@@ -110,11 +114,10 @@ public class RestaurantUseCase implements IRestaurantServicePort {
         }
 
         orderRestaurant.setOrderStatus(OrderStatus.EARRING_ORDER);
-        orderRestaurant.setDate(LocalDate.now());
+        orderRestaurant.setDate(LocalDateTime.now());
 
-         OrderRestaurant createdOrder =  orderRestaurantPersistencePort.createNewOrder(orderRestaurant);
+        OrderRestaurant createdOrder = orderRestaurantPersistencePort.createNewOrder(orderRestaurant);
 
-        traceabilityClient.saveOrderTrace(createdOrder);
 
         return createdOrder.getId();
     }
@@ -199,7 +202,7 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     public void orderRestaurantReady(Long orderRestaurantId) {
         OrderRestaurant orderRestaurant = orderRestaurantPersistencePort.getOrderById(orderRestaurantId).orElseThrow(OrdersNotFoundException::new);
 
-        if( orderRestaurant.getIdChef() == null){
+        if (orderRestaurant.getIdChef() == null) {
             throw new OrderNotAssignedException();
         }
 
@@ -211,10 +214,37 @@ public class RestaurantUseCase implements IRestaurantServicePort {
         String message = String.format(SMS_READY_ORDER_MESSAGE, pin);
 
         String clientPhone = userClient.getUserPhoneNumber(orderRestaurant.getIdClient().toString());
-        String correctedClientPhone =  PhoneNumberUtils.isValidColombianCellphoneNumber(clientPhone);
-        smsClient.sendMessage( correctedClientPhone, message );
+        String correctedClientPhone = PhoneNumberUtils.isValidColombianCellphoneNumber(clientPhone);
 
-        orderRestaurantPersistencePort.saveOrderRestaurant( orderRestaurant );
+        traceabilityClient.modifyOrderTrace(orderRestaurant);
+
+        smsClient.sendMessage(correctedClientPhone, message);
+        orderRestaurantPersistencePort.saveOrderRestaurant(orderRestaurant);
+
+    }
+
+    @Override
+    public void orderRestaurantDeliver(Long orderRestaurantId, String verificationCode, Long employeeId) {
+        OrderRestaurant orderRestaurant = orderRestaurantPersistencePort
+                .getOrderById(orderRestaurantId)
+                .orElseThrow(OrdersNotFoundException::new);
+
+        if (!Objects.equals(orderRestaurant.getIdChef(), employeeId)) {
+            throw new OrderNotAssignedException();
+        }
+
+        if (!orderRestaurant.getOrderStatus().equals(OrderStatus.READY_ORDER)) {
+            throw new NotAReadyOrderException();
+        }
+
+        if (!orderRestaurant.getVerificationCode().equals(verificationCode)) {
+            throw new WrongVerificationCodeException();
+        }
+
+        orderRestaurant.setOrderStatus(orderRestaurant.getOrderStatus().next());
+        traceabilityClient.modifyOrderTrace(orderRestaurant);
+
+        orderRestaurantPersistencePort.saveOrderRestaurant(orderRestaurant);
 
     }
 

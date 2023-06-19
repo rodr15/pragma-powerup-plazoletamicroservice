@@ -78,4 +78,9 @@ public class RestaurantHandlerImpl implements IRestaurantHandler {
         restaurantServicePort.orderRestaurantReady( orderRestaurantId );
     }
 
+    @Override
+    public void deliverRestaurantOrder(Long orderRestaurantId, String verificationCode, Long employeeId) {
+        restaurantServicePort.orderRestaurantDeliver( orderRestaurantId ,verificationCode,employeeId);
+    }
+
 }
