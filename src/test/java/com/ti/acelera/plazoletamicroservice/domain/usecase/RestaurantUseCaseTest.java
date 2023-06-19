@@ -847,4 +847,62 @@ class RestaurantUseCaseTest {
         verify(traceabilityClient, never()).modifyOrderTrace(any());
         verify(orderRestaurantPersistencePort, never()).saveOrderRestaurant(any());
     }
+    @Test
+    void cancelOrder_WithValidOrderAndUser_ShouldUpdateOrderStatusAndSaveOrderRestaurant() {
+        // Arrange
+        Long userId = 4L;
+        Long orderId = 2L;
+        OrderRestaurant orderRestaurant = new OrderRestaurant();
+        orderRestaurant.setId(orderId);
+        orderRestaurant.setIdClient(userId);
+        orderRestaurant.setOrderStatus(OrderStatus.EARRING_ORDER);
+
+        when(orderRestaurantPersistencePort.getOrderById(orderId)).thenReturn(Optional.of(orderRestaurant));
+
+        // Act
+        assertDoesNotThrow(() -> restaurantUseCase.cancelOrder(userId, orderId));
+
+        // Assert
+        assertEquals(OrderStatus.CANCELED_ORDER, orderRestaurant.getOrderStatus());
+        verify(orderRestaurantPersistencePort, times(1)).saveOrderRestaurant(orderRestaurant);
+        verify(traceabilityClient, times(1)).modifyOrderTrace(orderRestaurant);
+    }
+
+    @Test
+    void cancelOrder_WithInvalidUser_ShouldThrowOrderNotFoundException() {
+        // Arrange
+        Long userId = 10L;
+        Long orderId = 2L;
+        OrderRestaurant orderRestaurant = new OrderRestaurant();
+        orderRestaurant.setId(orderId);
+        orderRestaurant.setIdClient(4L);
+        orderRestaurant.setOrderStatus(OrderStatus.EARRING_ORDER);
+
+        when(orderRestaurantPersistencePort.getOrderById(orderId)).thenReturn(Optional.of(orderRestaurant));
+
+        // Act & Assert
+        assertThrows(OrderNotFoundException.class, () -> restaurantUseCase.cancelOrder(userId, orderId));
+        assertEquals(OrderStatus.EARRING_ORDER, orderRestaurant.getOrderStatus());
+        verify(orderRestaurantPersistencePort, never()).saveOrderRestaurant(any());
+        verify(traceabilityClient, never()).modifyOrderTrace(any());
+    }
+
+    @Test
+    void cancelOrder_WithInvalidOrderStatus_ShouldThrowOrderStatusNotAllowedForThisActionException() {
+        // Arrange
+        Long userId = 4L;
+        Long orderId = 2L;
+        OrderRestaurant orderRestaurant = new OrderRestaurant();
+        orderRestaurant.setId(orderId);
+        orderRestaurant.setIdClient(userId);
+        orderRestaurant.setOrderStatus(OrderStatus.READY_ORDER);
+
+        when(orderRestaurantPersistencePort.getOrderById(orderId)).thenReturn(Optional.of(orderRestaurant));
+
+        // Act & Assert
+        assertThrows(OrderStatusNotAllowedForThisActionException.class, () -> restaurantUseCase.cancelOrder(userId, orderId));
+        assertEquals(OrderStatus.READY_ORDER, orderRestaurant.getOrderStatus());
+        verify(orderRestaurantPersistencePort, never()).saveOrderRestaurant(any());
+        verify(traceabilityClient, never()).modifyOrderTrace(any());
+    }
 }
