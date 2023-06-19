@@ -83,4 +83,9 @@ public class RestaurantHandlerImpl implements IRestaurantHandler {
         restaurantServicePort.orderRestaurantDeliver( orderRestaurantId ,verificationCode,employeeId);
     }
 
+    @Override
+    public void cancelOrder(Long userId,Long orderId) {
+        restaurantServicePort.cancelOrder( userId,orderId  );
+    }
+
 }

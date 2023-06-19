@@ -33,39 +33,7 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     private final ISmsClient smsClient;
 
 
-    @Override
-    public void assignEmployeeToOrder(String employeeId, List<Long> ordersId) {
-        Long restaurantId = restaurantPersistencePort.getRestaurantIdByEmployeeId(parseLong(employeeId))
-                .orElseThrow(EmployeeNotFindException::new);
-
-        List<OrderRestaurant> restaurantOrdersList = orderRestaurantPersistencePort.getOrdersList(restaurantId);
-        List<OrderRestaurant> selectedOrdersRestaurant = orderRestaurantPersistencePort.getOrdersById(ordersId)
-                .orElseThrow(OrdersNotFoundException::new);
-
-        boolean allIdsPresent = selectedOrdersRestaurant
-                .stream()
-                .map(OrderRestaurant::getId)
-                .allMatch(restaurantOrder -> restaurantOrdersList.stream()
-                        .anyMatch(selectedOrder -> selectedOrder.getId().equals(restaurantOrder)));
-
-        if (!allIdsPresent) {
-            throw new OrdersNotFoundException();
-        }
-
-        selectedOrdersRestaurant.forEach(selectedOrderRestaurant -> {
-                    selectedOrderRestaurant.setIdChef(parseLong(employeeId));
-                    if(! selectedOrderRestaurant.getOrderStatus().equals( OrderStatus.EARRING_ORDER )  ){
-                        throw new OrderStatusNotAllowedForThisActionException();
-                    }
-                    selectedOrderRestaurant.setOrderStatus(selectedOrderRestaurant.getOrderStatus().next());
-                    traceabilityClient.saveOrderTrace(selectedOrderRestaurant);
-                }
-
-        );
-        orderRestaurantPersistencePort.saveAllOrderRestaurant(selectedOrdersRestaurant);
-    }
-
-    @Override
+   @Override
     public Page<OrderRestaurant> getOrdersPage(Long employeeId, OrderStatus state, int page, int size) {
         Long restaurantId = restaurantPersistencePort.getRestaurantIdByEmployeeId(employeeId)
                 .orElseThrow(RestaurantNotExistsException::new);
@@ -83,46 +51,7 @@ public class RestaurantUseCase implements IRestaurantServicePort {
         return ordersList;
     }
 
-    @Override
-    public Long makeOrder(OrderRestaurant orderRestaurant) {
-
-        if (orderRestaurantPersistencePort.hasUnfinishedOrders(orderRestaurant.getIdClient())) {
-            throw new ThisClientHasUnfinishedOrdersException();
-        }
-
-        if (!restaurantPersistencePort.restaurantExists(orderRestaurant.getRestaurant().getId())) {
-            throw new RestaurantNotExistsException();
-        }
-
-
-        List<Long> dishIds = orderRestaurant.getDishes()
-                .stream()
-                .map(DishOrder::getDish)
-                .map(Dish::getId)
-                .toList();
-
-        Set<Long> uniqueDishIds = new HashSet<>(dishIds);
-
-        if (dishIds.size() != uniqueDishIds.size()) {
-            throw new MalformedOrderException();
-        }
-
-        List<Dish> dishesFromDatabase = dishPersistencePort.findAllDishesByIdAndByRestaurantId(orderRestaurant.getRestaurant().getId(), dishIds);
-
-        if (dishesFromDatabase.size() != dishIds.size()) {
-            throw new DishNotFoundException();
-        }
-
-        orderRestaurant.setOrderStatus(OrderStatus.EARRING_ORDER);
-        orderRestaurant.setDate(LocalDateTime.now());
-
-        OrderRestaurant createdOrder = orderRestaurantPersistencePort.createNewOrder(orderRestaurant);
-
-
-        return createdOrder.getId();
-    }
-
-    @Override
+  @Override
     public Page<Dish> pageDish(Long restaurantId, Long categoryId, int page, int size) {
 
         if (page < 0 || size <= 0) {
@@ -216,13 +145,84 @@ public class RestaurantUseCase implements IRestaurantServicePort {
         String clientPhone = userClient.getUserPhoneNumber(orderRestaurant.getIdClient().toString());
         String correctedClientPhone = PhoneNumberUtils.isValidColombianCellphoneNumber(clientPhone);
 
-        traceabilityClient.modifyOrderTrace(orderRestaurant);
 
         smsClient.sendMessage(correctedClientPhone, message);
+        traceabilityClient.modifyOrderTrace(orderRestaurant);
+
         orderRestaurantPersistencePort.saveOrderRestaurant(orderRestaurant);
 
     }
 
+    @Override
+    public Long makeOrder(OrderRestaurant orderRestaurant) {
+
+        if (orderRestaurantPersistencePort.hasUnfinishedOrders(orderRestaurant.getIdClient())) {
+            throw new ThisClientHasUnfinishedOrdersException();
+        }
+
+        if (!restaurantPersistencePort.restaurantExists(orderRestaurant.getRestaurant().getId())) {
+            throw new RestaurantNotExistsException();
+        }
+
+
+        List<Long> dishIds = orderRestaurant.getDishes()
+                .stream()
+                .map(DishOrder::getDish)
+                .map(Dish::getId)
+                .toList();
+
+        Set<Long> uniqueDishIds = new HashSet<>(dishIds);
+
+        if (dishIds.size() != uniqueDishIds.size()) {
+            throw new MalformedOrderException();
+        }
+
+        List<Dish> dishesFromDatabase = dishPersistencePort.findAllDishesByIdAndByRestaurantId(orderRestaurant.getRestaurant().getId(), dishIds);
+
+        if (dishesFromDatabase.size() != dishIds.size()) {
+            throw new DishNotFoundException();
+        }
+
+        orderRestaurant.setOrderStatus(OrderStatus.EARRING_ORDER);
+        orderRestaurant.setDate(LocalDateTime.now());
+
+        OrderRestaurant createdOrder = orderRestaurantPersistencePort.createNewOrder(orderRestaurant);
+        traceabilityClient.saveOrderTrace(createdOrder);
+
+        return createdOrder.getId();
+    }
+
+    @Override
+    public void assignEmployeeToOrder(String employeeId, List<Long> ordersId) {
+        Long restaurantId = restaurantPersistencePort.getRestaurantIdByEmployeeId(parseLong(employeeId))
+                .orElseThrow(EmployeeNotFindException::new);
+
+        List<OrderRestaurant> restaurantOrdersList = orderRestaurantPersistencePort.getOrdersList(restaurantId);
+        List<OrderRestaurant> selectedOrdersRestaurant = orderRestaurantPersistencePort.getOrdersById(ordersId)
+                .orElseThrow(OrdersNotFoundException::new);
+
+        boolean allIdsPresent = selectedOrdersRestaurant
+                .stream()
+                .map(OrderRestaurant::getId)
+                .allMatch(restaurantOrder -> restaurantOrdersList.stream()
+                        .anyMatch(selectedOrder -> selectedOrder.getId().equals(restaurantOrder)));
+
+        if (!allIdsPresent) {
+            throw new OrdersNotFoundException();
+        }
+
+        selectedOrdersRestaurant.forEach(selectedOrderRestaurant -> {
+                    selectedOrderRestaurant.setIdChef(parseLong(employeeId));
+                    if (!selectedOrderRestaurant.getOrderStatus().equals(OrderStatus.EARRING_ORDER)) {
+                        throw new OrderStatusNotAllowedForThisActionException();
+                    }
+                    selectedOrderRestaurant.setOrderStatus(selectedOrderRestaurant.getOrderStatus().next());
+                    traceabilityClient.modifyOrderTrace(selectedOrderRestaurant);
+                }
+
+        );
+        orderRestaurantPersistencePort.saveAllOrderRestaurant(selectedOrdersRestaurant);
+    }
     @Override
     public void orderRestaurantDeliver(Long orderRestaurantId, String verificationCode, Long employeeId) {
         OrderRestaurant orderRestaurant = orderRestaurantPersistencePort
@@ -245,6 +245,24 @@ public class RestaurantUseCase implements IRestaurantServicePort {
         traceabilityClient.modifyOrderTrace(orderRestaurant);
 
         orderRestaurantPersistencePort.saveOrderRestaurant(orderRestaurant);
+
+    }
+
+    @Override
+    public void cancelOrder(Long userId, Long orderId) {
+        OrderRestaurant orderRestaurant = orderRestaurantPersistencePort.getOrderById(orderId).orElseThrow();
+
+        if (!orderRestaurant.getIdClient().equals(userId)) {
+            throw new OrderNotFoundException();
+        }
+
+        if (!orderRestaurant.getOrderStatus().equals(OrderStatus.EARRING_ORDER)) {
+            throw new OrderStatusNotAllowedForThisActionException();
+        }
+
+        orderRestaurant.setOrderStatus(OrderStatus.CANCELED_ORDER);
+        orderRestaurantPersistencePort.saveOrderRestaurant(orderRestaurant);
+        traceabilityClient.modifyOrderTrace(orderRestaurant);
 
     }
 

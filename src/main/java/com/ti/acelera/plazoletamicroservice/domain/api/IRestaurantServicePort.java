@@ -19,4 +19,5 @@ public interface IRestaurantServicePort {
     void assignEmployeeToRestaurant(String userId, Long restaurantId);
     void orderRestaurantReady(Long orderRestaurantId );
     void orderRestaurantDeliver(Long orderRestaurantId, String verificationCode, Long employeeId);
+    void cancelOrder(Long userId, Long orderId);
 }

@@ -23,7 +23,7 @@ public class JwtValidate {
         rolePermissions.put("ROLE_ADMIN", Arrays.asList("/restaurant/add"));
         rolePermissions.put("ROLE_OWNER", Arrays.asList("/dish/**"));
         rolePermissions.put("ROLE_EMPLOYEE", Arrays.asList("/restaurant/order-list","/restaurant/assign-order","/restaurant/ready-order","/restaurant/deliver-order"));
-        rolePermissions.put("ROLE_CLIENT", Arrays.asList("/restaurant/restaurant-list","/restaurant/*/menu","/restaurant/order"));
+        rolePermissions.put("ROLE_CLIENT", Arrays.asList("/restaurant/restaurant-list","/restaurant/*/menu","/restaurant/order","/restaurant/cancel-order"));
     }
 
     public boolean validateToken(String token) {

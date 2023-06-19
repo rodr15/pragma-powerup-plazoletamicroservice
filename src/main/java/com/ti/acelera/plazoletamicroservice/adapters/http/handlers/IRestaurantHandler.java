@@ -22,5 +22,6 @@ public interface IRestaurantHandler {
     boolean verifyRestaurantOwner( String userid,  Long restaurantId );
     void finishRestaurantOrder(Long orderRestaurantId);
     void deliverRestaurantOrder(Long orderRestaurantId, String verificationCode, Long employeeId);
+    void cancelOrder(Long userId,Long orderId);
 
 }

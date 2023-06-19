@@ -132,4 +132,16 @@ public class RestaurantRestController {
                 .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.ORDER_CREATED_MESSAGE));
     }
 
+    @SecurityRequirement(name = "jwt")
+    @PutMapping("/cancel-order")
+    public ResponseEntity<Map<String, String>> cancelOrder(
+            @RequestAttribute("userId") String userId,
+            @RequestParam(defaultValue = "1") Long orderId) {
+
+        restaurantHandler.cancelOrder( parseLong(userId),orderId );
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.ORDER_CREATED_MESSAGE));
+    }
+
 }
