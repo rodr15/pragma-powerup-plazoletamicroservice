@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static com.ti.acelera.plazoletamicroservice.configuration.Constants.ORDER_CANNOT_CANCELED_MESSAGE;
 import static com.ti.acelera.plazoletamicroservice.configuration.Constants.SMS_READY_ORDER_MESSAGE;
 import static java.lang.Long.parseLong;
 
@@ -257,7 +258,7 @@ public class RestaurantUseCase implements IRestaurantServicePort {
         }
 
         if (!orderRestaurant.getOrderStatus().equals(OrderStatus.EARRING_ORDER)) {
-            throw new OrderStatusNotAllowedForThisActionException();
+            throw new OrderStatusNotAllowedForThisActionException(ORDER_CANNOT_CANCELED_MESSAGE);
         }
 
         orderRestaurant.setOrderStatus(OrderStatus.CANCELED_ORDER);

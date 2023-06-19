@@ -116,7 +116,7 @@ public class RestaurantRestController {
     public ResponseEntity<Map<String, String>> readyOrder(@RequestParam(defaultValue = "1") Long orderId) {
         restaurantHandler.finishRestaurantOrder(orderId);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.ORDER_CREATED_MESSAGE));
+                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.ORDER_READY_MESSAGE));
     }
 
     @SecurityRequirement(name = "jwt")
@@ -128,8 +128,8 @@ public class RestaurantRestController {
 
         restaurantHandler.deliverRestaurantOrder(orderId, verificationCode, parseLong(userId));
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.ORDER_CREATED_MESSAGE));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.ORDER_DELIVER_MESSAGE));
     }
 
     @SecurityRequirement(name = "jwt")
@@ -141,7 +141,7 @@ public class RestaurantRestController {
         restaurantHandler.cancelOrder( parseLong(userId),orderId );
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.ORDER_CREATED_MESSAGE));
+                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.ORDER_CANCELED_MESSAGE));
     }
 
 }
