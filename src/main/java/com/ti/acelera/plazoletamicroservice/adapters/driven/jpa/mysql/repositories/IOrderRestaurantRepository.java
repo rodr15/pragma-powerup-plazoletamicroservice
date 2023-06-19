@@ -11,6 +11,7 @@ import java.util.Optional;
 
 public interface IOrderRestaurantRepository extends JpaRepository<OrderRestaurantEntity,Long> {
     List<OrderRestaurantEntity> findByIdClientAndOrderStatusNot(Long idClient, OrderStatus status);
+    List<OrderRestaurantEntity> findByIdClientAndOrderStatusNotIn(Long clientId, List<OrderStatus> excludedStatus);
     Page<OrderRestaurantEntity> findByRestaurantIdAndOrderStatus(Long idClient, OrderStatus status, Pageable pageable);
     List<OrderRestaurantEntity> findByRestaurantId(Long id);
     Optional<OrderRestaurantEntity> findById(Long id);

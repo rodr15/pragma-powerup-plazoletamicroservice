@@ -4,7 +4,8 @@ public enum OrderStatus {
     EARRING_ORDER("EARRING", 1),
     IN_PREPARATION_ORDER("IN PREPARATION", 2),
     READY_ORDER("READY", 3),
-    FINISHED_ORDER("FINISHED", 4);
+    FINISHED_ORDER("FINISHED", 4),
+    CANCELED_ORDER("CANCELED", 5);
 
     private final String status;
     private final int order;
@@ -23,6 +24,7 @@ public enum OrderStatus {
     }
 
     public OrderStatus next() {
+        if (this.order == 4){return OrderStatus.FINISHED_ORDER;}
         int nextOrder = this.order + 1;
         for (OrderStatus orderStatus : OrderStatus.values()) {
             if (orderStatus.order == nextOrder) {
