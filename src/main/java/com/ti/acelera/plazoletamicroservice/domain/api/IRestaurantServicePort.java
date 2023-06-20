@@ -1,9 +1,6 @@
 package com.ti.acelera.plazoletamicroservice.domain.api;
 
-import com.ti.acelera.plazoletamicroservice.domain.model.Dish;
-import com.ti.acelera.plazoletamicroservice.domain.model.OrderRestaurant;
-import com.ti.acelera.plazoletamicroservice.domain.model.OrderStatus;
-import com.ti.acelera.plazoletamicroservice.domain.model.Restaurant;
+import com.ti.acelera.plazoletamicroservice.domain.model.*;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -20,4 +17,5 @@ public interface IRestaurantServicePort {
     void orderRestaurantReady(Long orderRestaurantId );
     void orderRestaurantDeliver(Long orderRestaurantId, String verificationCode, Long employeeId);
     void cancelOrder(Long userId, Long orderId);
+    List<Traceability> historyOrder(Long userId, Long orderId);
 }

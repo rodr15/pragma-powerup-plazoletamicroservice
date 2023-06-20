@@ -33,7 +33,7 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     private final ISmsClient smsClient;
 
 
-   @Override
+    @Override
     public Page<OrderRestaurant> getOrdersPage(Long employeeId, OrderStatus state, int page, int size) {
         Long restaurantId = restaurantPersistencePort.getRestaurantIdByEmployeeId(employeeId)
                 .orElseThrow(RestaurantNotExistsException::new);
@@ -51,7 +51,7 @@ public class RestaurantUseCase implements IRestaurantServicePort {
         return ordersList;
     }
 
-  @Override
+    @Override
     public Page<Dish> pageDish(Long restaurantId, Long categoryId, int page, int size) {
 
         if (page < 0 || size <= 0) {
@@ -223,6 +223,7 @@ public class RestaurantUseCase implements IRestaurantServicePort {
         );
         orderRestaurantPersistencePort.saveAllOrderRestaurant(selectedOrdersRestaurant);
     }
+
     @Override
     public void orderRestaurantDeliver(Long orderRestaurantId, String verificationCode, Long employeeId) {
         OrderRestaurant orderRestaurant = orderRestaurantPersistencePort
@@ -264,6 +265,23 @@ public class RestaurantUseCase implements IRestaurantServicePort {
         orderRestaurantPersistencePort.saveOrderRestaurant(orderRestaurant);
         traceabilityClient.modifyOrderTrace(orderRestaurant);
 
+    }
+
+    @Override
+    public List<Traceability> historyOrder(Long userId, Long orderId) {
+
+        OrderRestaurant orderRestaurant = orderRestaurantPersistencePort.getOrderById(orderId)
+                .orElseThrow(OrderNotFoundException::new);
+
+        if (!orderRestaurant.getIdClient().equals(userId)) {
+            throw new OrderNotFoundException();
+        }
+
+        List<Traceability> traces = traceabilityClient.getOrderTrace(orderId);
+        if (traces.isEmpty()) {
+            throw new OrdersNotFoundException();
+        }
+        return traces;
     }
 
 

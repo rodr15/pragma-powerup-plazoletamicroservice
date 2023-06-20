@@ -7,6 +7,7 @@ import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.DishRespo
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.OrderRestaurantResponseDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.RestaurantResponseDto;
 import com.ti.acelera.plazoletamicroservice.domain.model.OrderStatus;
+import com.ti.acelera.plazoletamicroservice.domain.model.Traceability;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -23,5 +24,6 @@ public interface IRestaurantHandler {
     void finishRestaurantOrder(Long orderRestaurantId);
     void deliverRestaurantOrder(Long orderRestaurantId, String verificationCode, Long employeeId);
     void cancelOrder(Long userId,Long orderId);
+    List<Traceability> historyOrder(Long userId, Long orderId);
 
 }

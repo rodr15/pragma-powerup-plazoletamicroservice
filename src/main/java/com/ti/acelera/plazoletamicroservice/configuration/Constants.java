@@ -10,6 +10,7 @@ public class Constants {
     public static final String READY_ORDER = "READY";
     public static final String FINISHED_ORDER = "FINISHED";
     public static final String RESPONSE_MESSAGE_KEY = "message";
+    public static final String TRACEABILITY_SERVICE_ERROR = " traceability service not found ";
     public static final String RESTAURANT_CREATED_MESSAGE = "Restaurant created successfully";
     public static final String ORDER_CREATED_MESSAGE = "Order created successfully";
     public static final String ORDER_DELIVER_MESSAGE = "Order delivered successfully";
