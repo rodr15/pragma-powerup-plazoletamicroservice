@@ -9,10 +9,7 @@ import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.Restauran
 import com.ti.acelera.plazoletamicroservice.adapters.http.handlers.IRestaurantHandler;
 import com.ti.acelera.plazoletamicroservice.adapters.http.mapper.*;
 import com.ti.acelera.plazoletamicroservice.domain.api.IRestaurantServicePort;
-import com.ti.acelera.plazoletamicroservice.domain.model.Dish;
-import com.ti.acelera.plazoletamicroservice.domain.model.OrderRestaurant;
-import com.ti.acelera.plazoletamicroservice.domain.model.OrderStatus;
-import com.ti.acelera.plazoletamicroservice.domain.model.Restaurant;
+import com.ti.acelera.plazoletamicroservice.domain.model.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -86,6 +83,11 @@ public class RestaurantHandlerImpl implements IRestaurantHandler {
     @Override
     public void cancelOrder(Long userId,Long orderId) {
         restaurantServicePort.cancelOrder( userId,orderId  );
+    }
+
+    @Override
+    public List<Traceability> historyOrder(Long userId, Long orderId) {
+        return restaurantServicePort.historyOrder(userId,orderId);
     }
 
 }

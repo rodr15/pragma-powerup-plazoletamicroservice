@@ -905,4 +905,86 @@ class RestaurantUseCaseTest {
         verify(orderRestaurantPersistencePort, never()).saveOrderRestaurant(any());
         verify(traceabilityClient, never()).modifyOrderTrace(any());
     }
+    @Test
+    void testHistoryOrder_ValidOrder_ReturnsTraceabilityList() {
+        // Arrange
+        Long userId = 1L;
+        Long orderId = 2L;
+
+        OrderRestaurant orderRestaurant = new OrderRestaurant();
+        orderRestaurant.setId(orderId);
+        orderRestaurant.setIdClient(userId);
+
+        List<Traceability> traces = new ArrayList<>();
+        traces.add(new Traceability());
+        traces.add(new Traceability());
+
+        when(orderRestaurantPersistencePort.getOrderById(orderId)).thenReturn(Optional.of(orderRestaurant));
+        when(traceabilityClient.getOrderTrace(orderId)).thenReturn(traces);
+
+        // Act
+        List<Traceability> result = restaurantUseCase.historyOrder(userId, orderId);
+
+        // Assert
+        assertEquals(traces, result);
+        verify(orderRestaurantPersistencePort, times(1)).getOrderById(orderId);
+        verify(traceabilityClient, times(1)).getOrderTrace(orderId);
+    }
+
+    @Test
+    void testHistoryOrder_InvalidOrder_ThrowsOrderNotFoundException() {
+        // Arrange
+        Long userId = 1L;
+        Long orderId = 2L;
+
+        when(orderRestaurantPersistencePort.getOrderById(orderId)).thenReturn(Optional.empty());
+
+        // Act
+        assertThrows(OrderNotFoundException.class, () -> restaurantUseCase.historyOrder(userId, orderId));
+
+        // Assert
+        verify(orderRestaurantPersistencePort, times(1)).getOrderById(orderId);
+        verify(traceabilityClient, never()).getOrderTrace(orderId);
+    }
+
+    @Test
+    void testHistoryOrder_UnauthorizedUser_ThrowsOrderNotFoundException() {
+        // Arrange
+        Long userId = 1L;
+        Long orderId = 2L;
+
+        OrderRestaurant orderRestaurant = new OrderRestaurant();
+        orderRestaurant.setId(orderId);
+        orderRestaurant.setIdClient(3L); // Different user ID
+
+        when(orderRestaurantPersistencePort.getOrderById(orderId)).thenReturn(Optional.of(orderRestaurant));
+
+        // Act
+        assertThrows(OrderNotFoundException.class, () -> restaurantUseCase.historyOrder(userId, orderId));
+
+        // Assert
+        verify(orderRestaurantPersistencePort, times(1)).getOrderById(orderId);
+        verify(traceabilityClient, never()).getOrderTrace(orderId);
+    }
+
+    @Test
+    void testHistoryOrder_NoTraces_ThrowsOrdersNotFoundException() {
+        // Arrange
+        Long userId = 1L;
+        Long orderId = 2L;
+
+        OrderRestaurant orderRestaurant = new OrderRestaurant();
+        orderRestaurant.setId(orderId);
+        orderRestaurant.setIdClient(userId);
+
+        when(orderRestaurantPersistencePort.getOrderById(orderId)).thenReturn(Optional.of(orderRestaurant));
+        when(traceabilityClient.getOrderTrace(orderId)).thenReturn(new ArrayList<>());
+
+        // Act
+        assertThrows(OrdersNotFoundException.class, () -> restaurantUseCase.historyOrder(userId, orderId));
+
+        // Assert
+        verify(orderRestaurantPersistencePort, times(1)).getOrderById(orderId);
+        verify(traceabilityClient, times(1)).getOrderTrace(orderId);
+    }
 }
