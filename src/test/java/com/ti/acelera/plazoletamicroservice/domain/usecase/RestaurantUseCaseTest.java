@@ -20,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -955,7 +956,7 @@ class RestaurantUseCaseTest {
 
         OrderRestaurant orderRestaurant = new OrderRestaurant();
         orderRestaurant.setId(orderId);
-        orderRestaurant.setIdClient(3L); // Different user ID
+        orderRestaurant.setIdClient(3L);
 
         when(orderRestaurantPersistencePort.getOrderById(orderId)).thenReturn(Optional.of(orderRestaurant));
 
@@ -986,5 +987,75 @@ class RestaurantUseCaseTest {
         // Assert
         verify(orderRestaurantPersistencePort, times(1)).getOrderById(orderId);
         verify(traceabilityClient, times(1)).getOrderTrace(orderId);
+    }
+    @Test
+    void testRestaurantStatistics_WithValidData_ReturnsStatistics() {
+        // Arrange
+        Long restaurantId = 1L;
+        Long userId = 123L;
+        Restaurant restaurant = new Restaurant();
+        restaurant.setIdProprietary(userId.toString());
+
+        Set<String> employeesIds = new HashSet<>(List.of("2","3","4"));
+        restaurant.setEmployees(employeesIds);
+
+        when(restaurantPersistencePort.getRestaurant(restaurantId)).thenReturn(Optional.of(restaurant));
+
+        List<EmployeeStatistics> employeeStatistics = Arrays.asList(
+                new EmployeeStatistics(1L,2L, Duration.ofMinutes(30)),
+                new EmployeeStatistics(2L,3L, Duration.ofMinutes(45)),
+                new EmployeeStatistics(3L,4L, Duration.ofMinutes(60)));
+
+        when(traceabilityClient.getEmployeeStatistics(Arrays.asList(2L, 3L, 4L)))
+                .thenReturn(employeeStatistics);
+
+
+        List<Long> ordersIds = Arrays.asList(1L, 2L, 3L);
+        List<OrderRestaurant> orderRestaurantList = createOrderRestaurantList(restaurantId,ordersIds);
+
+        List<OrderStatistics> orderStatistics = Arrays.asList(
+                new OrderStatistics(1L, Duration.ofMinutes(20)),
+                new OrderStatistics(2L, Duration.ofMinutes(40)),
+                new OrderStatistics(3L, Duration.ofMinutes(60)));
+
+        when(orderRestaurantPersistencePort.getOrdersListWithStatus(restaurantId, OrderStatus.FINISHED_ORDER))
+                .thenReturn(orderRestaurantList);
+        when(traceabilityClient.getOrdersStatistics(ordersIds))
+                .thenReturn(orderStatistics);
+
+        // Act
+        RestaurantStatistics statistics = restaurantUseCase.restaurantStatistics(userId, restaurantId);
+
+        // Assertions
+        assertEquals(employeeStatistics, statistics.getEmployeeStatistics());
+        assertEquals(orderStatistics, statistics.getOrderStatistics());
+    }
+
+    @Test
+    void testRestaurantStatistics_WithInvalidUser_ThrowsException() {
+        // Arrange
+        Long restaurantId = 1L;
+        Long userId = 123L;
+        Restaurant restaurant = new Restaurant();
+        restaurant.setIdProprietary("456");
+
+        when(restaurantPersistencePort.getRestaurant(restaurantId)).thenReturn(Optional.of(restaurant));
+
+        // AssertThrow
+        assertThrows(NotProprietaryGivenRestaurantException.class,
+                () -> restaurantUseCase.restaurantStatistics(userId, restaurantId));
+    }
+
+    @Test
+    void testRestaurantStatistics_WithNonExistingRestaurant_ThrowsException() {
+        // Arrange
+        Long restaurantId = 1L;
+        Long userId = 123L;
+
+        when(restaurantPersistencePort.getRestaurant(restaurantId)).thenReturn(Optional.empty());
+
+        // AssertThrow
+        assertThrows(RestaurantNotExistsException.class,
+                () -> restaurantUseCase.restaurantStatistics(userId, restaurantId));
     }
 }
