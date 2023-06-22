@@ -90,4 +90,9 @@ public class RestaurantHandlerImpl implements IRestaurantHandler {
         return restaurantServicePort.historyOrder(userId,orderId);
     }
 
+    @Override
+    public RestaurantStatistics restaurantStatistics(Long userId,Long restaurantId) {
+        return restaurantServicePort.restaurantStatistics( userId, restaurantId );
+    }
+
 }

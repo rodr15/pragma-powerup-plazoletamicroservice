@@ -9,6 +9,7 @@ import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.Restauran
 import com.ti.acelera.plazoletamicroservice.adapters.http.handlers.IRestaurantHandler;
 import com.ti.acelera.plazoletamicroservice.configuration.Constants;
 import com.ti.acelera.plazoletamicroservice.domain.model.OrderStatus;
+import com.ti.acelera.plazoletamicroservice.domain.model.RestaurantStatistics;
 import com.ti.acelera.plazoletamicroservice.domain.model.Traceability;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -150,10 +151,15 @@ public class RestaurantRestController {
     public ResponseEntity<List<Traceability>> historyOrder(
             @RequestAttribute("userId") String userId,
             @RequestParam(defaultValue = "1") Long orderId) {
-
-
-
         return ResponseEntity.ok(restaurantHandler.historyOrder( parseLong(userId),orderId ));
     }
 
+    @SecurityRequirement(name = "jwt")
+    @GetMapping("/statistics")
+    public ResponseEntity<RestaurantStatistics> statistics(
+            @RequestAttribute("userId") String userId,
+            @RequestParam(defaultValue = "1") Long restaurantId
+            ) {
+        return ResponseEntity.ok(restaurantHandler.restaurantStatistics( parseLong(userId),restaurantId ));
+    }
 }

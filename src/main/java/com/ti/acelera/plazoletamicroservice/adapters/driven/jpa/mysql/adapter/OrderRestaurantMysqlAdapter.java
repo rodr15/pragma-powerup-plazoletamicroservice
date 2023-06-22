@@ -68,6 +68,14 @@ public class OrderRestaurantMysqlAdapter implements IOrderRestaurantPersistenceP
     }
 
     @Override
+    public List<OrderRestaurant> getOrdersListWithStatus(Long restaurantId, OrderStatus orderStatus) {
+        return orderRestaurantRepository.findByRestaurantIdAndOrderStatus(restaurantId,orderStatus)
+                .stream()
+                .map(orderEntityMapper::toOrder)
+                .toList();
+    }
+
+    @Override
     public boolean hasUnfinishedOrders(Long clientId) {
         List<OrderRestaurantEntity> unfinishedOrders  = orderRestaurantRepository.findByIdClientAndOrderStatusNotIn( clientId, List.of(OrderStatus.FINISHED_ORDER , OrderStatus.CANCELED_ORDER) );
         return !unfinishedOrders.isEmpty();
