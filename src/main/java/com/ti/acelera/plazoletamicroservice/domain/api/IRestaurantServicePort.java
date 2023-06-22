@@ -18,4 +18,5 @@ public interface IRestaurantServicePort {
     void orderRestaurantDeliver(Long orderRestaurantId, String verificationCode, Long employeeId);
     void cancelOrder(Long userId, Long orderId);
     List<Traceability> historyOrder(Long userId, Long orderId);
+    RestaurantStatistics restaurantStatistics(Long userId,Long restaurantId);
 }

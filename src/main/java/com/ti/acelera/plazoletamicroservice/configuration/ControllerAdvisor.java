@@ -95,4 +95,18 @@ public class ControllerAdvisor {
                 .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, WRONG_VERIFICATION_CODE_MESSAGE));
     }
 
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleOrderNotFoundException(
+            OrderNotFoundException thisOrderNotFoundException) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, ORDER_NOT_FOUND_MESSAGE));
+    }
+
+    @ExceptionHandler(OrderStatusNotAllowedForThisActionException.class)
+    public ResponseEntity<Map<String, String>> handleOrderStatusNotAllowedForThisActionException(
+            OrderStatusNotAllowedForThisActionException thisOrderStatusNotAllowedForThisActionException) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, INCORRECT_ORDER_STATUS));
+    }
+
 }
