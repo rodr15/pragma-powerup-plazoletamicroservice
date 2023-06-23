@@ -4,10 +4,7 @@ import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.adapter.Di
 import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.adapter.DishOrderMysqlAdapter;
 import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.adapter.OrderRestaurantMysqlAdapter;
 import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.adapter.RestaurantMysqlAdapter;
-import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.mappers.IDishEntityMapper;
-import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.mappers.IDishOrderEntityMapper;
-import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.mappers.IOrderEntityMapper;
-import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.mappers.IRestaurantEntityMapper;
+import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.mappers.*;
 import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.repositories.IDishOrderRepository;
 import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.repositories.IDishRepository;
 import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.repositories.IOrderRestaurantRepository;
@@ -42,7 +39,7 @@ public class BeanConfiguration {
     private final IOrderEntityMapper orderEntityMapper;
     private final IDishOrderEntityMapper dishOrderEntityMapper;
     private final IDishOrderRepository dishOrderRepository;
-
+    private final ICategoryEntityMapper categoryEntityMapper;
     @Bean
     public IRestaurantPersistencePort restaurantPersistencePort(){
         return new RestaurantMysqlAdapter( restaurantRepository, restaurantEntityMapper );
@@ -62,8 +59,8 @@ public class BeanConfiguration {
         return new RestaurantUseCase(restaurantPersistencePort, dishPersistencePort, orderRestaurantPersistencePort, dishOrderPersistencePort, userClient,traceabilityClient,smsClient);
     }
     @Bean
-    public IDishPersistencePort dishPersistencePort(){
-        return new DishMysqlAdapter( dishRepository, dishEntityMapper);
+    public IDishPersistencePort dishPersistencePort(IDishRepository dishRepository, IDishEntityMapper dishEntityMapper, ICategoryEntityMapper categoryEntityMapper){
+        return new DishMysqlAdapter( dishRepository, dishEntityMapper,categoryEntityMapper);
     }
     @Bean
     public IDishOrderPersistencePort dishOrderPersistencePort() {
