@@ -19,4 +19,5 @@ public interface IRestaurantServicePort {
     void cancelOrder(Long userId, Long orderId);
     List<Traceability> historyOrder(Long userId, Long orderId);
     RestaurantStatistics restaurantStatistics(Long userId,Long restaurantId);
+    List<CategoryAveragePrice> dishCategoryAveragePrice(Long userId, Long restaurantId);
 }

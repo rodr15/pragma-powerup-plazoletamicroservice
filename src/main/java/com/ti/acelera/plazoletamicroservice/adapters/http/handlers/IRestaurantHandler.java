@@ -6,6 +6,7 @@ import com.ti.acelera.plazoletamicroservice.adapters.http.dto.request.Restaurant
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.DishResponseDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.OrderRestaurantResponseDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.RestaurantResponseDto;
+import com.ti.acelera.plazoletamicroservice.domain.model.CategoryAveragePrice;
 import com.ti.acelera.plazoletamicroservice.domain.model.OrderStatus;
 import com.ti.acelera.plazoletamicroservice.domain.model.RestaurantStatistics;
 import com.ti.acelera.plazoletamicroservice.domain.model.Traceability;
@@ -27,5 +28,6 @@ public interface IRestaurantHandler {
     void cancelOrder(Long userId,Long orderId);
     List<Traceability> historyOrder(Long userId, Long orderId);
     RestaurantStatistics restaurantStatistics(Long userId, Long restaurantId);
+    List<CategoryAveragePrice> dishCategoryAveragePrice(Long userId, Long restaurantId);
 
 }

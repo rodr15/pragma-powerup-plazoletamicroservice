@@ -95,4 +95,9 @@ public class RestaurantHandlerImpl implements IRestaurantHandler {
         return restaurantServicePort.restaurantStatistics( userId, restaurantId );
     }
 
+    @Override
+    public List<CategoryAveragePrice> dishCategoryAveragePrice(Long userId, Long restaurantId) {
+        return restaurantServicePort.dishCategoryAveragePrice(userId,restaurantId);
+    }
+
 }

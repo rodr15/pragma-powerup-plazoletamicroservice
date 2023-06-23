@@ -1,5 +1,6 @@
 package com.ti.acelera.plazoletamicroservice.domain.spi;
 
+import com.ti.acelera.plazoletamicroservice.domain.model.CategoryAveragePrice;
 import com.ti.acelera.plazoletamicroservice.domain.model.Dish;
 import org.springframework.data.domain.Page;
 
@@ -15,4 +16,5 @@ public interface IDishPersistencePort {
 
     Page<Dish> getActiveDishesByRestaurantId(Long restaurantId, Long categoryId, int page, int size);
     List<Dish> findAllDishesByIdAndByRestaurantId( Long restaurantId ,List<Long> dishesId);
+    List<CategoryAveragePrice> dishCategoryAveragePrice(Long restaurantId);
 }

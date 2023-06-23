@@ -8,6 +8,7 @@ import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.OrderRest
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.RestaurantResponseDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.handlers.IRestaurantHandler;
 import com.ti.acelera.plazoletamicroservice.configuration.Constants;
+import com.ti.acelera.plazoletamicroservice.domain.model.CategoryAveragePrice;
 import com.ti.acelera.plazoletamicroservice.domain.model.OrderStatus;
 import com.ti.acelera.plazoletamicroservice.domain.model.RestaurantStatistics;
 import com.ti.acelera.plazoletamicroservice.domain.model.Traceability;
@@ -162,4 +163,15 @@ public class RestaurantRestController {
             ) {
         return ResponseEntity.ok(restaurantHandler.restaurantStatistics( parseLong(userId),restaurantId ));
     }
+
+    @SecurityRequirement(name = "jwt")
+    @GetMapping("category-average-price")
+    public ResponseEntity<List<CategoryAveragePrice>> averagePrice(@RequestAttribute("userId") String userId,
+                                                                   @RequestParam(defaultValue = "1") Long restaurantId) {
+
+
+        return ResponseEntity.ok(restaurantHandler.dishCategoryAveragePrice(parseLong(userId),restaurantId));
+
+    }
+
 }

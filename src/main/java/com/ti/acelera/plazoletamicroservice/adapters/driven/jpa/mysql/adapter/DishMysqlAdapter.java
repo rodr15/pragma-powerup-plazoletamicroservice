@@ -1,8 +1,11 @@
 package com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.adapter;
 
+import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.entity.CategoryEntity;
 import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.entity.DishEntity;
+import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.mappers.ICategoryEntityMapper;
 import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.mappers.IDishEntityMapper;
 import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.repositories.IDishRepository;
+import com.ti.acelera.plazoletamicroservice.domain.model.CategoryAveragePrice;
 import com.ti.acelera.plazoletamicroservice.domain.model.Dish;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IDishPersistencePort;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +22,7 @@ public class DishMysqlAdapter implements IDishPersistencePort {
 
     private final IDishRepository dishRepository;
     private final IDishEntityMapper dishEntityMapper;
+    private final ICategoryEntityMapper categoryEntityMapper;
 
     @Override
     public void saveDish(Dish dish) {
@@ -57,5 +62,19 @@ public class DishMysqlAdapter implements IDishPersistencePort {
         List<DishEntity> dishEntityList = dishRepository.findAllByIdInAndRestaurantIdAndActiveTrue(dishesId, restaurantId);
         return dishEntityList.stream().map(dishEntityMapper::toDish).toList();
 
+    }
+
+    @Override
+    public List<CategoryAveragePrice> dishCategoryAveragePrice(Long restaurantId) {
+        List<Object[]> results = dishRepository.categoryAveragePrice(restaurantId);
+
+        List<CategoryAveragePrice> categoryAveragePrices = new ArrayList<>();
+        for (Object[] result : results) {
+            CategoryEntity category = (CategoryEntity) result[0];
+            double averagePrice = (double) result[1];
+            categoryAveragePrices.add(new CategoryAveragePrice(categoryEntityMapper.toCategory(category), averagePrice));
+        }
+
+        return categoryAveragePrices;
     }
 }

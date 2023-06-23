@@ -308,5 +308,11 @@ public class RestaurantUseCase implements IRestaurantServicePort {
         return new RestaurantStatistics(employeeStatistics,ordersStatistics);
     }
 
+    @Override
+    public List<CategoryAveragePrice> dishCategoryAveragePrice(Long userId, Long restaurantId) {
+        return dishPersistencePort.dishCategoryAveragePrice(restaurantId);
+
+    }
+
 
 }
