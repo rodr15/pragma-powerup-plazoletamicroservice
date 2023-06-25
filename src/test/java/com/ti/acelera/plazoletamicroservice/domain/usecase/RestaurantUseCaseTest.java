@@ -1095,4 +1095,39 @@ class RestaurantUseCaseTest {
         verify(dishPersistencePort, times(1)).dishCategoryAveragePrice(restaurantId);
     }
 
+    @Test
+    void testRestaurantStatistics_WithNonEmployeesForTheRestaurant_ThrowsException() {
+
+        // Arrange
+        Long restaurantId = 1L;
+        Long userId = 123L;
+        Restaurant restaurant = new Restaurant();
+        restaurant.setIdProprietary(userId.toString());
+
+        when(restaurantPersistencePort.getRestaurant(restaurantId)).thenReturn(Optional.of(restaurant));
+
+
+        // AssertThrow
+        assertThrows(RestaurantDontHaveRegisteredEmployeesException.class, () -> restaurantUseCase.restaurantStatistics(userId, restaurantId));
+
+    }
+    @Test
+    void testRestaurantStatistics_WithNullEmployeesForTheRestaurant_ThrowsException() {
+        // Arrange
+        Long restaurantId = 1L;
+        Long userId = 123L;
+        Restaurant restaurant = new Restaurant();
+        restaurant.setIdProprietary(userId.toString());
+
+        Set<String> employeesIds = new HashSet<>(List.of());
+        restaurant.setEmployees(employeesIds);
+
+        when(restaurantPersistencePort.getRestaurant(restaurantId)).thenReturn(Optional.of(restaurant));
+
+
+        // AssertThrow
+        assertThrows(RestaurantDontHaveRegisteredEmployeesException.class, () -> restaurantUseCase.restaurantStatistics(userId, restaurantId));
+
+    }
+
 }
