@@ -311,7 +311,6 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     @Override
     public List<CategoryAveragePrice> dishCategoryAveragePrice(Long userId, Long restaurantId) {
         return dishPersistencePort.dishCategoryAveragePrice(restaurantId);
-
     }
 
 
