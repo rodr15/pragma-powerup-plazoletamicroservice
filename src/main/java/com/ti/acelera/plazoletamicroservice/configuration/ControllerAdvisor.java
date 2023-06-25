@@ -109,4 +109,11 @@ public class ControllerAdvisor {
                 .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, INCORRECT_ORDER_STATUS));
     }
 
+    @ExceptionHandler(RestaurantDontHaveRegisteredEmployeesException.class)
+    public ResponseEntity<Map<String, String>> handleRestaurantDontHaveRegisteredEmployeesException(
+            RestaurantDontHaveRegisteredEmployeesException thisRestaurantDontHaveRegisteredEmployeesException) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, RESTAURANT_WITHOUT_EMPLOYEES_MESSAGE));
+    }
+
 }

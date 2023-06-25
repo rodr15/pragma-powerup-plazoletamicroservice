@@ -293,10 +293,16 @@ public class RestaurantUseCase implements IRestaurantServicePort {
             throw new NotProprietaryGivenRestaurantException();
         }
 
+
+        Set<String> restaurantEmployees = restaurant.getEmployees();
+
+        if( restaurantEmployees == null || restaurantEmployees.isEmpty() ){
+            throw new RestaurantDontHaveRegisteredEmployeesException();
+        }
+
         // Employee Statistics
         List<EmployeeStatistics> employeeStatistics = traceabilityClient.getEmployeeStatistics(
-                restaurant
-                .getEmployees()
+                restaurantEmployees
                 .stream()
                 .map(Long::parseLong).toList() );
 

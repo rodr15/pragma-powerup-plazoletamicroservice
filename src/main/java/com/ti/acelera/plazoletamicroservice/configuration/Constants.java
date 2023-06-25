@@ -23,6 +23,7 @@ public class Constants {
     public static final String BAD_ORDER_MESSAGE = "The order is malformed";
     public static final String ORDER_NOT_FOUND_MESSAGE = "No order found with the one or more of the ids provided";
     public static final String INCORRECT_ORDER_STATUS = "The status of the order is not the correct for this action ";
+    public static final String RESTAURANT_WITHOUT_EMPLOYEES_MESSAGE = "This restaurant do not have registered employees";
     public static final String ORDER_NOT_ASSIGN_MESSAGE = "Order not assigned";
     public static final String NOT_ORDER_STATUS_REQUIRED_MESSAGE = "The order status is not the necessary for this action";
     public static final String WRONG_VERIFICATION_CODE_MESSAGE = "The verification code is wrong";
