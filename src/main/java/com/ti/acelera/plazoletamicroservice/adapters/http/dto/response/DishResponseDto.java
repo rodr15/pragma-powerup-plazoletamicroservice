@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class DishResponseDto {
     private String name;
-    private String idCategory;
+    private Long idCategory;
     private String description;
     private Long price;
     private String urlImage;

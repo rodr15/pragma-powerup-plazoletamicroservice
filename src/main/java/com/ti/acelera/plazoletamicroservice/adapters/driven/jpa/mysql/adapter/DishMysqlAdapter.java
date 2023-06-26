@@ -79,8 +79,12 @@ public class DishMysqlAdapter implements IDishPersistencePort {
     }
 
     @Override
-    public Page<Dish> getDishesByBudgetAndCategoryPreferences(Long budget, List<Long> categoryPreferencesId,Pageable pageable) {
-        return dishRepository.getDishesByBudgetAndCategoryPreferences(budget, categoryPreferencesId,pageable)
+    public Page<Dish> getDishesByBudgetAndCategoryPreferences(Long lowBudget,Long upBudget, List<Long> categoryPreferencesId, Pageable pageable) {
+        if (categoryPreferencesId == null || categoryPreferencesId.isEmpty()) {
+            return dishRepository.getDishesByBudget(lowBudget,upBudget,pageable)
+                    .map(dishEntityMapper::toDish);
+        }
+        return dishRepository.getDishesByBudgetAndCategoryPreferences(lowBudget,upBudget,categoryPreferencesId, pageable)
                 .map(dishEntityMapper::toDish);
     }
 }

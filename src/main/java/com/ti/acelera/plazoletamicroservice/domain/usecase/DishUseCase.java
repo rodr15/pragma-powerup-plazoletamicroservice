@@ -75,11 +75,11 @@ public class DishUseCase implements IDishServicePort {
 
     }
     @Override
-    public Page<Dish> getDishesByBudgetAndCategoryPreferences(Long budget, List<Long> categoryPreferencesId,int page, int size) {
+    public Page<Dish> getDishesByBudgetAndCategoryPreferences(Long lowBudget,Long upBudget, List<Long> categoryPreferencesId, int page, int size) {
 
         Pageable pageable = PageRequest.of(page, size);
 
-        return dishPersistencePort.getDishesByBudgetAndCategoryPreferences(budget,categoryPreferencesId,pageable);
+        return dishPersistencePort.getDishesByBudgetAndCategoryPreferences(lowBudget,upBudget,categoryPreferencesId,pageable);
     }
 
     private void verifyOwner(String userId, String restaurantOwnerId) {

@@ -62,13 +62,14 @@ public class DishRestController {
     @SecurityRequirement(name = "jwt")
     @GetMapping("/dish-search-budget")
     public ResponseEntity<Page<DishResponseDto>> searchDishByBudget(
-            @RequestParam(defaultValue = "20") Long budget,
-            @RequestParam List<Long> preferenceCategories,
-            @RequestParam int page,
-            @RequestParam int size
+            @RequestParam(defaultValue = "0") Long lowBudget,
+            @RequestParam(defaultValue = "100") Long upBudget,
+            @RequestParam(required = false) List<Long> preferenceCategories,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
     ) {
 
-        return ResponseEntity.ok(dishHandler.getDishesByBudgetAndCategoryPreferences(budget, preferenceCategories, page, size));
+        return ResponseEntity.ok(dishHandler.getDishesByBudgetAndCategoryPreferences(lowBudget,upBudget, preferenceCategories, page, size));
 
     }
 

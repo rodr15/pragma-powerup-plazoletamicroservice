@@ -11,6 +11,6 @@ public interface IDishHandler {
     void saveDish(String userId,DishRequestDto dishRequestDto);
     void modifyDish( String userId,Long dishId, UpdateDishRequestDto updateDishRequestDto);
     void modifyDishState(String userId, Long dishId,boolean dishState);
-    Page<DishResponseDto> getDishesByBudgetAndCategoryPreferences(Long budget, List<Long> categoryPreferencesId, int page, int size);
+    Page<DishResponseDto> getDishesByBudgetAndCategoryPreferences(Long lowBudget, Long upBudget, List<Long> categoryPreferencesId, int page, int size) ;
 
 }

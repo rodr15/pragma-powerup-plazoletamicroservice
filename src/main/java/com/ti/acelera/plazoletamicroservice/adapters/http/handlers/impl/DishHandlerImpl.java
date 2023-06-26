@@ -37,9 +37,9 @@ public class DishHandlerImpl implements IDishHandler {
     }
 
     @Override
-    public Page<DishResponseDto> getDishesByBudgetAndCategoryPreferences(Long budget, List<Long> categoryPreferencesId, int page, int size) {
+    public Page<DishResponseDto> getDishesByBudgetAndCategoryPreferences(Long lowBudget, Long upBudget, List<Long> categoryPreferencesId, int page, int size) {
         return dishServicePort
-                .getDishesByBudgetAndCategoryPreferences(budget, categoryPreferencesId, page, size)
+                .getDishesByBudgetAndCategoryPreferences(lowBudget,upBudget ,categoryPreferencesId, page, size)
                 .map(dishResponseMapper::toResponseDto);
     }
 
