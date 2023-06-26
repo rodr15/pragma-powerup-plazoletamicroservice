@@ -1,10 +1,7 @@
 package com.ti.acelera.plazoletamicroservice.domain.usecase;
 
 import com.ti.acelera.plazoletamicroservice.domain.api.IDishServicePort;
-import com.ti.acelera.plazoletamicroservice.domain.exceptions.DishNotFoundException;
-import com.ti.acelera.plazoletamicroservice.domain.exceptions.NotProprietaryGivenRestaurantException;
-import com.ti.acelera.plazoletamicroservice.domain.exceptions.RestaurantNotExistsException;
-import com.ti.acelera.plazoletamicroservice.domain.exceptions.RoleNotAllowedException;
+import com.ti.acelera.plazoletamicroservice.domain.exceptions.*;
 import com.ti.acelera.plazoletamicroservice.domain.gateway.IUserClient;
 import com.ti.acelera.plazoletamicroservice.domain.model.Dish;
 import com.ti.acelera.plazoletamicroservice.domain.model.Restaurant;
@@ -76,6 +73,10 @@ public class DishUseCase implements IDishServicePort {
     }
     @Override
     public Page<Dish> getDishesByBudgetAndCategoryPreferences(Long lowBudget,Long upBudget, List<Long> categoryPreferencesId, int page, int size) {
+
+        if (page < 0 || size <= 0) {
+            throw new BadPagedException();
+        }
 
         Pageable pageable = PageRequest.of(page, size);
 
