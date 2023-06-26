@@ -69,6 +69,7 @@ Right-click the class PowerUpApplication and choose Run
 Para acceder a ciertos endpoints de la API, es necesario autenticarse con un rol determinado. A continuación se detallan los roles y los endpoints asociados:
 
 - `ROLE_ADMIN`: Permite acceder a los siguientes endpoints:
+   - `/dish/dish-search-budget` (GET)
    - `/restaurant/add` (POST)
   
 - `ROLE_OWNER`: Permite acceder a los siguientes endpoints:
@@ -85,6 +86,7 @@ Para acceder a ciertos endpoints de la API, es necesario autenticarse con un rol
 - `ROLE_CLIENT`: Permite acceder a los siguientes endpoints:
   - `/restaurant/restaurant-list` (GET)
   - `/restaurant/{restaurantId}/menu` (GET)
+  - `/dish/dish-search-budget` (GET)
   - `/restaurant/order` (POST)
 
 ## Documentation
