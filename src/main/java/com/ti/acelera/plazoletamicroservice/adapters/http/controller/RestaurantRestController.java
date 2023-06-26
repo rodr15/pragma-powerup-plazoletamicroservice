@@ -165,11 +165,9 @@ public class RestaurantRestController {
     }
 
     @SecurityRequirement(name = "jwt")
-    @GetMapping("category-average-price")
+    @GetMapping("/category-average-price")
     public ResponseEntity<List<CategoryAveragePrice>> averagePrice(@RequestAttribute("userId") String userId,
                                                                    @RequestParam(defaultValue = "1") Long restaurantId) {
-
-
         return ResponseEntity.ok(restaurantHandler.dishCategoryAveragePrice(parseLong(userId),restaurantId));
 
     }

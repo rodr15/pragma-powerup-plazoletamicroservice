@@ -72,6 +72,8 @@ Para acceder a ciertos endpoints de la API, es necesario autenticarse con un rol
    - `/restaurant/add` (POST)
   
 - `ROLE_OWNER`: Permite acceder a los siguientes endpoints:
+  - `/restaurant/category-average-price` (GET)
+  - `/restaurant/statistics` (GET)
   - `/dish/add` (POST)
   - `/dish/update/{dishId}` (PUT)
   - `/dish/enable-disable/{dishId}/{dishState}` (PUT)
