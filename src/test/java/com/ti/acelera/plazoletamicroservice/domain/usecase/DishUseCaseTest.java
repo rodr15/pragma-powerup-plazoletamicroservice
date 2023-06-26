@@ -1,9 +1,7 @@
 package com.ti.acelera.plazoletamicroservice.domain.usecase;
 
-import com.ti.acelera.plazoletamicroservice.domain.exceptions.DishNotFoundException;
-import com.ti.acelera.plazoletamicroservice.domain.exceptions.NotProprietaryGivenRestaurantException;
-import com.ti.acelera.plazoletamicroservice.domain.exceptions.RestaurantNotExistsException;
-import com.ti.acelera.plazoletamicroservice.domain.exceptions.RoleNotAllowedException;
+import com.ti.acelera.plazoletamicroservice.domain.api.IDishServicePort;
+import com.ti.acelera.plazoletamicroservice.domain.exceptions.*;
 import com.ti.acelera.plazoletamicroservice.domain.gateway.IUserClient;
 import com.ti.acelera.plazoletamicroservice.domain.model.Dish;
 import com.ti.acelera.plazoletamicroservice.domain.model.Restaurant;
@@ -14,7 +12,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,7 +28,7 @@ class DishUseCaseTest {
     private IDishPersistencePort dishPersistencePort;
     private IRestaurantPersistencePort restaurantPersistencePort;
     private IUserClient userClient;
-    private DishUseCase dishUseCase;
+    private IDishServicePort dishService;
 
 
     @BeforeEach
@@ -34,7 +36,7 @@ class DishUseCaseTest {
         dishPersistencePort = mock(IDishPersistencePort.class);
         restaurantPersistencePort = mock(IRestaurantPersistencePort.class);
         userClient = mock(IUserClient.class);
-        dishUseCase = new DishUseCase(dishPersistencePort, restaurantPersistencePort, userClient);
+        dishService = new DishUseCase(dishPersistencePort, restaurantPersistencePort, userClient);
     }
 
     @Test
@@ -53,7 +55,7 @@ class DishUseCaseTest {
         when(restaurantPersistencePort.getRestaurant(dish.getRestaurant().getId())).thenReturn(Optional.of(restaurant));
         when(userClient.getRoleByDni("1231231231")).thenReturn("ROLE_OWNER");
 
-        dishUseCase.saveDish(userId, dish);
+        dishService.saveDish(userId, dish);
 
         verify(dishPersistencePort, times(1)).saveDish(dish);
     }
@@ -71,7 +73,7 @@ class DishUseCaseTest {
 
         when(restaurantPersistencePort.getRestaurant(dish.getRestaurant().getId())).thenReturn(Optional.empty());
 
-        assertThrows(RestaurantNotExistsException.class, () -> dishUseCase.saveDish(userId, dish));
+        assertThrows(RestaurantNotExistsException.class, () -> dishService.saveDish(userId, dish));
 
         verify(dishPersistencePort, never()).saveDish(Mockito.any());
     }
@@ -91,7 +93,7 @@ class DishUseCaseTest {
         when(restaurantPersistencePort.getRestaurant(dish.getRestaurant().getId())).thenReturn(Optional.of(restaurant));
         when(userClient.getRoleByDni("1231231231")).thenReturn("ROLE_USER");
 
-        assertThrows(RoleNotAllowedException.class, () -> dishUseCase.saveDish(userId, dish));
+        assertThrows(RoleNotAllowedException.class, () -> dishService.saveDish(userId, dish));
 
         verify(dishPersistencePort, never()).saveDish(Mockito.any());
     }
@@ -110,7 +112,7 @@ class DishUseCaseTest {
         when(restaurantPersistencePort.getRestaurant(dish.getRestaurant().getId())).thenReturn(Optional.of(restaurant));
         when(userClient.getRoleByDni(userId)).thenReturn("ROLE_OWNER");
 
-        assertThrows(NotProprietaryGivenRestaurantException.class, () -> dishUseCase.saveDish(userId, dish));
+        assertThrows(NotProprietaryGivenRestaurantException.class, () -> dishService.saveDish(userId, dish));
 
         verify(dishPersistencePort, never()).saveDish(Mockito.any());
     }
@@ -136,7 +138,7 @@ class DishUseCaseTest {
 
         when(userClient.getRoleByDni(userId)).thenReturn("ROLE_OWNER");
         // Act
-        dishUseCase.modifyDish(userId, dishId, price, description);
+        dishService.modifyDish(userId, dishId, price, description);
 
         // Assert
         assertEquals(price, dish.getPrice());
@@ -157,7 +159,7 @@ class DishUseCaseTest {
 
         // Act & Assert
         assertThrows(DishNotFoundException.class, () ->
-                dishUseCase.modifyDish(userId, dishId, price, description));
+                dishService.modifyDish(userId, dishId, price, description));
         verify(dishPersistencePort, never()).saveDish(any(Dish.class));
     }
 
@@ -180,7 +182,7 @@ class DishUseCaseTest {
         when(userClient.getRoleByDni(proprietaryId)).thenReturn("ROLE_OWNER");
 
         // Act
-        dishUseCase.modifyDishState(proprietaryId, dishId, dishState);
+        dishService.modifyDishState(proprietaryId, dishId, dishState);
 
         // Assert
         assertFalse(dish.isActive());
@@ -200,7 +202,7 @@ class DishUseCaseTest {
 
         // Act & Assert
         assertThrows(DishNotFoundException.class,
-                () -> dishUseCase.modifyDishState(proprietaryId, dishId, dishState));
+                () -> dishService.modifyDishState(proprietaryId, dishId, dishState));
         verify(dishPersistencePort, times(1)).getDish(dishId);
         verify(dishPersistencePort, never()).saveDish(any(Dish.class));
     }
@@ -227,8 +229,98 @@ class DishUseCaseTest {
 
         // Act & Assert
         assertThrows(NotProprietaryGivenRestaurantException.class,
-                () -> dishUseCase.modifyDishState(proprietaryId, dishId, dishState));
+                () -> dishService.modifyDishState(proprietaryId, dishId, dishState));
         verify(dishPersistencePort, times(1)).getDish(dishId);
         verify(dishPersistencePort, never()).saveDish(any(Dish.class));
     }
+    @Test
+    void getDishesByBudgetAndCategoryPreferences_ValidValues_ReturnsPageOfDishes() {
+        // Arrange
+        Long lowBudget = 10L;
+        Long upBudget = 20L;
+        List<Long> categoryPreferencesId = List.of(1L, 2L, 3L);
+        int page = 0;
+        int size = 10;
+
+        Page<Dish> expectedPage = createMockPageOfDishes();
+
+        when(dishPersistencePort.getDishesByBudgetAndCategoryPreferences(anyLong(), anyLong(), anyList(), any(Pageable.class)))
+                .thenReturn(expectedPage);
+
+        // Act
+        Page<Dish> result = dishService.getDishesByBudgetAndCategoryPreferences(lowBudget, upBudget, categoryPreferencesId, page, size);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(expectedPage, result);
+    }
+
+    @Test
+    void getDishesByBudgetAndCategoryPreferences_EmptyCategoryPreferences_ReturnsPageOfDishes() {
+        // Arrange
+        Long lowBudget = 10L;
+        Long upBudget = 20L;
+        List<Long> categoryPreferencesId = null;
+        int page = 0;
+        int size = 10;
+
+        Page<Dish> expectedPage = createMockPageOfDishes();
+
+        when(dishPersistencePort.getDishesByBudgetAndCategoryPreferences(anyLong(), anyLong(), isNull(), any(Pageable.class)))
+                .thenReturn(expectedPage);
+
+        // Act
+        Page<Dish> result = dishService.getDishesByBudgetAndCategoryPreferences(lowBudget, upBudget, categoryPreferencesId, page, size);
+
+        // Assert
+        assertNotNull(result);
+    }
+
+    @Test
+    void getDishesByBudgetAndCategoryPreferences_SameLowAndUpBudget_ReturnsPageOfDishes() {
+        // Arrange
+        Long lowBudget = 20L;
+        Long upBudget = 20L;
+        List<Long> categoryPreferencesId = List.of(1L, 2L, 3L);
+        int page = 0;
+        int size = 10;
+
+        Page<Dish> expectedPage = createMockPageOfDishes();
+
+        when(dishPersistencePort.getDishesByBudgetAndCategoryPreferences(anyLong(), anyLong(), anyList(), any(Pageable.class)))
+                .thenReturn(expectedPage);
+
+        // Act
+        Page<Dish> result = dishService.getDishesByBudgetAndCategoryPreferences(lowBudget, upBudget, categoryPreferencesId, page, size);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(expectedPage, result);
+    }
+
+    @Test
+    void getDishesByBudgetAndCategoryPreferences_InvalidPageAndSize_ThrowsBadPagedException() {
+        // Arrange
+        Long lowBudget = 10L;
+        Long upBudget = 20L;
+        List<Long> categoryPreferencesId = List.of(1L, 2L, 3L);
+        int page = -1;
+        int size = 0;
+
+        // Act & Assert
+        assertThrows(BadPagedException.class,
+                () -> dishService.getDishesByBudgetAndCategoryPreferences(lowBudget, upBudget, categoryPreferencesId, page, size));
+    }
+
+    private Page<Dish> createMockPageOfDishes() {
+
+
+        List<Dish> dishes = List.of(
+                new Dish(),
+                new Dish()
+        );
+
+        return new PageImpl<>(dishes);
+    }
+
 }
