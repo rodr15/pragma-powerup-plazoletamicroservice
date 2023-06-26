@@ -2,17 +2,20 @@ package com.ti.acelera.plazoletamicroservice.adapters.http.controller;
 
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.request.DishRequestDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.dto.request.UpdateDishRequestDto;
+import com.ti.acelera.plazoletamicroservice.adapters.http.dto.response.DishResponseDto;
 import com.ti.acelera.plazoletamicroservice.adapters.http.handlers.IDishHandler;
 import com.ti.acelera.plazoletamicroservice.configuration.Constants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -53,6 +56,20 @@ public class DishRestController {
         dishHandler.modifyDishState(userId, dishId, dishState);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.DISH_UPDATED_MESSAGE));
+    }
+
+
+    @SecurityRequirement(name = "jwt")
+    @GetMapping("/dish-search-budget")
+    public ResponseEntity<Page<DishResponseDto>> searchDishByBudget(
+            @RequestParam(defaultValue = "20") Long budget,
+            @RequestParam List<Long> preferenceCategories,
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
+
+        return ResponseEntity.ok(dishHandler.getDishesByBudgetAndCategoryPreferences(budget, preferenceCategories, page, size));
+
     }
 
 }

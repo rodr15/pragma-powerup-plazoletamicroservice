@@ -11,7 +11,11 @@ import com.ti.acelera.plazoletamicroservice.domain.model.Restaurant;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IDishPersistencePort;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IRestaurantPersistencePort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -70,6 +74,14 @@ public class DishUseCase implements IDishServicePort {
        dishPersistencePort.saveDish( dish.get() );
 
     }
+    @Override
+    public Page<Dish> getDishesByBudgetAndCategoryPreferences(Long budget, List<Long> categoryPreferencesId,int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return dishPersistencePort.getDishesByBudgetAndCategoryPreferences(budget,categoryPreferencesId,pageable);
+    }
+
     private void verifyOwner(String userId, String restaurantOwnerId) {
         final String userRole = userClient.getRoleByDni(userId);
 

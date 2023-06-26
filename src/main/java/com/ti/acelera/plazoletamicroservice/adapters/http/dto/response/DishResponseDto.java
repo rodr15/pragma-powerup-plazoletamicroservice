@@ -15,4 +15,5 @@ public class DishResponseDto {
     private String description;
     private Long price;
     private String urlImage;
+    private Long restaurantId;
 }
