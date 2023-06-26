@@ -1059,40 +1059,103 @@ class RestaurantUseCaseTest {
                 () -> restaurantUseCase.restaurantStatistics(userId, restaurantId));
     }
     @Test
-    void testDishCategoryAveragePrice_Valid(){
+    void testRestaurantStatistics_WithNonEmployeesForTheRestaurant_ThrowsException() {
+
+        // Arrange
+        Long restaurantId = 1L;
+        Long userId = 123L;
+        Restaurant restaurant = new Restaurant();
+        restaurant.setIdProprietary(userId.toString());
+
+        when(restaurantPersistencePort.getRestaurant(restaurantId)).thenReturn(Optional.of(restaurant));
+
+
+        // AssertThrow
+        assertThrows(RestaurantDontHaveRegisteredEmployeesException.class, () -> restaurantUseCase.restaurantStatistics(userId, restaurantId));
+
+    }
+    @Test
+    void testRestaurantStatistics_WithNullEmployeesForTheRestaurant_ThrowsException() {
+        // Arrange
+        Long restaurantId = 1L;
+        Long userId = 123L;
+        Restaurant restaurant = new Restaurant();
+        restaurant.setIdProprietary(userId.toString());
+
+        Set<String> employeesIds = new HashSet<>(List.of());
+        restaurant.setEmployees(employeesIds);
+
+        when(restaurantPersistencePort.getRestaurant(restaurantId)).thenReturn(Optional.of(restaurant));
+
+
+        // AssertThrow
+        assertThrows(RestaurantDontHaveRegisteredEmployeesException.class, () -> restaurantUseCase.restaurantStatistics(userId, restaurantId));
+
+    }
+
+    @Test
+    void dishCategoryAveragePrice_WithValidData_ShouldReturnCategoryAveragePrices() {
         // Arrange
         Long userId = 1L;
-        Long restaurantId = 1L;
+        Long restaurantId = 2L;
 
-        CategoryAveragePrice categoryAveragePrice = new CategoryAveragePrice();
-        List<CategoryAveragePrice> listCategoryAveragePrice = List.of(categoryAveragePrice);
+        // Mocking the restaurant
+        Restaurant restaurant = new Restaurant();
+        restaurant.setIdProprietary("1");
 
-        when(dishPersistencePort.dishCategoryAveragePrice(restaurantId)).thenReturn(listCategoryAveragePrice);
+        when(restaurantPersistencePort.getRestaurant(restaurantId)).thenReturn(Optional.of(restaurant));
+
+        // Mocking the dish category average prices
+        List<CategoryAveragePrice> categoryAveragePrices = new ArrayList<>();
+        categoryAveragePrices.add(new CategoryAveragePrice(new Category(1L,"DESSERT","DESSERT"), 10L));
+        categoryAveragePrices.add(new CategoryAveragePrice(new Category(2L,"PRINCIPAL","PRINCIPAL"), 15L));
+        categoryAveragePrices.add(new CategoryAveragePrice(new Category(1L,"JUICE","JUICE"), 8L));
+
+        when(dishPersistencePort.dishCategoryAveragePrice(restaurantId)).thenReturn(categoryAveragePrices);
 
         // Act
-        List<CategoryAveragePrice> result = restaurantUseCase.dishCategoryAveragePrice(userId,restaurantId);
+        List<CategoryAveragePrice> result = restaurantUseCase.dishCategoryAveragePrice(userId, restaurantId);
 
-        //Assert
-        assertEquals(result,listCategoryAveragePrice);
+        // Assert
+        assertEquals(3, result.size());
+        // Additional assertions based on expected category average prices
+
+        verify(restaurantPersistencePort, times(1)).getRestaurant(restaurantId);
         verify(dishPersistencePort, times(1)).dishCategoryAveragePrice(restaurantId);
     }
 
     @Test
-    void testDishCategoryAveragePrice_EmptyCategoryAveragePrice(){
+    void dishCategoryAveragePrice_WithInvalidUser_ShouldThrowException() {
         // Arrange
         Long userId = 1L;
-        Long restaurantId = 1L;
+        Long restaurantId = 2L;
 
-        List<CategoryAveragePrice> listCategoryAveragePrice = List.of();
+        // Mocking the restaurant
+        Restaurant restaurant = new Restaurant();
+        restaurant.setIdProprietary("2");
 
-        when(dishPersistencePort.dishCategoryAveragePrice(restaurantId)).thenReturn(listCategoryAveragePrice);
+        when(restaurantPersistencePort.getRestaurant(restaurantId)).thenReturn(Optional.of(restaurant));
 
-        // Act
-        List<CategoryAveragePrice> result = restaurantUseCase.dishCategoryAveragePrice(userId,restaurantId);
+        // Act and Assert
+        assertThrows(NotProprietaryGivenRestaurantException.class, () -> restaurantUseCase.dishCategoryAveragePrice(userId, restaurantId));
 
-        //Assert
-        assertEquals(result,listCategoryAveragePrice);
-        verify(dishPersistencePort, times(1)).dishCategoryAveragePrice(restaurantId);
+        verify(restaurantPersistencePort, times(1)).getRestaurant(restaurantId);
+        verify(dishPersistencePort, never()).dishCategoryAveragePrice(anyLong());
+    }
+
+    @Test
+    void dishCategoryAveragePrice_WithNonExistingRestaurant_ShouldThrowException() {
+        // Arrange
+        Long userId = 1L;
+        Long restaurantId = 2L;
+
+        when(restaurantPersistencePort.getRestaurant(restaurantId)).thenReturn(Optional.empty());
+
+        // Act and Assert
+        assertThrows(RestaurantNotExistsException.class, () -> restaurantUseCase.dishCategoryAveragePrice(userId, restaurantId));
+
+        verify(restaurantPersistencePort, times(1)).getRestaurant(restaurantId);
+        verify(dishPersistencePort, never()).dishCategoryAveragePrice(anyLong());
     }
 
 }

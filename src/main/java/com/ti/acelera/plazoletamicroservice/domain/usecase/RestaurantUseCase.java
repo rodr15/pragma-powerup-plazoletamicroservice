@@ -287,29 +287,42 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     @Override
     public RestaurantStatistics restaurantStatistics(Long userId, Long restaurantId) {
 
-        Restaurant restaurant = restaurantPersistencePort.getRestaurant( restaurantId ).orElseThrow(RestaurantNotExistsException::new);
+        Restaurant restaurant = restaurantPersistencePort.getRestaurant(restaurantId).orElseThrow(RestaurantNotExistsException::new);
 
-        if( !restaurant.getIdProprietary().equals( userId.toString() ) ){
+        if (!restaurant.getIdProprietary().equals(userId.toString())) {
             throw new NotProprietaryGivenRestaurantException();
+        }
+
+
+        Set<String> restaurantEmployees = restaurant.getEmployees();
+
+        if (restaurantEmployees == null || restaurantEmployees.isEmpty()) {
+            throw new RestaurantDontHaveRegisteredEmployeesException();
         }
 
         // Employee Statistics
         List<EmployeeStatistics> employeeStatistics = traceabilityClient.getEmployeeStatistics(
-                restaurant
-                .getEmployees()
-                .stream()
-                .map(Long::parseLong).toList() );
+                restaurantEmployees
+                        .stream()
+                        .map(Long::parseLong).toList());
 
         // Orders Statistics
-        List<OrderRestaurant> orderRestaurantList = orderRestaurantPersistencePort.getOrdersListWithStatus( restaurantId ,OrderStatus.FINISHED_ORDER);
+        List<OrderRestaurant> orderRestaurantList = orderRestaurantPersistencePort.getOrdersListWithStatus(restaurantId, OrderStatus.FINISHED_ORDER);
         List<Long> ordersIds = orderRestaurantList.stream().map(OrderRestaurant::getId).toList();
-        List<OrderStatistics> ordersStatistics = traceabilityClient.getOrdersStatistics( ordersIds );
+        List<OrderStatistics> ordersStatistics = traceabilityClient.getOrdersStatistics(ordersIds);
 
-        return new RestaurantStatistics(employeeStatistics,ordersStatistics);
+        return new RestaurantStatistics(employeeStatistics, ordersStatistics);
     }
 
     @Override
     public List<CategoryAveragePrice> dishCategoryAveragePrice(Long userId, Long restaurantId) {
+        Restaurant restaurant = restaurantPersistencePort.getRestaurant(restaurantId)
+                .orElseThrow(RestaurantNotExistsException::new);
+
+        if (!restaurant.getIdProprietary().equals(userId.toString())) {
+            throw new NotProprietaryGivenRestaurantException();
+        }
+
         return dishPersistencePort.dishCategoryAveragePrice(restaurantId);
     }
 
