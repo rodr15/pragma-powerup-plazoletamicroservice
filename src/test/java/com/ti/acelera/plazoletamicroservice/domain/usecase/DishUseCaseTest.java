@@ -238,13 +238,13 @@ class DishUseCaseTest {
         // Arrange
         Long lowBudget = 10L;
         Long upBudget = 20L;
-        List<Long> categoryPreferencesId = List.of(1L, 2L, 3L);
+        Long categoryPreferencesId = 2L;
         int page = 0;
         int size = 10;
 
         Page<Dish> expectedPage = createMockPageOfDishes();
 
-        when(dishPersistencePort.getDishesByBudgetAndCategoryPreferences(anyLong(), anyLong(), anyList(), any(Pageable.class)))
+        when(dishPersistencePort.getDishesByBudgetAndCategoryPreferences(anyLong(), anyLong(), anyLong(), any(Pageable.class)))
                 .thenReturn(expectedPage);
 
         // Act
@@ -260,7 +260,7 @@ class DishUseCaseTest {
         // Arrange
         Long lowBudget = 10L;
         Long upBudget = 20L;
-        List<Long> categoryPreferencesId = null;
+        Long categoryPreferencesId = null;
         int page = 0;
         int size = 10;
 
@@ -281,13 +281,13 @@ class DishUseCaseTest {
         // Arrange
         Long lowBudget = 20L;
         Long upBudget = 20L;
-        List<Long> categoryPreferencesId = List.of(1L, 2L, 3L);
+        Long categoryPreferencesId = 2L;
         int page = 0;
         int size = 10;
 
         Page<Dish> expectedPage = createMockPageOfDishes();
 
-        when(dishPersistencePort.getDishesByBudgetAndCategoryPreferences(anyLong(), anyLong(), anyList(), any(Pageable.class)))
+        when(dishPersistencePort.getDishesByBudgetAndCategoryPreferences(anyLong(), anyLong(), anyLong(), any(Pageable.class)))
                 .thenReturn(expectedPage);
 
         // Act
@@ -303,7 +303,7 @@ class DishUseCaseTest {
         // Arrange
         Long lowBudget = 10L;
         Long upBudget = 20L;
-        List<Long> categoryPreferencesId = List.of(1L, 2L, 3L);
+        Long categoryPreferencesId = 2L;
         int page = -1;
         int size = 0;
 

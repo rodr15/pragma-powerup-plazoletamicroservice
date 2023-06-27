@@ -18,5 +18,5 @@ public interface IDishPersistencePort {
     Page<Dish> getActiveDishesByRestaurantId(Long restaurantId, Long categoryId, int page, int size);
     List<Dish> findAllDishesByIdAndByRestaurantId( Long restaurantId ,List<Long> dishesId);
     List<CategoryAveragePrice> dishCategoryAveragePrice(Long restaurantId);
-    Page<Dish> getDishesByBudgetAndCategoryPreferences(Long lowBudget,Long upBudget, List<Long> categoryPreferencesId, Pageable pageable);
+    Page<Dish> getDishesByBudgetAndCategoryPreferences(Long lowBudget,Long upBudget, Long categoryPreferenceId, Pageable pageable);
 }

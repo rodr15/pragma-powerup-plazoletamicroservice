@@ -15,8 +15,6 @@ public interface IDishRepository extends JpaRepository<DishEntity,Long> {
     List<DishEntity> findAllByIdInAndRestaurantIdAndActiveTrue(List<Long> dishIds, Long restaurantId);
     @Query("SELECT d.category, AVG(d.price) FROM DishEntity d WHERE d.restaurant.id = :restaurantId GROUP BY d.category")
     List<Object[]> categoryAveragePrice(@Param("restaurantId") Long restaurantId);
-    @Query("SELECT d FROM DishEntity d WHERE price BETWEEN :lowBudget AND :upBudget AND d.category.id IN :preferences ORDER BY d.category.id ASC,d.restaurant.id ASC")
-    Page<DishEntity> getDishesByBudgetAndCategoryPreferences(Long lowBudget,Long upBudget,List<Long> preferences,Pageable pageable);
-    @Query("SELECT d FROM DishEntity d WHERE price BETWEEN :lowBudget AND :upBudget ORDER BY d.category.id ASC,d.restaurant.id ASC")
-    Page<DishEntity> getDishesByBudget(Long lowBudget,Long upBudget,Pageable pageable);
+    @Query("SELECT d FROM DishEntity d WHERE price BETWEEN :lowBudget AND :upBudget AND (:preferenceCategory IS NULL OR d.category.id IN :preferenceCategory) ORDER BY d.category.id ASC,d.restaurant.id ASC")
+    Page<DishEntity> getDishesByBudgetAndCategoryPreferences(Long lowBudget,Long upBudget,Long preferenceCategory,Pageable pageable);
 }

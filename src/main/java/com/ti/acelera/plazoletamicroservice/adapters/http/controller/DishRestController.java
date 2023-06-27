@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -64,12 +63,12 @@ public class DishRestController {
     public ResponseEntity<Page<DishResponseDto>> searchDishByBudget(
             @RequestParam(defaultValue = "0") Long lowBudget,
             @RequestParam(defaultValue = "100") Long upBudget,
-            @RequestParam(required = false) List<Long> preferenceCategories,
+            @RequestParam(required = false) Long preferenceCategory,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
 
-        return ResponseEntity.ok(dishHandler.getDishesByBudgetAndCategoryPreferences(lowBudget,upBudget, preferenceCategories, page, size));
+        return ResponseEntity.ok(dishHandler.getDishesByBudgetAndCategoryPreferences(lowBudget,upBudget, preferenceCategory, page, size));
 
     }
 

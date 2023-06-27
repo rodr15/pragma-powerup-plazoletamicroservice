@@ -11,8 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class DishHandlerImpl implements IDishHandler {
@@ -37,7 +35,7 @@ public class DishHandlerImpl implements IDishHandler {
     }
 
     @Override
-    public Page<DishResponseDto> getDishesByBudgetAndCategoryPreferences(Long lowBudget, Long upBudget, List<Long> categoryPreferencesId, int page, int size) {
+    public Page<DishResponseDto> getDishesByBudgetAndCategoryPreferences(Long lowBudget, Long upBudget, Long categoryPreferencesId, int page, int size) {
         return dishServicePort
                 .getDishesByBudgetAndCategoryPreferences(lowBudget,upBudget ,categoryPreferencesId, page, size)
                 .map(dishResponseMapper::toResponseDto);

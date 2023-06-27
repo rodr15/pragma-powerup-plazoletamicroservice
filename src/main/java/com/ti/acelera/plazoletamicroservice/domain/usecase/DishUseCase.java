@@ -12,7 +12,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -72,7 +71,7 @@ public class DishUseCase implements IDishServicePort {
 
     }
     @Override
-    public Page<Dish> getDishesByBudgetAndCategoryPreferences(Long lowBudget,Long upBudget, List<Long> categoryPreferencesId, int page, int size) {
+    public Page<Dish> getDishesByBudgetAndCategoryPreferences(Long lowBudget,Long upBudget, Long categoryPreferencesId, int page, int size) {
 
         if (page < 0 || size <= 0) {
             throw new BadPagedException();
