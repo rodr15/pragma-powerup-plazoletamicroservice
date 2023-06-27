@@ -56,7 +56,7 @@ class RestaurantUseCaseTest {
     @Test
     void saveRestaurant_ValidRestaurant_RestaurantSaved() {
         // Arrange
-        Restaurant restaurant = new Restaurant(1L, "Restaurant 1", "CC SANTA", "123123123", "123456789", "Some Address", "12312332", new HashSet<>());
+        Restaurant restaurant = new Restaurant(1L, "Restaurant 1", "CC SANTA", "123123123", "123456789", "Some Address", "12312332", new HashSet<>(),RestaurantState.ACTIVE);
         when(userClient.getRoleByDni(restaurant.getIdProprietary())).thenReturn("ROLE_OWNER");
 
         // Act
@@ -70,7 +70,7 @@ class RestaurantUseCaseTest {
     @Test
     void saveRestaurant_NonOwnerRole_ThrowsRoleNotAllowedException() {
         // Arrange
-        Restaurant restaurant = new Restaurant(1L, "Restaurant 1", "CC SANTA", "123", "123456789", "Some Address", "12312332", new HashSet<>());
+        Restaurant restaurant = new Restaurant(1L, "Restaurant 1", "CC SANTA", "123", "123456789", "Some Address", "12312332", new HashSet<>(),RestaurantState.ACTIVE);
         when(userClient.getRoleByDni(restaurant.getIdProprietary())).thenReturn("ROLE_USER");
 
         // Act & Assert
@@ -314,7 +314,7 @@ class RestaurantUseCaseTest {
     void makeOrder_WithNoUnfinishedOrdersAndValidRestaurant_ShouldCreateOrder() {
 
         // Arrange
-        Restaurant validRestaurant = new Restaurant(1L, "Mock", "ABC", "1", "321312312", "", "", new HashSet<>());
+        Restaurant validRestaurant = new Restaurant(1L, "Mock", "ABC", "1", "321312312", "", "", new HashSet<>(),RestaurantState.ACTIVE);
 
         Category category = new Category();
         Dish dish = new Dish(1L, "Dish 1", category, "Moch Dish 1", 123L, validRestaurant, "", true);
@@ -348,7 +348,7 @@ class RestaurantUseCaseTest {
     void makeOrder_WithUnfinishedOrdersAndValidRestaurant_ShouldNotCreateOrder() {
 
         // Arrange
-        Restaurant validRestaurant = new Restaurant(1L, "Mock", "ABC", "1", "321312312", "", "", new HashSet<>());
+        Restaurant validRestaurant = new Restaurant(1L, "Mock", "ABC", "1", "321312312", "", "", new HashSet<>(),RestaurantState.ACTIVE);
 
         Category category = new Category();
         Dish dish = new Dish(1L, "Dish 1", category, "Moch Dish 1", 123L, validRestaurant, "", true);
@@ -375,7 +375,7 @@ class RestaurantUseCaseTest {
     void makeOrder_WithNotUnfinishedOrdersAndNotValidRestaurant_ShouldNotCreateOrder() {
 
         // Arrange
-        Restaurant validRestaurant = new Restaurant(1L, "Mock", "ABC", "1", "321312312", "", "", new HashSet<>());
+        Restaurant validRestaurant = new Restaurant(1L, "Mock", "ABC", "1", "321312312", "", "", new HashSet<>(),RestaurantState.ACTIVE);
 
         Category category = new Category();
         Dish dish = new Dish(1L, "Dish 1", category, "Moch Dish 1", 123L, validRestaurant, "", true);
@@ -403,7 +403,7 @@ class RestaurantUseCaseTest {
     void makeOrder_WithNotUnfinishedOrdersAndValidRestaurantAndInvalidDishOrder_ShouldNotCreateOrder() {
 
         // Arrange
-        Restaurant validRestaurant = new Restaurant(1L, "Mock", "ABC", "1", "321312312", "", "", new HashSet<>());
+        Restaurant validRestaurant = new Restaurant(1L, "Mock", "ABC", "1", "321312312", "", "", new HashSet<>(),RestaurantState.ACTIVE);
 
         Category category = new Category();
         Dish dish = new Dish(1L, "Dish 1", category, "Moch Dish 1", 123L, validRestaurant, "", true);
@@ -431,7 +431,7 @@ class RestaurantUseCaseTest {
     void makeOrder_WithNotUnfinishedOrdersAndValidRestaurantAndValidDishOrderAndInvalidDishesId_ShouldNotCreateOrder() {
 
         // Arrange
-        Restaurant validRestaurant = new Restaurant(1L, "Mock", "ABC", "1", "321312312", "", "", new HashSet<>());
+        Restaurant validRestaurant = new Restaurant(1L, "Mock", "ABC", "1", "321312312", "", "", new HashSet<>(),RestaurantState.ACTIVE);
 
         Category category = new Category();
         Dish dish = new Dish(1L, "Dish 1", category, "Moch Dish 1", 123L, validRestaurant, "", true);
@@ -465,7 +465,7 @@ class RestaurantUseCaseTest {
         int page = 0;
         int size = 10;
 
-        Restaurant restaurant = new Restaurant(1L, "Mock", "ABC", "1", "321312312", "", "", new HashSet<>());
+        Restaurant restaurant = new Restaurant(1L, "Mock", "ABC", "1", "321312312", "", "", new HashSet<>(),RestaurantState.ACTIVE);
         OrderRestaurant orderRestaurant = new OrderRestaurant(1L, 111L, LocalDateTime.now(), state, 5L, restaurant, List.of(),null);
         List<OrderRestaurant> orders = Collections.singletonList(orderRestaurant);
         Page<OrderRestaurant> ordersPage = new PageImpl<>(orders, PageRequest.of(page, size), orders.size());
@@ -521,7 +521,7 @@ class RestaurantUseCaseTest {
         int size = 10;
         Long restaurantId = 456L;
 
-        Restaurant restaurant = new Restaurant(1L, "Mock", "ABC", "1", "321312312", "", "", new HashSet<>());
+        Restaurant restaurant = new Restaurant(1L, "Mock", "ABC", "1", "321312312", "", "", new HashSet<>(),RestaurantState.ACTIVE);
         OrderRestaurant orderRestaurant = new OrderRestaurant(1L, 111L, LocalDateTime.now(), state, 5L, restaurant, List.of(),null);
 
         // Mocking the restaurantPersistencePort
