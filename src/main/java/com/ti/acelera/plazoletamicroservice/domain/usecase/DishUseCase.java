@@ -1,16 +1,16 @@
 package com.ti.acelera.plazoletamicroservice.domain.usecase;
 
 import com.ti.acelera.plazoletamicroservice.domain.api.IDishServicePort;
-import com.ti.acelera.plazoletamicroservice.domain.exceptions.DishNotFoundException;
-import com.ti.acelera.plazoletamicroservice.domain.exceptions.NotProprietaryGivenRestaurantException;
-import com.ti.acelera.plazoletamicroservice.domain.exceptions.RestaurantNotExistsException;
-import com.ti.acelera.plazoletamicroservice.domain.exceptions.RoleNotAllowedException;
+import com.ti.acelera.plazoletamicroservice.domain.exceptions.*;
 import com.ti.acelera.plazoletamicroservice.domain.gateway.IUserClient;
 import com.ti.acelera.plazoletamicroservice.domain.model.Dish;
 import com.ti.acelera.plazoletamicroservice.domain.model.Restaurant;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IDishPersistencePort;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IRestaurantPersistencePort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 
@@ -70,6 +70,18 @@ public class DishUseCase implements IDishServicePort {
        dishPersistencePort.saveDish( dish.get() );
 
     }
+    @Override
+    public Page<Dish> getDishesByBudgetAndCategoryPreferences(Long lowBudget,Long upBudget, Long categoryPreferencesId, int page, int size) {
+
+        if (page < 0 || size <= 0) {
+            throw new BadPagedException();
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return dishPersistencePort.getDishesByBudgetAndCategoryPreferences(lowBudget,upBudget,categoryPreferencesId,pageable);
+    }
+
     private void verifyOwner(String userId, String restaurantOwnerId) {
         final String userRole = userClient.getRoleByDni(userId);
 

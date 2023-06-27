@@ -77,4 +77,12 @@ public class DishMysqlAdapter implements IDishPersistencePort {
 
         return categoryAveragePrices;
     }
+
+    @Override
+    public Page<Dish> getDishesByBudgetAndCategoryPreferences(Long lowBudget,Long upBudget, Long categoryPreferenceId, Pageable pageable) {
+
+        Page<DishEntity> dishEntityPage = dishRepository.getDishesByBudgetAndCategoryPreferences(lowBudget,upBudget,categoryPreferenceId, pageable);
+
+        return dishEntityPage.map(dishEntityMapper::toDish);
+    }
 }
