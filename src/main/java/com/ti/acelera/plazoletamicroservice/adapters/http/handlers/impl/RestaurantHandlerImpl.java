@@ -100,4 +100,9 @@ public class RestaurantHandlerImpl implements IRestaurantHandler {
         return restaurantServicePort.dishCategoryAveragePrice(userId,restaurantId);
     }
 
+    @Override
+    public void deleteRestaurant(Long userId, Long restaurantId) {
+        restaurantServicePort.deleteRestaurant(userId,restaurantId);
+    }
+
 }

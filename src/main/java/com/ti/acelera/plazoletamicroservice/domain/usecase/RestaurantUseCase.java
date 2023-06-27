@@ -326,5 +326,9 @@ public class RestaurantUseCase implements IRestaurantServicePort {
         return dishPersistencePort.dishCategoryAveragePrice(restaurantId);
     }
 
+    @Override
+    public void deleteRestaurant(Long userId, Long restaurantId) {
+    //TODO: implement method
+    }
 
 }
