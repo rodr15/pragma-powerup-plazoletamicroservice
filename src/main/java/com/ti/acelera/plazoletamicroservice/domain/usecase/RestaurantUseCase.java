@@ -156,14 +156,16 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     @Override
     public Long makeOrder(OrderRestaurant orderRestaurant) {
 
-        if (orderRestaurantPersistencePort.hasUnfinishedOrders(orderRestaurant.getIdClient())) {
+        if (orderRestaurantPersistencePort.clientHasUnfinishedOrders(orderRestaurant.getIdClient())) {
             throw new ThisClientHasUnfinishedOrdersException();
         }
 
-        if (!restaurantPersistencePort.restaurantExists(orderRestaurant.getRestaurant().getId())) {
+        Restaurant restaurant = restaurantPersistencePort.getRestaurant(orderRestaurant.getRestaurant().getId())
+                .orElseThrow(RestaurantNotExistsException::new);
+
+        if (restaurant.getState().equals(RestaurantState.PENDING_DELETE)) {
             throw new RestaurantNotExistsException();
         }
-
 
         List<Long> dishIds = orderRestaurant.getDishes()
                 .stream()
@@ -328,7 +330,7 @@ public class RestaurantUseCase implements IRestaurantServicePort {
 
     @Override
     public void deleteRestaurant(Long userId, Long restaurantId) {
-    //TODO: implement method
+       //TODO: IMPLEMENTE METHOD
     }
 
 }

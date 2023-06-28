@@ -326,7 +326,7 @@ class RestaurantUseCaseTest {
         OrderRestaurant orderRestaurant = new OrderRestaurant(1L, 1L, LocalDateTime.now(), null, null, validRestaurant, dishOrders,null);
 
 
-        when(orderRestaurantPersistencePort.hasUnfinishedOrders(orderRestaurant.getIdClient())).thenReturn(false);
+        when(orderRestaurantPersistencePort.clientHasUnfinishedOrders(orderRestaurant.getIdClient())).thenReturn(false);
         when(restaurantPersistencePort.restaurantExists(orderRestaurant.getRestaurant().getId())).thenReturn(true);
         when(dishPersistencePort.findAllDishesByIdAndByRestaurantId(anyLong(), anyList())).thenReturn(validDishList);
         when(orderRestaurantPersistencePort.createNewOrder(orderRestaurant)).thenReturn(orderRestaurant);
@@ -337,7 +337,7 @@ class RestaurantUseCaseTest {
         // Assert
 
         assertEquals(1L, orderId);
-        verify(orderRestaurantPersistencePort, times(1)).hasUnfinishedOrders(orderRestaurant.getIdClient());
+        verify(orderRestaurantPersistencePort, times(1)).clientHasUnfinishedOrders(orderRestaurant.getIdClient());
         verify(restaurantPersistencePort, times(1)).restaurantExists(orderRestaurant.getRestaurant().getId());
         verify(dishPersistencePort, times(1)).findAllDishesByIdAndByRestaurantId(anyLong(), anyList());
         verify(orderRestaurantPersistencePort, times(1)).createNewOrder(orderRestaurant);
@@ -359,13 +359,13 @@ class RestaurantUseCaseTest {
         OrderRestaurant orderRestaurant = new OrderRestaurant(1L, 1L, LocalDateTime.now(), null, null, validRestaurant, dishOrders,null);
 
 
-        when(orderRestaurantPersistencePort.hasUnfinishedOrders(orderRestaurant.getIdClient())).thenReturn(true);
+        when(orderRestaurantPersistencePort.clientHasUnfinishedOrders(orderRestaurant.getIdClient())).thenReturn(true);
 
         // Act
         assertThrows(ThisClientHasUnfinishedOrdersException.class, () -> restaurantUseCase.makeOrder(orderRestaurant));
 
         // Assert
-        verify(orderRestaurantPersistencePort, times(1)).hasUnfinishedOrders(orderRestaurant.getIdClient());
+        verify(orderRestaurantPersistencePort, times(1)).clientHasUnfinishedOrders(orderRestaurant.getIdClient());
         verify(restaurantPersistencePort, times(0)).restaurantExists(anyLong());
         verify(dishPersistencePort, times(0)).findAllDishesByIdAndByRestaurantId(anyLong(), anyList());
         verify(orderRestaurantPersistencePort, times(0)).createNewOrder(new OrderRestaurant());
@@ -386,13 +386,13 @@ class RestaurantUseCaseTest {
         OrderRestaurant orderRestaurant = new OrderRestaurant(1L, 1L, LocalDateTime.now(), null, null, validRestaurant, dishOrders,null);
 
 
-        when(orderRestaurantPersistencePort.hasUnfinishedOrders(orderRestaurant.getIdClient())).thenReturn(false);
+        when(orderRestaurantPersistencePort.clientHasUnfinishedOrders(orderRestaurant.getIdClient())).thenReturn(false);
         when(restaurantPersistencePort.restaurantExists(orderRestaurant.getRestaurant().getId())).thenReturn(false);
         // Act
         assertThrows(RestaurantNotExistsException.class, () -> restaurantUseCase.makeOrder(orderRestaurant));
 
         // Assert
-        verify(orderRestaurantPersistencePort, times(1)).hasUnfinishedOrders(orderRestaurant.getIdClient());
+        verify(orderRestaurantPersistencePort, times(1)).clientHasUnfinishedOrders(orderRestaurant.getIdClient());
         verify(restaurantPersistencePort, times(1)).restaurantExists(anyLong());
         verify(dishPersistencePort, times(0)).findAllDishesByIdAndByRestaurantId(anyLong(), anyList());
         verify(orderRestaurantPersistencePort, times(0)).createNewOrder(new OrderRestaurant());
@@ -414,13 +414,13 @@ class RestaurantUseCaseTest {
         OrderRestaurant orderRestaurant = new OrderRestaurant(1L, 1L, LocalDateTime.now(), null, null, validRestaurant, dishOrders,null);
 
 
-        when(orderRestaurantPersistencePort.hasUnfinishedOrders(orderRestaurant.getIdClient())).thenReturn(false);
+        when(orderRestaurantPersistencePort.clientHasUnfinishedOrders(orderRestaurant.getIdClient())).thenReturn(false);
         when(restaurantPersistencePort.restaurantExists(orderRestaurant.getRestaurant().getId())).thenReturn(true);
         // Act
         assertThrows(MalformedOrderException.class, () -> restaurantUseCase.makeOrder(orderRestaurant));
 
         // Assert
-        verify(orderRestaurantPersistencePort, times(1)).hasUnfinishedOrders(orderRestaurant.getIdClient());
+        verify(orderRestaurantPersistencePort, times(1)).clientHasUnfinishedOrders(orderRestaurant.getIdClient());
         verify(restaurantPersistencePort, times(1)).restaurantExists(anyLong());
         verify(dishPersistencePort, times(0)).findAllDishesByIdAndByRestaurantId(anyLong(), anyList());
         verify(orderRestaurantPersistencePort, times(0)).createNewOrder(new OrderRestaurant());
@@ -443,14 +443,14 @@ class RestaurantUseCaseTest {
         OrderRestaurant orderRestaurant = new OrderRestaurant(1L, 1L, LocalDateTime.now(), null, null, validRestaurant, dishOrders,null);
 
 
-        when(orderRestaurantPersistencePort.hasUnfinishedOrders(orderRestaurant.getIdClient())).thenReturn(false);
+        when(orderRestaurantPersistencePort.clientHasUnfinishedOrders(orderRestaurant.getIdClient())).thenReturn(false);
         when(restaurantPersistencePort.restaurantExists(orderRestaurant.getRestaurant().getId())).thenReturn(true);
         when(dishPersistencePort.findAllDishesByIdAndByRestaurantId(anyLong(), anyList())).thenReturn(validDishList);
         // Act
         assertThrows(DishNotFoundException.class, () -> restaurantUseCase.makeOrder(orderRestaurant));
 
         // Assert
-        verify(orderRestaurantPersistencePort, times(1)).hasUnfinishedOrders(orderRestaurant.getIdClient());
+        verify(orderRestaurantPersistencePort, times(1)).clientHasUnfinishedOrders(orderRestaurant.getIdClient());
         verify(restaurantPersistencePort, times(1)).restaurantExists(anyLong());
         verify(dishPersistencePort, times(1)).findAllDishesByIdAndByRestaurantId(anyLong(), anyList());
         verify(orderRestaurantPersistencePort, times(0)).createNewOrder(new OrderRestaurant());

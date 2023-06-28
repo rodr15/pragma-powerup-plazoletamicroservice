@@ -106,4 +106,10 @@ public class OrderRestaurantMysqlAdapter implements IOrderRestaurantPersistenceP
         OrderRestaurantEntity savedOrderRestaurant =  orderRestaurantRepository.save( orderEntityMapper.toOrderEntity(orderRestaurant) );
         return orderEntityMapper.toOrder(savedOrderRestaurant);
     }
+
+    @Override
+    public boolean restaurantHasUnfinishedOrders(Long restaurantId) {
+        List<OrderStatus> statusList = List.of(OrderStatus.FINISHED_ORDER , OrderStatus.CANCELED_ORDER);
+        return orderRestaurantRepository.existsOrderByRestaurantIdAndStatusNotIn( restaurantId, statusList );
+    }
 }

@@ -13,6 +13,4 @@ public enum RestaurantState {
     private final String state;
     private final int order;
 
-
-
 }
