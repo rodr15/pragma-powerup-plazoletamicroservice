@@ -344,69 +344,72 @@ public class RestaurantUseCase implements IRestaurantServicePort {
 
     @Scheduled(cron = "*/10 * * * * *")
     public void cleanUpRestaurants() {
-
         List<Restaurant> restaurants = restaurantPersistencePort.getAllRestaurantsByState(RestaurantState.PENDING_DELETE);
-
-
-        for (Restaurant restaurant : restaurants) {
-
-            deleteRestaurant(restaurant);
-
-        }
+        for (Restaurant restaurant : restaurants) deleteRestaurant(restaurant);
     }
 
     @Transactional
     public void deleteRestaurant(Restaurant restaurant) {
-
+        // Check if the restaurant has unfinished orders
         if (orderRestaurantPersistencePort.restaurantHasUnfinishedOrders(restaurant.getId())) {
-            throw new NotAReadyOrderException(); // TODO: CHANGE THIS EXCEPTION
+            throw new ThisClientHasUnfinishedOrdersException();
         }
 
-
+        // Delete OrderRestaurants and related DishOrders
         List<OrderRestaurant> orderRestaurantList = orderRestaurantPersistencePort.getOrdersList(restaurant.getId());
-
-        orderRestaurantList.forEach(orderRestaurant -> {
-
+        for (OrderRestaurant orderRestaurant : orderRestaurantList) {
             List<DishOrder> dishOrderList = dishOrderPersistencePort.getDishOrderByOrderRestaurantId(orderRestaurant.getId());
 
-            dishOrderList.forEach(dishOrder -> {
-
-                RestaurantObjectsTrace restaurantObjectsTrace =
-                        new RestaurantObjectsTrace(restaurant.getId(), "DELETED", dishOrder.getId(), "dishOrder");
+            for (DishOrder dishOrder : dishOrderList) {
+                // Save traceability for deleted DishOrders
+                RestaurantObjectsTrace restaurantObjectsTrace = new RestaurantObjectsTrace(
+                        restaurant.getId(),
+                        "DELETED",
+                        dishOrder.getId(),
+                        "dishOrder"
+                );
                 traceabilityClient.saveRestaurantTrace(restaurantObjectsTrace);
-            });
+            }
 
             dishOrderPersistencePort.deleteAllDishOrder(dishOrderList);
 
-
-            RestaurantObjectsTrace restaurantObjectsTrace =
-                    new RestaurantObjectsTrace(restaurant.getId(), "DELETED", orderRestaurant.getId(), "orderRestaurant");
-
+            // Save traceability for deleted OrderRestaurants
+            RestaurantObjectsTrace restaurantObjectsTrace = new RestaurantObjectsTrace(
+                    restaurant.getId(),
+                    "DELETED",
+                    orderRestaurant.getId(),
+                    "orderRestaurant"
+            );
             traceabilityClient.saveRestaurantTrace(restaurantObjectsTrace);
-        });
+        }
 
         orderRestaurantPersistencePort.deleteAllOrderRestaurant(orderRestaurantList);
 
-
+        // Delete dishes
         List<Dish> dishList = dishPersistencePort.findAllByRestaurantId(restaurant.getId());
-        dishList.forEach(dish -> {
-
-            RestaurantObjectsTrace restaurantObjectsTrace =
-                    new RestaurantObjectsTrace(restaurant.getId(), "DELETED", dish.getId(), "dish");
+        for (Dish dish : dishList) {
+            // Save traceability for deleted dishes
+            RestaurantObjectsTrace restaurantObjectsTrace = new RestaurantObjectsTrace(
+                    restaurant.getId(),
+                    "DELETED",
+                    dish.getId(),
+                    "dish"
+            );
             traceabilityClient.saveRestaurantTrace(restaurantObjectsTrace);
-        });
+        }
 
         dishPersistencePort.deleteAllDishes(dishList);
 
-
+        // Delete the restaurant
         restaurant.setState(RestaurantState.DELETED);
-        RestaurantObjectsTrace restaurantObjectsTrace =
-                new RestaurantObjectsTrace(restaurant.getId(), "DELETED", restaurant.getId(), "restaurant");
-
+        RestaurantObjectsTrace restaurantObjectsTrace = new RestaurantObjectsTrace(
+                restaurant.getId(),
+                "DELETED",
+                restaurant.getId(),
+                "restaurant"
+        );
         traceabilityClient.saveRestaurantTrace(restaurantObjectsTrace);
-
         restaurantPersistencePort.deleteRestaurant(restaurant);
-
     }
 
 }
