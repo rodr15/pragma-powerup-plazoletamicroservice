@@ -10,6 +10,7 @@ import com.ti.acelera.plazoletamicroservice.domain.spi.IDishOrderPersistencePort
 import com.ti.acelera.plazoletamicroservice.domain.spi.IDishPersistencePort;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IOrderRestaurantPersistencePort;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IRestaurantPersistencePort;
+import com.ti.acelera.plazoletamicroservice.domain.transactions.DeleteRestaurantsTransaction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,11 +47,13 @@ class RestaurantUseCaseTest {
     private ISmsClient smsClient;
     @Mock
     private ITraceabilityClient traceabilityClient;
+    @Mock
+    private DeleteRestaurantsTransaction transaction;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        restaurantUseCase = new RestaurantUseCase(restaurantPersistencePort, dishPersistencePort, orderRestaurantPersistencePort, dishOrderPersistencePort, userClient,traceabilityClient,smsClient);
+        restaurantUseCase = new RestaurantUseCase(restaurantPersistencePort, dishPersistencePort, orderRestaurantPersistencePort, dishOrderPersistencePort, userClient,traceabilityClient,smsClient,transaction);
     }
 
     @Test
@@ -319,7 +322,7 @@ class RestaurantUseCaseTest {
         Category category = new Category();
         Dish dish = new Dish(1L, "Dish 1", category, "Moch Dish 1", 123L, validRestaurant, "", true);
 
-        DishOrder dishOrder = new DishOrder(null, dish, 2);
+        DishOrder dishOrder = new DishOrder(1L,null, dish, 2);
 
         List<DishOrder> dishOrders = List.of(dishOrder);
         List<Dish> validDishList = List.of(dish);
@@ -327,7 +330,7 @@ class RestaurantUseCaseTest {
 
 
         when(orderRestaurantPersistencePort.clientHasUnfinishedOrders(orderRestaurant.getIdClient())).thenReturn(false);
-        when(restaurantPersistencePort.restaurantExists(orderRestaurant.getRestaurant().getId())).thenReturn(true);
+        when(restaurantPersistencePort.getRestaurant(orderRestaurant.getRestaurant().getId())).thenReturn(Optional.of(validRestaurant));
         when(dishPersistencePort.findAllDishesByIdAndByRestaurantId(anyLong(), anyList())).thenReturn(validDishList);
         when(orderRestaurantPersistencePort.createNewOrder(orderRestaurant)).thenReturn(orderRestaurant);
 
@@ -338,7 +341,7 @@ class RestaurantUseCaseTest {
 
         assertEquals(1L, orderId);
         verify(orderRestaurantPersistencePort, times(1)).clientHasUnfinishedOrders(orderRestaurant.getIdClient());
-        verify(restaurantPersistencePort, times(1)).restaurantExists(orderRestaurant.getRestaurant().getId());
+        verify(restaurantPersistencePort, times(1)).getRestaurant(anyLong());
         verify(dishPersistencePort, times(1)).findAllDishesByIdAndByRestaurantId(anyLong(), anyList());
         verify(orderRestaurantPersistencePort, times(1)).createNewOrder(orderRestaurant);
     }
@@ -353,7 +356,7 @@ class RestaurantUseCaseTest {
         Category category = new Category();
         Dish dish = new Dish(1L, "Dish 1", category, "Moch Dish 1", 123L, validRestaurant, "", true);
 
-        DishOrder dishOrder = new DishOrder(null, dish, 2);
+        DishOrder dishOrder = new DishOrder(1L,null, dish, 2);
 
         List<DishOrder> dishOrders = List.of(dishOrder);
         OrderRestaurant orderRestaurant = new OrderRestaurant(1L, 1L, LocalDateTime.now(), null, null, validRestaurant, dishOrders,null);
@@ -380,20 +383,20 @@ class RestaurantUseCaseTest {
         Category category = new Category();
         Dish dish = new Dish(1L, "Dish 1", category, "Moch Dish 1", 123L, validRestaurant, "", true);
 
-        DishOrder dishOrder = new DishOrder(null, dish, 2);
+        DishOrder dishOrder = new DishOrder(1L,null, dish, 2);
 
         List<DishOrder> dishOrders = List.of(dishOrder);
         OrderRestaurant orderRestaurant = new OrderRestaurant(1L, 1L, LocalDateTime.now(), null, null, validRestaurant, dishOrders,null);
 
 
         when(orderRestaurantPersistencePort.clientHasUnfinishedOrders(orderRestaurant.getIdClient())).thenReturn(false);
-        when(restaurantPersistencePort.restaurantExists(orderRestaurant.getRestaurant().getId())).thenReturn(false);
+        when(restaurantPersistencePort.getRestaurant(orderRestaurant.getRestaurant().getId())).thenReturn(Optional.empty());
         // Act
         assertThrows(RestaurantNotExistsException.class, () -> restaurantUseCase.makeOrder(orderRestaurant));
 
         // Assert
         verify(orderRestaurantPersistencePort, times(1)).clientHasUnfinishedOrders(orderRestaurant.getIdClient());
-        verify(restaurantPersistencePort, times(1)).restaurantExists(anyLong());
+        verify(restaurantPersistencePort, times(1)).getRestaurant(anyLong());
         verify(dishPersistencePort, times(0)).findAllDishesByIdAndByRestaurantId(anyLong(), anyList());
         verify(orderRestaurantPersistencePort, times(0)).createNewOrder(new OrderRestaurant());
     }
@@ -408,20 +411,20 @@ class RestaurantUseCaseTest {
         Category category = new Category();
         Dish dish = new Dish(1L, "Dish 1", category, "Moch Dish 1", 123L, validRestaurant, "", true);
 
-        DishOrder dishOrder = new DishOrder(null, dish, 2);
+        DishOrder dishOrder = new DishOrder(1L,null, dish, 2);
 
         List<DishOrder> dishOrders = List.of(dishOrder, dishOrder);
         OrderRestaurant orderRestaurant = new OrderRestaurant(1L, 1L, LocalDateTime.now(), null, null, validRestaurant, dishOrders,null);
 
 
         when(orderRestaurantPersistencePort.clientHasUnfinishedOrders(orderRestaurant.getIdClient())).thenReturn(false);
-        when(restaurantPersistencePort.restaurantExists(orderRestaurant.getRestaurant().getId())).thenReturn(true);
+        when(restaurantPersistencePort.getRestaurant(orderRestaurant.getRestaurant().getId())).thenReturn(Optional.of(validRestaurant));
         // Act
         assertThrows(MalformedOrderException.class, () -> restaurantUseCase.makeOrder(orderRestaurant));
 
         // Assert
         verify(orderRestaurantPersistencePort, times(1)).clientHasUnfinishedOrders(orderRestaurant.getIdClient());
-        verify(restaurantPersistencePort, times(1)).restaurantExists(anyLong());
+        verify(restaurantPersistencePort, times(1)).getRestaurant(anyLong());
         verify(dishPersistencePort, times(0)).findAllDishesByIdAndByRestaurantId(anyLong(), anyList());
         verify(orderRestaurantPersistencePort, times(0)).createNewOrder(new OrderRestaurant());
     }
@@ -436,7 +439,7 @@ class RestaurantUseCaseTest {
         Category category = new Category();
         Dish dish = new Dish(1L, "Dish 1", category, "Moch Dish 1", 123L, validRestaurant, "", true);
 
-        DishOrder dishOrder = new DishOrder(null, dish, 2);
+        DishOrder dishOrder = new DishOrder(1L,null, dish, 2);
 
         List<DishOrder> dishOrders = List.of(dishOrder);
         List<Dish> validDishList = List.of();
@@ -444,14 +447,14 @@ class RestaurantUseCaseTest {
 
 
         when(orderRestaurantPersistencePort.clientHasUnfinishedOrders(orderRestaurant.getIdClient())).thenReturn(false);
-        when(restaurantPersistencePort.restaurantExists(orderRestaurant.getRestaurant().getId())).thenReturn(true);
+        when(restaurantPersistencePort.getRestaurant(orderRestaurant.getRestaurant().getId())).thenReturn(Optional.of(validRestaurant));
         when(dishPersistencePort.findAllDishesByIdAndByRestaurantId(anyLong(), anyList())).thenReturn(validDishList);
         // Act
         assertThrows(DishNotFoundException.class, () -> restaurantUseCase.makeOrder(orderRestaurant));
 
         // Assert
         verify(orderRestaurantPersistencePort, times(1)).clientHasUnfinishedOrders(orderRestaurant.getIdClient());
-        verify(restaurantPersistencePort, times(1)).restaurantExists(anyLong());
+        verify(restaurantPersistencePort, times(1)).getRestaurant(anyLong());
         verify(dishPersistencePort, times(1)).findAllDishesByIdAndByRestaurantId(anyLong(), anyList());
         verify(orderRestaurantPersistencePort, times(0)).createNewOrder(new OrderRestaurant());
     }
@@ -1156,6 +1159,37 @@ class RestaurantUseCaseTest {
 
         verify(restaurantPersistencePort, times(1)).getRestaurant(restaurantId);
         verify(dishPersistencePort, never()).dishCategoryAveragePrice(anyLong());
+    }
+    @Test
+    void requestDeleteRestaurant_ExistingRestaurant_Success() {
+        // Arrange
+        Long userId = 1L;
+        Long restaurantId = 1L;
+        Restaurant restaurant = new Restaurant();
+        restaurant.setId(restaurantId);
+        restaurant.setState(RestaurantState.ACTIVE);
+
+        when(restaurantPersistencePort.getRestaurant(restaurantId)).thenReturn(Optional.of(restaurant));
+
+        // Act
+        assertDoesNotThrow(() -> restaurantUseCase.requestDeleteRestaurant(userId, restaurantId));
+
+        // Assert
+        assertEquals(RestaurantState.PENDING_DELETE, restaurant.getState());
+        verify(restaurantPersistencePort, times(1)).saveRestaurant(restaurant);
+    }
+
+    @Test
+    void requestDeleteRestaurant_NonExistingRestaurant_ExceptionThrown() {
+        // Arrange
+        Long userId = 1L;
+        Long restaurantId = 1L;
+
+        when(restaurantPersistencePort.getRestaurant(restaurantId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(RestaurantNotExistsException.class, () -> restaurantUseCase.requestDeleteRestaurant(userId, restaurantId));
+        verify(restaurantPersistencePort, never()).saveRestaurant(any(Restaurant.class));
     }
 
 }
