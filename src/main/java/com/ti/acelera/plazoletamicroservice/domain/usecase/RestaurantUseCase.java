@@ -14,6 +14,8 @@ import com.ti.acelera.plazoletamicroservice.domain.utils.PhoneNumberUtils;
 import com.ti.acelera.plazoletamicroservice.domain.utils.RandomVerificationCode;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -329,8 +331,82 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     }
 
     @Override
-    public void deleteRestaurant(Long userId, Long restaurantId) {
-       //TODO: IMPLEMENTE METHOD
+    public void requestDeleteRestaurant(Long userId, Long restaurantId) {
+
+        Restaurant restaurant = restaurantPersistencePort.getRestaurant(restaurantId)
+                .orElseThrow(RestaurantNotExistsException::new);
+
+        restaurant.setState(RestaurantState.PENDING_DELETE);
+        restaurantPersistencePort.saveRestaurant(restaurant);
+
+    }
+
+
+    @Scheduled(cron = "*/10 * * * * *")
+    public void cleanUpRestaurants() {
+
+        List<Restaurant> restaurants = restaurantPersistencePort.getAllRestaurantsByState(RestaurantState.PENDING_DELETE);
+
+
+        for (Restaurant restaurant : restaurants) {
+
+            deleteRestaurant(restaurant);
+
+        }
+    }
+
+    @Transactional
+    public void deleteRestaurant(Restaurant restaurant) {
+
+        if (orderRestaurantPersistencePort.restaurantHasUnfinishedOrders(restaurant.getId())) {
+            throw new NotAReadyOrderException(); // TODO: CHANGE THIS EXCEPTION
+        }
+
+
+        List<OrderRestaurant> orderRestaurantList = orderRestaurantPersistencePort.getOrdersList(restaurant.getId());
+
+        orderRestaurantList.forEach(orderRestaurant -> {
+
+            List<DishOrder> dishOrderList = dishOrderPersistencePort.getDishOrderByOrderRestaurantId(orderRestaurant.getId());
+
+            dishOrderList.forEach(dishOrder -> {
+
+                RestaurantObjectsTrace restaurantObjectsTrace =
+                        new RestaurantObjectsTrace(restaurant.getId(), "DELETED", dishOrder.getId(), "dishOrder");
+                traceabilityClient.saveRestaurantTrace(restaurantObjectsTrace);
+            });
+
+            dishOrderPersistencePort.deleteAllDishOrder(dishOrderList);
+
+
+            RestaurantObjectsTrace restaurantObjectsTrace =
+                    new RestaurantObjectsTrace(restaurant.getId(), "DELETED", orderRestaurant.getId(), "orderRestaurant");
+
+            traceabilityClient.saveRestaurantTrace(restaurantObjectsTrace);
+        });
+
+        orderRestaurantPersistencePort.deleteAllOrderRestaurant(orderRestaurantList);
+
+
+        List<Dish> dishList = dishPersistencePort.findAllByRestaurantId(restaurant.getId());
+        dishList.forEach(dish -> {
+
+            RestaurantObjectsTrace restaurantObjectsTrace =
+                    new RestaurantObjectsTrace(restaurant.getId(), "DELETED", dish.getId(), "dish");
+            traceabilityClient.saveRestaurantTrace(restaurantObjectsTrace);
+        });
+
+        dishPersistencePort.deleteAllDishes(dishList);
+
+
+        restaurant.setState(RestaurantState.DELETED);
+        RestaurantObjectsTrace restaurantObjectsTrace =
+                new RestaurantObjectsTrace(restaurant.getId(), "DELETED", restaurant.getId(), "restaurant");
+
+        traceabilityClient.saveRestaurantTrace(restaurantObjectsTrace);
+
+        restaurantPersistencePort.deleteRestaurant(restaurant);
+
     }
 
 }

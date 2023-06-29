@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface IDishOrderPersistencePort {
     List<DishOrder> getDishOrderByOrderRestaurantId(Long restaurantId );
+    void deleteAllDishOrder(List<DishOrder> dishOrderList);
 }

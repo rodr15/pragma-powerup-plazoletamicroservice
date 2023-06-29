@@ -21,4 +21,5 @@ public interface IOrderRestaurantPersistencePort {
     Optional<OrderRestaurant> getOrderById(Long orderId);
     OrderRestaurant saveOrderRestaurant(OrderRestaurant orderRestaurant);
     boolean restaurantHasUnfinishedOrders(Long restaurantId );
+    void  deleteAllOrderRestaurant (List<OrderRestaurant> orderRestaurantList);
 }

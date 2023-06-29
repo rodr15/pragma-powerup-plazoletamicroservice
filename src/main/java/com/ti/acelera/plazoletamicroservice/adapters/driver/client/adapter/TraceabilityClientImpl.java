@@ -3,10 +3,7 @@ package com.ti.acelera.plazoletamicroservice.adapters.driver.client.adapter;
 import com.nimbusds.jose.shaded.gson.JsonObject;
 import com.ti.acelera.plazoletamicroservice.adapters.driver.client.exceptions.ServiceNotFoundException;
 import com.ti.acelera.plazoletamicroservice.domain.gateway.ITraceabilityClient;
-import com.ti.acelera.plazoletamicroservice.domain.model.EmployeeStatistics;
-import com.ti.acelera.plazoletamicroservice.domain.model.OrderRestaurant;
-import com.ti.acelera.plazoletamicroservice.domain.model.OrderStatistics;
-import com.ti.acelera.plazoletamicroservice.domain.model.Traceability;
+import com.ti.acelera.plazoletamicroservice.domain.model.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -170,6 +167,32 @@ public class TraceabilityClientImpl implements ITraceabilityClient {
 
             return response.getBody();
 
+
+        } catch (Exception e) {
+            throw new ServiceNotFoundException(TRACEABILITY_SERVICE_ERROR);
+        }
+    }
+
+    @Override
+    public void saveRestaurantTrace(RestaurantObjectsTrace restaurantObjectsTrace) {
+        RestTemplate restTemplate = new RestTemplate();
+
+        try {
+            String url = String.format("%s/restaurant-trace", traceabilityServiceUrl);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            JsonObject orderJsonObject = new JsonObject();
+            orderJsonObject.addProperty("restaurantId", restaurantObjectsTrace.getRestaurantId());
+            orderJsonObject.addProperty("state", restaurantObjectsTrace.getState());
+            orderJsonObject.addProperty("objectId", restaurantObjectsTrace.getObjectId());
+            orderJsonObject.addProperty("objectType", restaurantObjectsTrace.getObjectType());
+
+            HttpEntity<String> request =
+                    new HttpEntity<>(orderJsonObject.toString(), headers);
+
+            restTemplate.postForObject(url, request, String.class);
 
         } catch (Exception e) {
             throw new ServiceNotFoundException(TRACEABILITY_SERVICE_ERROR);

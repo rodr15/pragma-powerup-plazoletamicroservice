@@ -9,9 +9,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class DishOrder {
-    private Long id;
-    private OrderRestaurant order;
-    private Dish dish;
-    private int quantity;
+public class RestaurantObjectsTrace {
+    private Long restaurantId;
+    private String state;
+    private Long objectId;
+    private String objectType;
 }

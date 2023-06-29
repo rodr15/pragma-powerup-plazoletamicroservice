@@ -26,5 +26,6 @@ public class RestaurantEntity {
     private String urlLogo;
     private String nit;
     private Set<String> employees;
+    @Enumerated(EnumType.STRING)
     private RestaurantState state;
 }

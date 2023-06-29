@@ -102,7 +102,7 @@ public class RestaurantHandlerImpl implements IRestaurantHandler {
 
     @Override
     public void deleteRestaurant(Long userId, Long restaurantId) {
-        restaurantServicePort.deleteRestaurant(userId,restaurantId);
+        restaurantServicePort.requestDeleteRestaurant(userId,restaurantId);
     }
 
 }

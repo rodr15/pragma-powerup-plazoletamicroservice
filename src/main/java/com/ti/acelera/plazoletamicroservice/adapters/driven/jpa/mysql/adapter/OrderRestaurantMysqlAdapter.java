@@ -112,4 +112,9 @@ public class OrderRestaurantMysqlAdapter implements IOrderRestaurantPersistenceP
         List<OrderStatus> statusList = List.of(OrderStatus.FINISHED_ORDER , OrderStatus.CANCELED_ORDER);
         return orderRestaurantRepository.existsOrderByRestaurantIdAndStatusNotIn( restaurantId, statusList );
     }
+
+    @Override
+    public void deleteAllOrderRestaurant(List<OrderRestaurant> orderRestaurantList) {
+        orderRestaurantRepository.deleteAll( orderRestaurantList.stream().map(orderEntityMapper::toOrderEntity).toList() );
+    }
 }
