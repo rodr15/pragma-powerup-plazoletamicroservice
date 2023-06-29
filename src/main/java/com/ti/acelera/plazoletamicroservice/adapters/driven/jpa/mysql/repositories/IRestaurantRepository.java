@@ -2,13 +2,16 @@ package com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.repositor
 
 
 import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.entity.RestaurantEntity;
+import com.ti.acelera.plazoletamicroservice.domain.model.RestaurantState;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface IRestaurantRepository extends JpaRepository<RestaurantEntity, Long> {
     @Query("SELECT r FROM RestaurantEntity r WHERE FIND_IN_SET(:employeeId, r.employees) >= 0")
     Optional<RestaurantEntity> findRestaurantsByEmployeeId(@Param("employeeId") String employeeId);
+    List<RestaurantEntity> findRestaurantsByState(RestaurantState restaurantState);
 }

@@ -16,10 +16,10 @@ public interface IOrderRestaurantPersistencePort {
     Page<OrderRestaurant> getOrdersList(Long restaurantId, OrderStatus state, int page, int size);
     List<OrderRestaurant> getOrdersList(Long restaurantId);
     List<OrderRestaurant> getOrdersListWithStatus(Long restaurantId,OrderStatus orderStatus);
-    boolean hasUnfinishedOrders( Long clientId );
+    boolean clientHasUnfinishedOrders(Long clientId );
     OrderRestaurant createNewOrder(OrderRestaurant orderRestaurant);
-
     Optional<OrderRestaurant> getOrderById(Long orderId);
-
     OrderRestaurant saveOrderRestaurant(OrderRestaurant orderRestaurant);
+    boolean restaurantHasUnfinishedOrders(Long restaurantId );
+    void  deleteAllOrderRestaurant (List<OrderRestaurant> orderRestaurantList);
 }

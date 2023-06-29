@@ -29,5 +29,6 @@ public interface IRestaurantHandler {
     List<Traceability> historyOrder(Long userId, Long orderId);
     RestaurantStatistics restaurantStatistics(Long userId, Long restaurantId);
     List<CategoryAveragePrice> dishCategoryAveragePrice(Long userId, Long restaurantId);
+    void deleteRestaurant(Long userId,Long restaurantId);
 
 }

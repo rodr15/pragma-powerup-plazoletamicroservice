@@ -10,10 +10,13 @@ import com.ti.acelera.plazoletamicroservice.domain.spi.IDishOrderPersistencePort
 import com.ti.acelera.plazoletamicroservice.domain.spi.IDishPersistencePort;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IOrderRestaurantPersistencePort;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IRestaurantPersistencePort;
+import com.ti.acelera.plazoletamicroservice.domain.transactions.DeleteRestaurantsTransaction;
 import com.ti.acelera.plazoletamicroservice.domain.utils.PhoneNumberUtils;
 import com.ti.acelera.plazoletamicroservice.domain.utils.RandomVerificationCode;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.scheduling.annotation.Scheduled;
+
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -31,6 +34,7 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     private final IUserClient userClient;
     private final ITraceabilityClient traceabilityClient;
     private final ISmsClient smsClient;
+    private final DeleteRestaurantsTransaction transaction;
 
 
     @Override
@@ -156,14 +160,16 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     @Override
     public Long makeOrder(OrderRestaurant orderRestaurant) {
 
-        if (orderRestaurantPersistencePort.hasUnfinishedOrders(orderRestaurant.getIdClient())) {
+        if (orderRestaurantPersistencePort.clientHasUnfinishedOrders(orderRestaurant.getIdClient())) {
             throw new ThisClientHasUnfinishedOrdersException();
         }
 
-        if (!restaurantPersistencePort.restaurantExists(orderRestaurant.getRestaurant().getId())) {
+        Restaurant restaurant = restaurantPersistencePort.getRestaurant(orderRestaurant.getRestaurant().getId())
+                .orElseThrow(RestaurantNotExistsException::new);
+
+        if (restaurant.getState().equals(RestaurantState.PENDING_DELETE)) {
             throw new RestaurantNotExistsException();
         }
-
 
         List<Long> dishIds = orderRestaurant.getDishes()
                 .stream()
@@ -325,6 +331,26 @@ public class RestaurantUseCase implements IRestaurantServicePort {
 
         return dishPersistencePort.dishCategoryAveragePrice(restaurantId);
     }
+
+    @Override
+    public void requestDeleteRestaurant(Long userId, Long restaurantId) {
+
+        Restaurant restaurant = restaurantPersistencePort.getRestaurant(restaurantId)
+                .orElseThrow(RestaurantNotExistsException::new);
+
+        restaurant.setState(RestaurantState.PENDING_DELETE);
+        restaurantPersistencePort.saveRestaurant(restaurant);
+
+    }
+
+    @Scheduled(cron = "*/10 * * * * *")
+    public void cleanUpRestaurants() {
+        List<Restaurant> restaurants = restaurantPersistencePort.getAllRestaurantsByState(RestaurantState.PENDING_DELETE);
+        for (Restaurant restaurant : restaurants) {
+            transaction.deleteRestaurant(restaurant);
+        }
+    }
+
 
 
 }

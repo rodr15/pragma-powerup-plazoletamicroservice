@@ -76,7 +76,7 @@ public class OrderRestaurantMysqlAdapter implements IOrderRestaurantPersistenceP
     }
 
     @Override
-    public boolean hasUnfinishedOrders(Long clientId) {
+    public boolean clientHasUnfinishedOrders(Long clientId) {
         List<OrderRestaurantEntity> unfinishedOrders  = orderRestaurantRepository.findByIdClientAndOrderStatusNotIn( clientId, List.of(OrderStatus.FINISHED_ORDER , OrderStatus.CANCELED_ORDER) );
         return !unfinishedOrders.isEmpty();
     }
@@ -105,5 +105,16 @@ public class OrderRestaurantMysqlAdapter implements IOrderRestaurantPersistenceP
     public OrderRestaurant saveOrderRestaurant(OrderRestaurant orderRestaurant) {
         OrderRestaurantEntity savedOrderRestaurant =  orderRestaurantRepository.save( orderEntityMapper.toOrderEntity(orderRestaurant) );
         return orderEntityMapper.toOrder(savedOrderRestaurant);
+    }
+
+    @Override
+    public boolean restaurantHasUnfinishedOrders(Long restaurantId) {
+        List<OrderStatus> statusList = List.of(OrderStatus.FINISHED_ORDER , OrderStatus.CANCELED_ORDER);
+        return orderRestaurantRepository.existsOrderByRestaurantIdAndStatusNotIn( restaurantId, statusList );
+    }
+
+    @Override
+    public void deleteAllOrderRestaurant(List<OrderRestaurant> orderRestaurantList) {
+        orderRestaurantRepository.deleteAll( orderRestaurantList.stream().map(orderEntityMapper::toOrderEntity).toList() );
     }
 }

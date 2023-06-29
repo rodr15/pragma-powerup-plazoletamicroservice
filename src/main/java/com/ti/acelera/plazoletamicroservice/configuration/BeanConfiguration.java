@@ -21,6 +21,7 @@ import com.ti.acelera.plazoletamicroservice.domain.spi.IDishOrderPersistencePort
 import com.ti.acelera.plazoletamicroservice.domain.spi.IDishPersistencePort;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IOrderRestaurantPersistencePort;
 import com.ti.acelera.plazoletamicroservice.domain.spi.IRestaurantPersistencePort;
+import com.ti.acelera.plazoletamicroservice.domain.transactions.DeleteRestaurantsTransaction;
 import com.ti.acelera.plazoletamicroservice.domain.usecase.DishUseCase;
 import com.ti.acelera.plazoletamicroservice.domain.usecase.RestaurantUseCase;
 import lombok.RequiredArgsConstructor;
@@ -49,14 +50,25 @@ public class BeanConfiguration {
         return new OrderRestaurantMysqlAdapter(orderRestaurantRepository, orderEntityMapper, dishOrderRepository, dishOrderEntityMapper);
     }
     @Bean
+    public DeleteRestaurantsTransaction transaction(IRestaurantPersistencePort restaurantPersistencePort,
+                                                        IDishPersistencePort dishPersistencePort,
+                                                        IOrderRestaurantPersistencePort orderRestaurantPersistencePort,
+                                                        IDishOrderPersistencePort dishOrderPersistencePort,
+                                                        ITraceabilityClient traceabilityClient
+                                                        ){
+        return new DeleteRestaurantsTransaction(restaurantPersistencePort, dishPersistencePort, orderRestaurantPersistencePort, dishOrderPersistencePort, traceabilityClient);
+    }
+
+    @Bean
     public IRestaurantServicePort restaurantServicePort(IRestaurantPersistencePort restaurantPersistencePort,
                                                         IDishPersistencePort dishPersistencePort,
                                                         IOrderRestaurantPersistencePort orderRestaurantPersistencePort,
                                                         IDishOrderPersistencePort dishOrderPersistencePort,
                                                         IUserClient userClient,
-                                                         ITraceabilityClient traceabilityClient,
-                                                        ISmsClient smsClient){
-        return new RestaurantUseCase(restaurantPersistencePort, dishPersistencePort, orderRestaurantPersistencePort, dishOrderPersistencePort, userClient,traceabilityClient,smsClient);
+                                                        ITraceabilityClient traceabilityClient,
+                                                        ISmsClient smsClient,
+                                                        DeleteRestaurantsTransaction transaction){
+        return new RestaurantUseCase(restaurantPersistencePort, dishPersistencePort, orderRestaurantPersistencePort, dishOrderPersistencePort, userClient,traceabilityClient,smsClient,transaction);
     }
     @Bean
     public IDishPersistencePort dishPersistencePort(IDishRepository dishRepository, IDishEntityMapper dishEntityMapper, ICategoryEntityMapper categoryEntityMapper){

@@ -20,6 +20,5 @@ public class Restaurant {
     private String urlLogo;
     private String nit;
     private Set<String> employees;
-
-
+    private RestaurantState state;
 }

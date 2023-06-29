@@ -171,5 +171,14 @@ public class RestaurantRestController {
         return ResponseEntity.ok(restaurantHandler.dishCategoryAveragePrice(parseLong(userId),restaurantId));
 
     }
+    @SecurityRequirement(name = "jwt")
+    @GetMapping("/delete")
+    public ResponseEntity<Map<String,String>> delete(@RequestAttribute("userId") String userId,
+                                                             @RequestParam(defaultValue = "1") Long restaurantId) {
 
+        restaurantHandler.deleteRestaurant(parseLong(userId),restaurantId);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.ORDER_CANCELED_MESSAGE));
+
+    }
 }

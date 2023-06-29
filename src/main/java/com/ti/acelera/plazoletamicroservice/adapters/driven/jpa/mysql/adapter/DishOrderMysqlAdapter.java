@@ -1,5 +1,6 @@
 package com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.adapter;
 
+import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.entity.DishOrderEntity;
 import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.mappers.IDishOrderEntityMapper;
 import com.ti.acelera.plazoletamicroservice.adapters.driven.jpa.mysql.repositories.IDishOrderRepository;
 import com.ti.acelera.plazoletamicroservice.domain.model.DishOrder;
@@ -20,5 +21,11 @@ public class DishOrderMysqlAdapter implements IDishOrderPersistencePort {
                 .stream()
                 .map( dishOrderEntityMapper::toDishOrder )
                 .toList();
+    }
+
+    @Override
+    public void deleteAllDishOrder(List<DishOrder> dishOrderList) {
+        List<DishOrderEntity> dishOrderEntityList = dishOrderList.stream().map(dishOrderEntityMapper::toDishOrderEntity).toList();
+        dishOrderRepository.deleteAll(dishOrderEntityList);
     }
 }
