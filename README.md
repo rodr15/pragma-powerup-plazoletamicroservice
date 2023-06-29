@@ -1,3 +1,4 @@
+
 # Plazoleta Microservice
 
 This is a microservice called "Plazoleta" developed with Java 17, Spring Boot, Gradle, and MySQL. The microservice is designed to manage restaurants and orders in a food court.
